@@ -1,3 +1,4 @@
+from typing import List
 import numpy as np
 import sympy as sym
 #from sympy.geometry import *
@@ -7,20 +8,41 @@ from sympy.plotting import plot_parametric
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
+class GeometryScene:
+    plt.clf()
 
-plt.figure(figsize=(12,9))
-ax_2d = plt.subplot(121)
-ax_2d.set(ylabel=(r'<-x | z ->'))
+    plt.figure(figsize=(12,9))
+    ax_2d = plt.subplot(121)
+    ax_2d.set(ylabel=(r'<-x | z ->'))
 
-plt.xlim(0, 16)
-plt.ylim(-12, 12)
+    plt.xlim(0, 16)
+    plt.ylim(-12, 12)
 
-ax_3d = plt.subplot(122, projection='3d')
+    ax_3d = plt.subplot(122, projection='3d')
 
-plt.xlim(0, 10)
-plt.ylim(0, 10)
-ax_3d.set_zlim(0, 10)
-plt.tight_layout()
+    plt.xlim(0, 10)
+    plt.ylim(0, 10)
+    ax_3d.set_zlim(0, 10)
+    plt.tight_layout()
+    
+    def __init__(self):
+
+        plt.figure(figsize=(12,9))
+        ax_2d = plt.subplot(121)
+        ax_2d.set(ylabel=(r'<-x | z ->'))
+
+        plt.xlim(0, 16)
+        plt.ylim(-12, 12)
+
+        ax_3d = plt.subplot(122, projection='3d')
+
+        plt.xlim(0, 10)
+        plt.ylim(0, 10)
+        ax_3d.set_zlim(0, 10)
+        plt.tight_layout()  
+
+        self.__class__.ax_2d=ax_2d 
+        self.__class__.ax_3d=ax_3d 
 
 
 
@@ -63,6 +85,9 @@ def intersection(method):
 
 
 class Entity:
+
+
+
     '''
     Parent class
     '''
@@ -112,6 +137,8 @@ class Entity:
         self.__marker = marker
         self.__style = style
         self.__fmt = fmt
+
+
 
 
         
@@ -173,12 +200,14 @@ class Entity:
         style='-',
         text=None,
         fontsize=20,
-        scene=ax_3d,
+        scene=GeometryScene.ax_3d,
     ):
         '''
         Set the coordinates of the points with the text explanation 
         Return: Line with the text that presents the actual point on the chosen plane
         '''
+
+        scene = GeometryScene.ax_3d   
 
         if fmt is None:
             fmt = self.__fmt
@@ -194,7 +223,6 @@ class Entity:
         scene.plot(points_cooridinates['x'],
                    points_cooridinates['y'],
                    points_cooridinates['z'],
-                   fmt,
                    linestyle=style,
                    color=color,
                    marker=marker)
@@ -215,12 +243,14 @@ class Entity:
         style='-',
         text=None,
         fontsize=20,
-        scene=ax_2d,
+        scene=GeometryScene.ax_2d,
     ):
         '''
         Set the coordinates of the points with the text explanation         
         Return: Line with the text that presents the actual point on the chosen plane
         '''
+
+        scene = GeometryScene.ax_2d
 
         if fmt is None:
             fmt = self.__fmt
@@ -235,7 +265,6 @@ class Entity:
         points_cooridinates['x'] = -np.asarray(points_cooridinates['x'])
         scene.plot(points_cooridinates['y'],
                    points_cooridinates['x'],
-                   fmt,
                    linestyle=style,
                    color=color,
                    marker=marker)
@@ -256,12 +285,13 @@ class Entity:
         style='-',
         text=None,
         fontsize=20,
-        scene=ax_2d,
+        scene=GeometryScene.ax_2d,
     ):
         '''
         Set the coordinates of the points with the text explanation 
         Return: Line with the text that presents the actual point on the chosen plane
         '''
+        scene = GeometryScene.ax_2d
 
         if fmt is None:
             fmt = self.__fmt
@@ -274,9 +304,27 @@ class Entity:
 
         points_cooridinates = self._generating_points()
 
+        # plt.figure(figsize=(12,9))
+        # ax_2d = plt.subplot(121)
+        # ax_2d.set(ylabel=(r'<-x | z ->'))
+
+        
+
+        # plt.xlim(0, 16)
+        # plt.ylim(-12, 12)
+
+        # ax_3d = plt.subplot(122, projection='3d')
+
+        # plt.xlim(0, 10)
+        # plt.ylim(0, 10)
+        # ax_3d.set_zlim(0, 10)
+        # plt.tight_layout()
+
+        # scene=ax_2d
+
+
         scene.plot(points_cooridinates['y'],
                    points_cooridinates['z'],
-                   fmt,
                    linestyle=style,
                    color=color,
                    marker=marker)
@@ -291,7 +339,7 @@ class Entity:
 
     def draw_projection(self,
                         projection_name='frontal',
-                        scene=ax_2d,
+                        scene=GeometryScene.ax_2d,
                         marker=None,
                         style='-',
                         color=None,
@@ -310,7 +358,6 @@ class Entity:
         scene.plot(points_cooridinates['x'],
                    points_cooridinates['y'],
                    points_cooridinates['z'],
-                   fmt,
                    linestyle=style,
                    color=color,
                    marker=marker)
@@ -426,7 +473,7 @@ class Point(Entity):
 
     def __truediv__(self,divisor):
         
-        result=self._geo_ref.__div__(divisor)
+        result=self._geo_ref.__truediv__(divisor)
         return entity_convert(result)       
     
     
@@ -524,3 +571,25 @@ class Plane(Entity):
     
     def perpendicular_plane(self, p):
         return entity_convert(self._geo_ref.perpendicular_plane(p._geo_ref))
+
+
+
+class DrawingSet(Entity,list):
+    def __init__(self,*entities,scene=None):
+        super(list,self).__init__()
+
+    def plot(
+        self,
+        fmt=None,
+        marker=None,
+        color=None,
+        style='-',
+        text=None,
+        fontsize=20,
+        scene=GeometryScene.ax_3d,
+        ):
+
+        for elem in self:
+            elem.plot(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
+
+        return scene
