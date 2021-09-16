@@ -8,6 +8,14 @@ from sympy.plotting import plot_parametric
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
+
+import random
+import base64
+import random
+import IPython as IP
+import numpy as np
+from sympy import Symbol
+
 class GeometryScene:
     plt.clf()
 
@@ -577,6 +585,9 @@ class Plane(Entity):
 class DrawingSet(Entity,list):
     def __init__(self,*entities,scene=None):
         super(list,self).__init__()
+        super(Entity,self).__init__()
+
+        self += list(entities)
 
     def plot(
         self,
@@ -593,3 +604,291 @@ class DrawingSet(Entity,list):
             elem.plot(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
 
         return scene
+
+    def plot_hp(
+        self,
+        fmt=None,
+        marker=None,
+        color=None,
+        style='-',
+        text=None,
+        fontsize=20,
+        scene=GeometryScene.ax_2d,
+        ):
+
+        for elem in self:
+            elem.plot_hp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
+
+        return scene
+
+    def plot_vp(
+        self,
+        fmt=None,
+        marker=None,
+        color=None,
+        style='-',
+        text=None,
+        fontsize=20,
+        scene=GeometryScene.ax_2d,
+        ):
+
+        for elem in self:
+            elem.plot_vp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
+
+        return scene
+
+
+
+
+
+
+class GeometricalCase(DrawingSet):
+
+    scheme_name = 'abs.png'
+    real_name = 'abs.png'
+
+    @classmethod
+    def _scheme(cls):
+
+        path = __file__.replace('dgeometry.py', 'images/') + cls.scheme_name
+        path = './images/' + cls.scheme_name
+
+        return path
+
+    @classmethod
+    def _real_example(cls):
+
+        path = __file__.replace('dgeometry.py', 'images/') + cls.real_name
+        path = './images/' + cls.real_name
+
+
+        return path
+
+
+
+
+    @classmethod
+    def preview(cls, example=False):
+        if example:
+            path = cls._real_example()
+
+        else:
+            path = cls._scheme()
+
+        with open(f"{path}", "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+        image_file.close()
+
+        return IP.display.Image(base64.b64decode(encoded_string))
+
+
+    @classmethod
+    def from_random_data(cls):
+        new_obj = cls()
+        data_set=new_obj.get_random_parameters()
+        
+        entities = [point(str(label))  for label,point in data_set.items()]
+        print(entities)
+        return cls(*entities)
+
+    def __init__(self,*assumptions,**kwargs):
+        self._assumptions=DrawingSet(*assumptions)
+        self._given_data=None
+
+    def plot(
+        self,
+        fmt=None,
+        marker=None,
+        color=None,
+        style='-',
+        text=None,
+        fontsize=20,
+        scene=GeometryScene.ax_3d,
+        ):
+
+        print(type(self._assumptions))
+        print(self._assumptions)
+
+        self._assumptions.plot(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
+
+        return copy.deepcopy(self)
+
+    def plot_hp(
+        self,
+        fmt=None,
+        marker=None,
+        color=None,
+        style='-',
+        text=None,
+        fontsize=20,
+        scene=GeometryScene.ax_2d,
+        ):
+
+        self._assumptions.plot_hp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
+
+        
+
+        return copy.deepcopy(self)
+
+    def plot_vp(
+        self,
+        fmt=None,
+        marker=None,
+        color=None,
+        style='-',
+        text=None,
+        fontsize=20,
+        scene=GeometryScene.ax_3d,
+        ):
+
+        self._assumptions.plot_vp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
+
+        return copy.deepcopy(self)
+
+    def solution(self):
+
+        A = self._assumptions[0]
+        CA = self._assumptions[1]
+        OA = self._assumptions[2]
+ 
+
+        xshift,yshift,zshift = 0,0,0
+        #print(counter)
+
+        A=Point(A.x,A.y,A.z)('A',marker='o').plot('ko').plot_hp('go').plot_vp('go')
+        O=(A+OA)('O',marker='o').plot('ko').plot_hp('go').plot_vp('go')
+        C=(A+CA)('C',marker='o').plot('ko').plot_hp('go').plot_vp('go') 
+        #D=(A+Point(4,3,4))('D',marker='o').plot('ko').plot_hp('go').plot_vp('go')
+        G=(A+Point(-4,3,-1))('D',marker='o')#.plot('ko').plot_hp('go').plot_vp('go')
+
+        HPP_A = Plane(A,A+Point(0,1,0),A+Point(1,0,0)  )
+        VPP_A = Plane(A,A+Point(0,1,0),A+Point(0,0,1)  )
+
+        
+
+        # A=Point(0,0,0)('A')
+        # B=Point(A.x+2,A.y+1,A.z+3)('B')
+        # C=Point(4,3,5)('C')
+        E=Point(4,4,5)('E')
+        F=Point(3,3,5)('F')
+
+
+        #B._geo_ref
+        a=Line(A,O)('a')
+        b=Line(O,C)('b')
+
+        P1=(A @ b)('1',marker='o').plot('ko').plot_hp('go').plot_vp('go') 
+        
+        
+        
+        alpha=Plane(A,O,C)
+
+        #alpha.intersection(Plane(E,F,A))[0]
+
+        e=Line(E,F)
+        e.projection(Line(A,O))
+
+        alpha.projection(e)
+
+        c = alpha.perpendicular_line(A)
+        # c('nn',marker='o').plot().plot_hp().plot_vp()
+
+        # (alpha & HPP_A)[0]('go',marker='o').plot().plot().plot_hp().plot_vp()
+        # (alpha & VPP_A)[0]('go',marker='o').plot().plot().plot_hp().plot_vp()
+
+        #(e @ VPP)('A',marker='o').plot().plot_hp().plot_vp()
+        # Plane(A._geo_ref,B._geo_ref,C._geo_ref).projection_line(Line(E._geo_ref,F._geo_ref))
+        # Line(E._geo_ref,F._geo_ref).projection(Line(A._geo_ref,B._geo_ref))
+        #dg2.entity_convert(alpha.intersection(dg2.Line(A,B))[0])
+
+        # Line(A,B)('a',marker='o').plot().plot_hp().plot_vp()
+
+
+        # B1=Point(A.x,(A.y+(B@HPP).distance(A@HPP)),B.z,evaluate=True)('B1',marker='o').plot().plot_hp().plot_vp()
+        # B1.n()
+        # B1.distance(A).n(),B.distance(A)
+
+        # (B1.x.n(),B1.y.n(),B1.z.n())
+
+
+        # Line(D,C-A+D  )('e').plot().plot_hp().plot_vp()
+        # Line(D,B-A+D  )('f').plot().plot_hp().plot_vp()
+        M = (O @ (Line(A,C)))('M',marker='o').plot().plot_hp().plot_vp()
+        
+        Q=G @ alpha
+        Q('Q',marker='o')#.plot_hp().plot_vp()
+
+        S=(A+(C-A)*0.5)
+        
+        B=(S+((M^O).direction()/M.distance(O))*(A.distance(S)).n())('B',marker='o').plot().plot_hp().plot_vp()
+        D=(S+((M^O).direction()/M.distance(O))*(-A.distance(S)).n())('D',marker='o').plot().plot_hp().plot_vp()
+        #C=(M+((M^O).direction()/M.distance(O))*(A.distance(M))*(-sqrt(3)/3).n())
+        
+    #     H=(A+((P^D).direction()/D.distance(P))*(A.distance(F))*(-1))
+    #     H('H',marker='o').plot().plot_hp().plot_vp()
+        
+        W=(C+((Q^G).direction()/G.distance(Q))*(A.distance(B))*(-1))
+        W('W',marker='o').plot().plot_hp().plot_vp()
+        
+        (W @ alpha)('W_test',marker='o').plot().plot_hp().plot_vp()
+        
+        A, c@alpha
+
+        Line(A,B)(marker='o').plot().plot_hp().plot_vp()
+        Line(A,D)(marker='o').plot().plot_hp().plot_vp()
+        Line(B,C)(marker='o').plot().plot_hp().plot_vp()
+        Line(C,D)(marker='o').plot().plot_hp().plot_vp()
+        
+        
+        Line(A,W)(marker='o').plot().plot_hp().plot_vp()
+        Line(B,W)(marker='o').plot().plot_hp().plot_vp()
+        Line(C,W)(marker='o').plot().plot_hp().plot_vp()
+
+        new_obj = copy.deepcopy(self)
+
+        new_obj._solution_dict=({'Ax':A.x,'Ay':A.y,'Az':A.z,'Bx':B.x.n(4),'By':B.y.n(4),
+                            'Bz':B.z.n(4),'Cx':C.x,'Cy':C.y,'Cz':C.z,'Dx':D.x.n(4),'Dy':D.y.n(4),
+                            'Dz':D.z.n(4),'Wx':W.x.n(4),'Wy':W.y.n(4),'Wz':W.z.n(4),
+                            'Ox':O.x,'Oy':O.y,'Oz':O.z})
+
+        new_obj._all_points = DrawingSet(A,B,C,D,W)
+
+        return new_obj
+
+    def get_default_data(self):
+
+        
+
+        default_data_dict = {
+            Symbol('A'): [Point(4,5,8),Point(4,6,8),Point(5,10,8),Point(6,10,8),Point(7,10,8),Point(8,10,8),Point(-1,10,8),Point(3,10,8)],
+            Symbol('C'): [Point(2,-4,-1),Point(1,-4,-2),Point(2,-5,-1),],
+            Symbol('O'): [Point(1,-5,2),Point(0,-5,1),],
+        }
+        return default_data_dict
+
+    def get_random_parameters(self):
+
+
+
+        default_data_dict = self.get_default_data()
+
+        parameters_dict = {
+            key: random.choice(items_list)
+            for key, items_list in default_data_dict.items()
+            }
+          
+        return parameters_dict
+    
+    def subs(self,*args,**kwargs):
+        if len(args)>0:
+            data_set=args[0]
+            entities = [point(str(label))  for label,point in data_set.items()]
+
+            new_obj=self.__class__(*entities)
+            new_obj._given_data=args[0]
+
+        else:
+            new_obj = copy.deepcopy(self)
+        return new_obj
+        
+        
