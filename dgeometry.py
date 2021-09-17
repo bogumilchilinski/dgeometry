@@ -651,7 +651,7 @@ class GeometricalCase(DrawingSet):
     def _scheme(cls):
 
         path = __file__.replace('dgeometry.py', 'images/') + cls.scheme_name
-        path = './images/' + cls.scheme_name
+        #path = './images/' + cls.scheme_name
 
         return path
 
@@ -659,7 +659,7 @@ class GeometricalCase(DrawingSet):
     def _real_example(cls):
 
         path = __file__.replace('dgeometry.py', 'images/') + cls.real_name
-        path = './images/' + cls.real_name
+        #path = './images/' + cls.real_name
 
 
         return path
