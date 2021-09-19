@@ -747,9 +747,86 @@ class GeometricalCase(DrawingSet):
 
     def solution(self):
 
-        A = self._assumptions[0]
-        CA = self._assumptions[1]
-        OA = self._assumptions[2]
+        new_obj = copy.deepcopy(self)
+
+        return new_obj
+
+    def get_default_data(self):
+
+        
+
+        return None
+
+    def get_random_parameters(self):
+
+        default_data_dict = self.get_default_data()
+
+
+        
+        if default_data_dict:
+            parameters_dict = {
+                key: random.choice(items_list)
+                for key, items_list in default_data_dict.items()
+            }
+        else:
+            parameters_dict=None
+
+        return parameters_dict
+    
+    def subs(self,*args,**kwargs):
+        if len(args)>0:
+            data_set=args[0]
+            entities = [point(str(label))  for label,point in data_set.items()]
+
+            new_obj=self.__class__(*entities)
+            new_obj._given_data=args[0]
+
+        else:
+            new_obj = copy.deepcopy(self)
+        return new_obj
+        
+class PyramidWithSquareBaseFromDiagonalAndPoint(GeometricalCase):
+
+    scheme_name = 'abs.png'
+    real_name = 'abs.png'
+
+ 
+
+
+    # @classmethod
+    # def from_random_data(cls):
+    #     new_obj = cls()
+    #     data_set=new_obj.get_random_parameters()
+        
+    #     entities = [point(str(label))  for label,point in data_set.items()]
+    #     print(entities)
+    #     return cls(*entities)
+
+    def __init__(self,point_A,distance_CA,distance_OA,top_projection=None,relative_height=1,**kwargs):
+        self._assumptions=DrawingSet(point_A,distance_CA,distance_OA)
+        self._given_data=None
+
+        self._point_A=point_A
+        self._distance_CA=distance_CA
+        self._distance_OA=distance_OA
+
+        if top_projection:
+            self._top_projection= top_projection
+        else:
+            self._top_projection = self._point_A
+        
+        self._relative_height = relative_height
+
+
+
+    def solution(self):
+
+        A = self._point_A
+        CA = self._distance_CA
+        OA = self._distance_OA
+
+        relative_h = self._relative_height
+        W_projection = self._top_projection
  
 
         xshift,yshift,zshift = 0,0,0
@@ -866,29 +943,4 @@ class GeometricalCase(DrawingSet):
         }
         return default_data_dict
 
-    def get_random_parameters(self):
 
-
-
-        default_data_dict = self.get_default_data()
-
-        parameters_dict = {
-            key: random.choice(items_list)
-            for key, items_list in default_data_dict.items()
-            }
-          
-        return parameters_dict
-    
-    def subs(self,*args,**kwargs):
-        if len(args)>0:
-            data_set=args[0]
-            entities = [point(str(label))  for label,point in data_set.items()]
-
-            new_obj=self.__class__(*entities)
-            new_obj._given_data=args[0]
-
-        else:
-            new_obj = copy.deepcopy(self)
-        return new_obj
-        
-        
