@@ -647,21 +647,33 @@ class DrawingSet(Entity,list):
 
 class GeometricalCase(DrawingSet):
 
-    scheme_name = 'abs.png'
+    scheme_name = 'absxyz.png'
     real_name = 'abs.png'
 
-    @classmethod
-    def _scheme(cls):
+    
+    def _scheme(self):
 
-        path = __file__.replace('dgeometry.py', 'images/') + cls.scheme_name
+        GeometryScene()
+
+        self._assumptions.plot()
+        self._assumptions.plot_hp()
+        self._assumptions.plot_vp()
+
+        path = __file__.replace('dgeometry.py', 'images/') + self.__class__.scheme_name
+
+        plt.savefig(path)
+
+        plt.close()
+
+        # path = __file__.replace('dgeometry.py', 'images/') + self.__class__.scheme_name
         #path = './images/' + cls.scheme_name
 
         return path
 
-    @classmethod
-    def _real_example(cls):
 
-        path = __file__.replace('dgeometry.py', 'images/') + cls.real_name
+    def _real_example(self):
+
+        path = __file__.replace('dgeometry.py', 'images/') + self.__class__.real_name
         #path = './images/' + cls.real_name
 
 
@@ -678,20 +690,11 @@ class GeometricalCase(DrawingSet):
         # else:
         #     path = cls._scheme()
 
-        GeometryScene()
 
-        self._assumptions.plot()
-        self._assumptions.plot_hp()
-        self._assumptions.plot_vp()
 
-        path  = './images/abcd.png'
+        path  = self._scheme()
 
-        plt.savefig(path)
-        print('check'*100)
 
-        plt.show()
-        print('check'*100)
-        plt.close()
 
         with open(f"{path}", "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
