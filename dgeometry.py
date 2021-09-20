@@ -15,6 +15,7 @@ import random
 import IPython as IP
 import numpy as np
 from sympy import Symbol
+import copy
 
 class GeometryScene:
     plt.clf()
@@ -126,11 +127,11 @@ class Entity:
 #     plt.tight_layout()
 
     def __init__(self,
-                 coding_points,
+                 coding_points=None,
                  label=None,
                  fmt='b',
                  color=None,
-                 marker=None,
+                 marker='o',
                  style='-',
                  *args,
                  **kwargs):
@@ -141,10 +142,10 @@ class Entity:
         self.__coding_points = coding_points
         self.__label = label
         self.__color = color
-        self.__text = text
+        self.__text = None
         self.__marker = marker
         self.__style = style
-        self.__fmt = fmt
+        self.__fmt = None
 
 
 
@@ -155,7 +156,7 @@ class Entity:
                  label=None,
                  fmt='b',
                  color=None,
-                 marker=None,
+                 marker='o',
                  style='-',
                  text=None,
                  *args,
@@ -423,6 +424,7 @@ class Point(Entity):
     """
     
     def __init__(self,*args,**kwargs):
+        super().__init__()
         self._geo_ref =  geo.Point3D(*args,**kwargs)     #geometrical reference
 
     def _coding_points(self):
@@ -497,6 +499,7 @@ class Line(Entity):
     """
 
     def __init__(self, p1, p2, **kwargs):
+        super().__init__()
         self._geo_ref = geo.Line3D(p1=p1._geo_ref,pt=p2._geo_ref,**kwargs)
 
 #     def __repr__(self):
@@ -546,7 +549,7 @@ class Plane(Entity):
     
     
     def __init__(self,p1, a=None, b=None, **kwargs):
-
+        super().__init__()
         self._geo_ref = geo.Plane(p1=p1._geo_ref, a=a._geo_ref, b=b._geo_ref, **kwargs)
         self._p2=a
         self._p3=b
@@ -667,13 +670,28 @@ class GeometricalCase(DrawingSet):
 
 
 
-    @classmethod
-    def preview(cls, example=False):
-        if example:
-            path = cls._real_example()
+    
+    def preview(self, example=False):
+        # if example:
+        #     path = cls._real_example()
 
-        else:
-            path = cls._scheme()
+        # else:
+        #     path = cls._scheme()
+
+        GeometryScene()
+
+        self._assumptions.plot()
+        self._assumptions.plot_hp()
+        self._assumptions.plot_vp()
+
+        path  = './images/abcd.png'
+
+        plt.savefig(path)
+        print('check'*100)
+
+        plt.show()
+        print('check'*100)
+        plt.close()
 
         with open(f"{path}", "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
