@@ -22,15 +22,22 @@ class GeometryScene:
 
     plt.figure(figsize=(12,9))
     ax_2d = plt.subplot(121)
-    ax_2d.set(ylabel=(r'<-x | z ->'))
+    ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='x')
 
     plt.xlim(0, 16)
     plt.ylim(-12, 12)
+    
+    ax_2d.set_yticks(  range(-12,12,2) )
+    ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
 
     ax_3d = plt.subplot(122, projection='3d')
+    ax_3d.view_init(30,10)
+    ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
 
     plt.xlim(0, 10)
     plt.ylim(0, 10)
+    
+    
     ax_3d.set_zlim(0, 10)
     plt.tight_layout()
     
@@ -38,16 +45,21 @@ class GeometryScene:
 
         plt.figure(figsize=(12,9))
         ax_2d = plt.subplot(121)
-        ax_2d.set(ylabel=(r'<-x | z ->'))
+        ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='x')
 
         plt.xlim(0, 16)
         plt.ylim(-12, 12)
+        
+        ax_2d.set_yticks(  range(-12,12,2) )
+        ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
 
         ax_3d = plt.subplot(122, projection='3d')
+        ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
 
         plt.xlim(0, 10)
         plt.ylim(0, 10)
         ax_3d.set_zlim(0, 10)
+        ax_3d.view_init(30,10)
         plt.tight_layout()  
 
         self.__class__.ax_2d=ax_2d 
@@ -126,6 +138,8 @@ class Entity:
 #     ax_3d.set_zlim(0, 10)
 #     plt.tight_layout()
 
+    _at_symbol='@'
+
     def __init__(self,
                  coding_points=None,
                  label=None,
@@ -133,6 +147,7 @@ class Entity:
                  color=None,
                  marker='o',
                  style='-',
+                 projection=False,
                  *args,
                  **kwargs):
         '''
@@ -140,12 +155,13 @@ class Entity:
         Input: Coordinates of code points
         '''
         self.__coding_points = coding_points
-        self.__label = label
+        self._label = label
         self.__color = color
         self.__text = None
         self.__marker = marker
         self.__style = style
         self.__fmt = None
+        self._projection=projection
 
 
 
@@ -165,7 +181,7 @@ class Entity:
         The object allows to assign a variable symbol (letter)
         to the points in the plane
         """
-        self.__label = label
+        self._label = label
         self.__color = color
 
         self.__marker = marker
@@ -174,18 +190,27 @@ class Entity:
 
         return self
 
-    def _coding_points(self):
-        return [geo.Point3D(0,0,0)]
+#     def _coding_points(self):
+#         return [geo.Point3D(0,0,0)]
 
     def __repr__(self):
-        return self.__class__.__name__ +str(self._coding_points())
+        
+        
+        if self._label is None:
+            self._label = self.__class__.__name__#+' '+ str(self._coding_point())
+        
+        return self._label
     
     def __str__(self):
-        return self.__class__.__name__ +str(self._coding_points())    
+        
+        if self._label is None:
+            self._label = self.__class__.__name__
+        
+        return self._label
     
     @property
     def label(self):
-        return self.__label
+        return self._label
     
     
     def _generating_points(self):
@@ -222,13 +247,14 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self.__label
+            text = self._label
 
         if marker is None:
             marker = self.__marker
 
         points_cooridinates = self._generating_points()
 
+        
         scene.plot(points_cooridinates['x'],
                    points_cooridinates['y'],
                    points_cooridinates['z'],
@@ -265,24 +291,28 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self.__label
+            text = self._label
 
         if marker is None:
             marker = self.__marker
 
-        points_cooridinates = self._generating_points()
-        points_cooridinates['x'] = -np.asarray(points_cooridinates['x'])
-        scene.plot(points_cooridinates['y'],
-                   points_cooridinates['x'],
-                   linestyle=style,
-                   color=color,
-                   marker=marker)
-        scene.text(*[
-            sum(points_cooridinates[coord_name]) /
-            len(points_cooridinates[coord_name]) for coord_name in 'yx'
-        ],
-                   text,
-                   fontsize=fontsize)
+        print("plot_hp",self)
+        print(self._projection)
+            
+        if str(self)[-1]=="\'" and str(self)[-2]!="\'":
+            points_cooridinates = self._generating_points()
+            points_cooridinates['x'] = -np.asarray(points_cooridinates['x'])
+            scene.plot(points_cooridinates['y'],
+                       points_cooridinates['x'],
+                       linestyle=style,
+                       color=color,
+                       marker=marker)
+            scene.text(*[
+                sum(points_cooridinates[coord_name]) /
+                len(points_cooridinates[coord_name]) for coord_name in 'yx'
+            ],
+                       text,
+                       fontsize=fontsize)
 
         return self
 
@@ -306,7 +336,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self.__label
+            text = self._label
 
         if marker is None:
             marker = self.__marker
@@ -331,18 +361,18 @@ class Entity:
 
         # scene=ax_2d
 
-
-        scene.plot(points_cooridinates['y'],
-                   points_cooridinates['z'],
-                   linestyle=style,
-                   color=color,
-                   marker=marker)
-        scene.text(*[
-            sum(points_cooridinates[coord_name]) /
-            len(points_cooridinates[coord_name]) for coord_name in 'yz'
-        ],
-                   text,
-                   fontsize=fontsize)
+        if str(self)[-1]=="\'" and str(self)[-2]=="\'":
+            scene.plot(points_cooridinates['y'],
+                       points_cooridinates['z'],
+                       linestyle=style,
+                       color=color,
+                       marker=marker)
+            scene.text(*[
+                sum(points_cooridinates[coord_name]) /
+                len(points_cooridinates[coord_name]) for coord_name in 'yz'
+            ],
+                       text,
+                       fontsize=fontsize)
 
         return self
 
@@ -360,7 +390,7 @@ class Entity:
         '''
 
         if text is None:
-            text = self.__label
+            text = self._label
 
         points_cooridinates = self._generating_points()
 
@@ -393,8 +423,7 @@ class Entity:
 
         return new_result
 
-    def __matmul__(self, entity):
-        return self.entity_convert(entity.projection(self))
+
 
 #     def intersection(self, other):
 #         return [self.entity_convert(entry) for entry in other.intersection(self)]
@@ -407,10 +436,23 @@ class Entity:
         
         projection = self._geo_ref.projection(other._geo_ref)
 
-        return entity_convert(projection)
+        new_entity = entity_convert(projection)
+        
+        at=other.__class__._at_symbol
+        
+        new_entity._label= f'{self._label}{at}{other._label}'
+    
+        new_entity._projection=other
+    
+        return new_entity
     
     def __matmul__(self, entity):
-        return entity.projection(self)
+        new_obj = entity.projection(self)
+        at=entity.__class__._at_symbol
+        
+        new_obj._label= f'{self._label}{at}{entity._label}'
+        
+        return new_obj
     
     def __and__(self,o):
         return o.intersection(self)
@@ -450,11 +492,11 @@ class Point(Entity):
     def n(self):
         return (self._geo_ref.n())
     
-    def __repr__(self):
-        return self.__class__.__name__ +str(self._geo_ref.coordinates)
+#     def __repr__(self):
+#         return self.__class__.__name__ +str(self._geo_ref.coordinates)+str(self._label)
     
-    def __str__(self):
-        return self.__class__.__name__ +str(self._geo_ref.coordinates)
+#     def __str__(self):
+#         return self.__class__.__name__ +str(self._geo_ref.coordinates)+str(self._label)
         
 
     def distance(self,other):
@@ -499,6 +541,8 @@ class Line(Entity):
     """
 
     def __init__(self, p1, p2, **kwargs):
+        self.p1v=p1
+        self.p2v=p2
         super().__init__()
         self._geo_ref = geo.Line3D(p1=p1._geo_ref,pt=p2._geo_ref,**kwargs)
 
@@ -511,11 +555,11 @@ class Line(Entity):
     def _coding_points(self):
         return (self._geo_ref.p1,self._geo_ref.p2)
 
-    def __repr__(self):
-        return self.__class__.__name__ +str(self._coding_points())
+#     def __repr__(self):
+#         return self.__class__.__name__ +str(self._coding_points())
     
-    def __str__(self):
-        return self.__class__.__name__ +str(self._coding_points())
+#     def __str__(self):
+#         return self.__class__.__name__ +str(self._coding_points())
     
     def __xor__(self,other):
         if isinstance(other,geo.Point3D):
@@ -529,6 +573,12 @@ class Line(Entity):
     @property
     def direction(self):
         return entity_convert(self._geo_ref.direction)
+    @property
+    def p1(self):
+        return self.p1v
+    @property
+    def p2(self):
+        return self.p2v
     
 #     def intersection(self, other):
 #         common_part_line = self._geo_ref.intersection(other._geo_ref)
@@ -574,8 +624,13 @@ class Plane(Entity):
         elif isinstance(other,Line):
             projection = self._geo_ref.projection_line(other._geo_ref)            
             
-        #print(projection)
-        return entity_convert(projection)
+        new_obj=entity_convert(projection)
+        
+        at=self.__class__._at_symbol
+        
+        new_obj._label = f'{self._label}{at}{other._label}'
+        
+        return new_obj
     
     def perpendicular_line(self, p):
         return entity_convert(self._geo_ref.perpendicular_line(p._geo_ref))
@@ -584,11 +639,35 @@ class Plane(Entity):
         return entity_convert(self._geo_ref.perpendicular_plane(p._geo_ref))
 
 
+class HorizontalPlane(Plane):
+    _at_symbol=''
+    def __init__(self,p1=None):
+        
+        if p1 is None:
+            p1=Point(0,0,0)
+        super().__init__(p1, p1+Point(0,5,0),p1+Point(5,0,0))
+
+        self._label="\'"
+        
+        
+class VerticalPlane(Plane):
+    _at_symbol=''
+    def __init__(self,p1=None):
+        
+        if p1 is None:
+            p1=Point(0,0,0)
+            
+        super().__init__(p1, p1+Point(0,5,0),p1+Point(0,0,5))
+        self._label="\'\'"
+        
+HPP=HorizontalPlane()
+VPP=VerticalPlane()
 
 class DrawingSet(Entity,list):
     def __init__(self,*entities,scene=None):
         super(list,self).__init__()
         super(Entity,self).__init__()
+        self._label=None
 
         self += list(entities)
 
@@ -606,7 +685,7 @@ class DrawingSet(Entity,list):
         for elem in self:
             elem.plot(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
 
-        return scene
+        return copy.deepcopy(self)
 
     def plot_hp(
         self,
@@ -622,7 +701,7 @@ class DrawingSet(Entity,list):
         for elem in self:
             elem.plot_hp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
 
-        return scene
+        return copy.deepcopy(self)
 
     def plot_vp(
         self,
@@ -638,7 +717,7 @@ class DrawingSet(Entity,list):
         for elem in self:
             elem.plot_vp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
 
-        return scene
+        return copy.deepcopy(self)
 
 
 
@@ -650,22 +729,20 @@ class GeometricalCase(DrawingSet):
     scheme_name = 'abs.png'
     real_name = 'abs.png'
 
-    @classmethod
-    def _scheme(cls):
 
-        path = __file__.replace('dgeometry.py', 'images/') + cls.scheme_name
-        #path = './images/' + cls.scheme_name
+    def _scheme(self):
 
-        return path
-
-    @classmethod
-    def _real_example(cls):
-
-        path = __file__.replace('dgeometry.py', 'images/') + cls.real_name
-        #path = './images/' + cls.real_name
+        self.preview()
 
 
-        return path
+        return self._path
+
+
+    def _real_example(self):
+
+        self.preview()
+
+        return self._path
 
 
 
@@ -685,11 +762,12 @@ class GeometricalCase(DrawingSet):
         self._assumptions.plot_vp()
 
         path  = './images/abcd.png'
+        self._path = path
 
         plt.savefig(path)
         print('check'*100)
 
-        plt.show()
+
         print('check'*100)
         plt.close()
 
@@ -710,8 +788,13 @@ class GeometricalCase(DrawingSet):
         return cls(*entities)
 
     def __init__(self,*assumptions,**kwargs):
+        super().__init__()
+        self._label = None
         self._assumptions=DrawingSet(*assumptions)
         self._given_data=None
+        
+        self._solution_step=[]
+
 
     def plot(
         self,
@@ -792,7 +875,7 @@ class GeometricalCase(DrawingSet):
         return parameters_dict
     
     def subs(self,*args,**kwargs):
-        if len(args)>0:
+        if len(args)>0 and isinstance(args[0],dict):
             data_set=args[0]
             entities = [point(str(label))  for label,point in data_set.items()]
 
@@ -872,10 +955,7 @@ class PyramidWithSquareBaseFromDiagonalAndPoint(GeometricalCase):
         a=Line(A,O)('a')
         b=Line(O,C)('b')
 
-        P1=(A @ b)('1',marker='o').plot('ko').plot_hp('go').plot_vp('go') 
-        
-        
-        
+        P1=(A @ b)('1',marker='o').plot('ko').plot_hp('go').plot_vp('go')
         alpha=Plane(A,O,C)
 
         #alpha.intersection(Plane(E,F,A))[0]
