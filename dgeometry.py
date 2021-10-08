@@ -726,10 +726,11 @@ class DrawingSet(Entity,list):
 
 class GeometricalCase(DrawingSet):
 
-    scheme_name = 'abs.png'
+    scheme_name = 'absxyz.png'
     real_name = 'abs.png'
 
 
+    
     def _scheme(self):
 
         self.preview()
@@ -737,10 +738,10 @@ class GeometricalCase(DrawingSet):
 
         return self._path
 
-
     def _real_example(self):
 
         self.preview()
+
 
         return self._path
 
@@ -749,27 +750,29 @@ class GeometricalCase(DrawingSet):
 
     
     def preview(self, example=False):
-        # if example:
-        #     path = cls._real_example()
-
-        # else:
-        #     path = cls._scheme()
-
         GeometryScene()
 
         self._assumptions.plot()
         self._assumptions.plot_hp()
         self._assumptions.plot_vp()
 
-        path  = './images/abcd.png'
-        self._path = path
+        path = __file__.replace('dgeometry.py', 'images/') + self.__class__.scheme_name
 
         plt.savefig(path)
-        print('check'*100)
+
+        plt.close()
+
+
+
+
+        self._path = path
+
+
 
 
         print('check'*100)
         plt.close()
+
 
         with open(f"{path}", "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
