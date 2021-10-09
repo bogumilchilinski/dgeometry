@@ -17,6 +17,13 @@ import numpy as np
 from sympy import Symbol
 import copy
 
+
+def plots_no():
+    num = 0
+    while True:
+        yield num
+        num += 1
+
 class GeometryScene:
     plt.clf()
 
@@ -726,8 +733,9 @@ class DrawingSet(Entity,list):
 
 class GeometricalCase(DrawingSet):
 
-    scheme_name = 'absxyz.png'
-    real_name = 'abs.png'
+    _case_no = plots_no()
+    scheme_name = 'absxyz'
+    real_name = 'abs'
 
 
     
@@ -756,7 +764,7 @@ class GeometricalCase(DrawingSet):
         self._assumptions.plot_hp()
         self._assumptions.plot_vp()
 
-        path = __file__.replace('dgeometry.py', 'images/') + self.__class__.scheme_name
+        path = __file__.replace('dgeometry.py', 'images/') + self.__class__.__name__ + str(next(self.__class__._case_no)) + '.png'
 
         plt.savefig(path)
 
@@ -794,9 +802,9 @@ class GeometricalCase(DrawingSet):
         super().__init__()
         self._label = None
         self._assumptions=DrawingSet(*assumptions)
-        self._given_data=None
+        self._given_data={str(elem):elem  for no,elem in enumerate(assumptions)}
         
-        self._solution_step=[]
+        self._solution_step=list(assumptions)
 
 
     def plot(
