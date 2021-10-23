@@ -514,6 +514,7 @@ class Point(Entity):
 
     def distance(self,other):
         return self._geo_ref.distance(other._geo_ref)
+
     
     def __xor__(self,other):
         if isinstance(other,Point):
@@ -582,6 +583,8 @@ class Line(Entity):
         
     def perpendicular_line(self, p):
         return entity_convert(self._geo_ref.perpendicular_line(p._geo_ref))
+    def parallel_line(self, p):
+        return entity_convert(self._geo_ref.parallel_line(p._geo_ref))
 
     @property
     def direction(self):
@@ -2373,93 +2376,81 @@ class PlanePerpendicularToPlaneIntersection(GeometricalCase):
 
         }
         return default_data_dict
-# class LineParallelToPlane(TwoPlanesIntersection):
+class LineParallelToPlane(TwoPlanesIntersection):
     
-#     point_A = [Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]
+    point_A = [Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]
 
-#     point_O = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in range(8,12) ]
+    point_O = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in range(8,12) ]
 
 
-#     point_B=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5,3,3.5] ]
+    point_B=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5,3,3.5] ]
 
-#     point_D=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [1,1.5,2,2.5,3,3.5] for z in range(8,12) ]
-#     point_E = [Point(x,y,z) for x in [7,7.5,8,8.5,9] for y in [7,7.5,8.5,9,9.5] for z in range(2,5) ]
+    point_D=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [1,1.5,2,2.5,3,3.5] for z in range(8,12) ]
+    point_E = [Point(x,y,z) for x in [7,7.5,8,8.5,9] for y in [7,7.5,8.5,9,9.5] for z in range(2,5) ]
 
-#     point_F = [Point(x,y,z) for x in  [1,1.5,2,2.5,3,3.5] for y in [10,10.5,11,11.5,12] for z in range(8,12) ]
+    point_F = [Point(x,y,z) for x in  [1,1.5,2,2.5,3,3.5] for y in [10,10.5,11,11.5,12] for z in range(8,12) ]
 
-#     def solution(self):
-# #         self._line=Line(self._point_N1,self._point_N2)
-#         current_obj=copy.deepcopy(self)
+    def solution(self):
+#         self._line=Line(self._point_N1,self._point_N2)
+        current_obj=copy.deepcopy(self)
         
-#         A=current_obj._point_A
-#         B=current_obj._point_B
-#         O=current_obj._point_O
-#         D=current_obj._point_D
-#         E=current_obj._point_E
-#         F=current_obj._point_F
+        A=current_obj._point_A
+        B=current_obj._point_B
+        O=current_obj._point_O
+        D=current_obj._point_D
+        E=current_obj._point_E
+        F=current_obj._point_F
         
-#         current_set=DrawingSet(*current_obj._solution_step[-1])
+        current_set=DrawingSet(*current_obj._solution_step[-1])
 
-#         base_plane=Plane(A,B,O)('base')
-#         line_a=Line(A,O)('a')
-#         line_b=Line(B,O)('b')
-#         line_d=Line(D,E)('d')
-#         line_f=Line(F,normal_vector(D-E))('f')
-#         line_q=line_f.intersection(base_plane)[0]('q')
-# #         point_G=line_f_on_AOB.intersection(line_a)[0]
-# #         point_H=line_f_on_AOB.intersection(line_b)[0]
-# # #         intersection_line=base_plane.intersection(cutting_plane)[0]('k')
-# #         P=base_plane.intersection(line_d)[0]('P')
-# #         Q=base_plane.intersection(line_f)[0]('Q')
-# #         intersection_line=Line(P,Q)('k')
-
+        base_plane=Plane(A,B,O)('base')
+        line_a=Line(A,O)('a')
+        line_b=Line(B,O)('b')
+        line_d=Line(D,E)('d')
+        line_f=line_d.parallel_line(F)('f')
+        edge_plane=Plane(line_f.p1,line_f.p2,line_f.p1@VPP)
+        line_q=edge_plane.intersection(base_plane)[0]('q')
+#         point_G=line_f_on_AOB.intersection(line_a)[0]
+#         point_H=line_f_on_AOB.intersection(line_b)[0]
+# #         intersection_line=base_plane.intersection(cutting_plane)[0]('k')
+#         P=base_plane.intersection(line_d)[0]('P')
+#         Q=base_plane.intersection(line_f)[0]('Q')
+#         intersection_line=Line(P,Q)('k')
         
-#         elems=[line_a,line_b,line_d,line_f,line_q]
-
         
-#         projections=[line_d@HPP,line_f@HPP,line_d@VPP,line_f@VPP,line_a@HPP,line_b@HPP,line_a@VPP,line_b@VPP,line_q@VPP,line_q@HPP]
-#         current_set+=[*elems,*projections]
-
-#         current_obj._solution_step.append(current_set)
-
-#         current_obj._assumptions=DrawingSet(*elems,*projections)
-
-#         return current_obj
-
-#     def get_default_data(self):
-
-#         point_A = self.__class__.point_A
-        
-#         point_O = self.__class__.point_O 
-        
-#         point_B=self.__class__.point_B
-        
-#         point_D=self.__class__.point_D
-#         point_E = self.__class__.point_E
-#         point_F = self.__class__.point_F
-        
-#         default_data_dict = {
-#             Symbol('A'): point_A,
-#             Symbol('B'): point_B,
-#             Symbol('O'): point_O,
-
-#             Symbol('D'): point_D,
-#             Symbol('E'): point_E,
-#             Symbol('F'): point_F,
-#         }
-#         return default_data_dict
-
-#     def get_random_parameters(self):
-
-#         parameters_dict=super().get_random_parameters()
-
-
-
-#         point_A=parameters_dict[Symbol('A')]
-#         point_B=parameters_dict[Symbol('B')] 
+        elems=[line_a,line_b,line_d,line_f,line_q]
 
         
-#         parameters_dict[Symbol('O')]=(point_A+point_B)*0.5+Point(0,0,5)
+        projections=[line_d@HPP,line_f@HPP,line_d@VPP,line_f@VPP,line_a@HPP,line_b@HPP,line_a@VPP,line_b@VPP,line_q@VPP,line_q@HPP]
+        current_set+=[*elems,*projections]
 
-#         return parameters_dict
-# LineParallelToPlane().from_random_data().solution()
+        current_obj._solution_step.append(current_set)
+
+        current_obj._assumptions=DrawingSet(*elems,*projections)
+
+        return current_obj
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        
+        point_O = self.__class__.point_O 
+        
+        point_B=self.__class__.point_B
+        
+        point_D=self.__class__.point_D
+        point_E = self.__class__.point_E
+        point_F = self.__class__.point_F
+        
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('B'): point_B,
+            Symbol('O'): point_O,
+
+            Symbol('D'): point_D,
+            Symbol('E'): point_E,
+            Symbol('F'): point_F,
+        }
+        return default_data_dict
+
+
