@@ -671,6 +671,7 @@ class Plane(Entity):
     def parallel_plane(self, p):
 
         return entity_convert(self._geo_ref.parallel_plane(p._geo_ref))
+    
 class HorizontalPlane(Plane):
     _at_symbol=''
     def __init__(self,p1=None):
@@ -2568,3 +2569,251 @@ class TriangularPrism(GeometricalCase):
             Symbol('O'): point_O,
         }
         return default_data_dict
+
+class TriangularPyramid(TriangularPrism):
+
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+
+    point_B=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    
+    point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
+    
+    point_O = [Point(x,y,z) for x in range(7,10) for y in [6,6.5,7,7.5,8.5] for z in range(6,9) ]
+    
+class TetragonalPrism(GeometricalCase):
+
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+
+    point_B=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    
+    point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
+    
+    point_Z=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    
+    point_O = [Point(x,y,z) for x in range(7,10) for y in [6,6.5,7,7.5,8.5] for z in range(6,9) ]
+    
+    def __init__(self,point_A=None,point_B=None,point_C=None,point_Z=None,point_O=None,**kwargs):
+
+        super().__init__()
+
+        if point_A and point_B and point_C and point_Z and point_O:
+            projections=(point_A@HPP,point_B@HPP,point_C@HPP,point_O@HPP,point_Z@HPP,point_A@VPP,point_B@VPP,point_C@VPP,point_O@VPP,point_Z@VPP
+                         #Plane(point_A@HPP,point_B@HPP,point_C@HPP),Plane(point_A@VPP,point_B@VPP,point_C@VPP),
+                        )
+        else:
+            projections=[]
+
+        self._assumptions=DrawingSet(*projections)
+
+        self._point_A=point_A
+        self._point_B=point_B
+        self._point_C=point_C
+        self._point_Z=point_Z
+        self._point_O=point_O
+        
+        self._given_data={'A':point_A,'B':point_B,'C':point_C,'Z':point_Z,'O':point_O,}
+        
+        self._solution_step.append(self._assumptions)
+
+    def solution(self):
+        current_obj=copy.deepcopy(self)
+        
+        A=current_obj._point_A
+        B=current_obj._point_B
+        C=current_obj._point_C
+        Z=current_obj._point_Z
+        O=current_obj._point_O
+        
+        current_set=DrawingSet(*current_obj._solution_step[-1])
+
+        plane_alpha=Plane(A,B,C)
+        line_z=Line(Z,Z@HPP)
+        D=line_z.intersection(plane_alpha)[0]
+        
+        
+        plane_beta=Plane(O,O+(B-A),O-(C-A))
+        E=(A@plane_beta)('E')
+        F=(B@plane_beta)('F')
+        G=(C@plane_beta)('G')
+        H=(D@plane_beta)('H')
+        plane_gamma=Plane(E,F,G)
+
+        line_ae=Line(A,E)('a')
+        line_bf=Line(B,F)('b')
+        line_cg=Line(C,G)('c')
+        line_dh=Line(D,H)('d')
+        elems=[E,F,G,H,line_ae,line_bf,line_cg,line_dh]
+
+        projections=[line_ae@HPP,line_ae@VPP,line_bf@HPP,line_bf@VPP,line_cg@HPP,line_cg@VPP,line_dh@HPP,line_dh@VPP,
+                     E@HPP,E@VPP,F@HPP,F@VPP,G@HPP,G@VPP,H@HPP,H@VPP,]
+
+        current_set+=[*elems,*projections]
+
+        current_obj._solution_step.append(current_set)
+        current_obj.point_E=E
+        current_obj.point_F=F
+        current_obj.point_G=G
+        current_obj.point_H=H
+        current_obj._assumptions+=[DrawingSet(*elems,*projections)]
+
+        return current_obj
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        point_B = self.__class__.point_B
+        point_C = self.__class__.point_C
+        point_Z = self.__class__.point_Z
+        point_O = self.__class__.point_O
+
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('B'): point_B,
+            Symbol('C'): point_C,
+            Symbol('Z'): point_Z,
+            Symbol('O'): point_O,
+        }
+        return default_data_dict
+    
+    
+class TruncatedTriangularPrism(GeometricalCase):
+
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+
+    point_B=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    
+    point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
+    
+    
+
+    
+    
+    point_M=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [7,7.5,8.5,9,9.5] for z in range(8,12) ]
+    point_N = [Point(x,y,z) for x in [7,7.5,8,8.5,9] for y in [10,10.5,11,11.5,12] for z in range(2,5) ]
+
+    point_O = [Point(x,y,z) for x in  [1,1.5,2,2.5,3,3.5] for y in [13,13.5,14,14.5,15] for z in range(8,12) ]
+
+
+    def __init__(self,point_A=None,point_B=None,point_C=None,point_M=None,point_N=None,point_O=None,**kwargs):
+
+        super().__init__()
+
+        if point_A and point_B and point_O and point_C and point_M and point_N:
+            projections=(point_A@HPP,point_B@HPP,Line(point_A@HPP,point_B@HPP),Line(point_A@VPP,point_B@VPP),
+                         Line(point_B@HPP,point_C@HPP),Line(point_B@VPP,point_C@VPP),point_A@VPP,point_B@VPP,
+                         point_C@HPP,point_C@VPP,point_M@HPP,point_M@VPP,point_N@HPP,point_N@VPP,point_O@HPP,point_O@VPP)
+        else:
+            projections=[]
+
+        self._assumptions=DrawingSet(*projections)
+
+
+
+
+        self._point_A=point_A
+        self._point_B=point_B
+        self._point_C=point_C
+        self._point_M=point_M
+        self._point_N=point_N
+        self._point_O=point_O
+
+        self._given_data={'A':point_A,'B':point_B,'C':point_C,'M':point_M,'N':point_N,'O':point_O}
+        
+        self._solution_step.append(self._assumptions)
+
+    
+
+
+    def solution(self):
+        current_obj=copy.deepcopy(self)
+        
+        A=current_obj._point_A
+        B=current_obj._point_B
+        C=current_obj._point_C
+        
+        M=current_obj._point_M
+        N=current_obj._point_N
+        O=current_obj._point_O
+        
+        current_set=DrawingSet(*current_obj._solution_step[-1])
+
+        plane_alpha=Plane(A,B,C)
+        
+        
+        
+        plane_beta=Plane(M,N,O)
+        D=(plane_alpha.perpendicular_line(A) & plane_beta)[0]('D')
+        E=(plane_alpha.perpendicular_line(B) & plane_beta)[0]('E')
+        F=(plane_alpha.perpendicular_line(C) & plane_beta)[0]('F')
+        plane_gamma=Plane(D,E,F)
+
+        line_ad=Line(A,D)('a')
+        line_be=Line(B,E)('b')
+        line_cf=Line(C,F)('c')
+
+        elems=[D,E,F,plane_alpha,plane_gamma,line_ad,line_be,line_cf]
+
+        projections=[line_ad@HPP,line_ad@VPP,line_be@HPP,line_be@VPP,line_cf@HPP,line_cf@VPP,
+                     D@HPP,D@VPP,E@HPP,E@VPP,F@HPP,F@VPP,]
+
+        current_set+=[*elems,*projections]
+
+        current_obj._solution_step.append(current_set)
+        current_obj.point_D=D
+        current_obj.point_E=E
+        current_obj.point_F=F
+        current_obj._assumptions+=[DrawingSet(*elems,*projections)]
+
+        return current_obj
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        point_B = self.__class__.point_B
+        point_C = self.__class__.point_C
+        point_O = self.__class__.point_O
+        point_M = self.__class__.point_M
+        point_N = self.__class__.point_N        
+
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('B'): point_B,
+            Symbol('C'): point_C,
+            Symbol('M'): point_M,
+            Symbol('N'): point_N,
+            Symbol('O'): point_O,
+        }
+        return default_data_dict
+    
+
+class TruncatedTriangularPrismByEdgePlane(TruncatedTriangularPrism):
+
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+
+    point_B=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    
+    point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
+    
+    
+
+    
+    
+    point_M=[Point(x,y,z) for x in [7,7.5,8,8.5,9] for y in [7,7.5,8.5,9,9.5] for z in range(7,10) ]
+    point_N = [Point(x,y,z) for x in [7,7.5,8,8.5,9] for y in [10,10.5,11,11.5,12] for z in range(2,5) ]
+
+    point_O = [Point(x,y,z) for x in  [7,7.5,8,8.5,9] for y in [13,13.5,14,14.5,15] for z in range(9,12) ]
+    
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_M=parameters_dict[Symbol('M')]
+        point_O=parameters_dict[Symbol('O')] 
+
+        
+        parameters_dict[Symbol('N')]=(point_M+point_O)*0.5+Point(3,0,0)
+
+        return parameters_dict
+    
