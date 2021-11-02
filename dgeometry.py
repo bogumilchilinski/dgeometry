@@ -2628,10 +2628,10 @@ class TetragonalPrism(GeometricalCase):
 
         plane_alpha=Plane(A,B,C)
         line_z=Line(Z,Z@HPP)
-        D=line_z.intersection(plane_alpha)[0]
+        D=line_z.intersection(plane_alpha)[0]('D')
         
         
-        plane_beta=Plane(O,O+(B-A),O-(C-A))
+        plane_beta=Plane(O,O+(B-A),O+(C-A))
         E=(A@plane_beta)('E')
         F=(B@plane_beta)('F')
         G=(C@plane_beta)('G')
@@ -2645,7 +2645,7 @@ class TetragonalPrism(GeometricalCase):
         elems=[E,F,G,H,line_ae,line_bf,line_cg,line_dh]
 
         projections=[line_ae@HPP,line_ae@VPP,line_bf@HPP,line_bf@VPP,line_cg@HPP,line_cg@VPP,line_dh@HPP,line_dh@VPP,
-                     E@HPP,E@VPP,F@HPP,F@VPP,G@HPP,G@VPP,H@HPP,H@VPP,]
+                     E@HPP,E@VPP,F@HPP,F@VPP,G@HPP,G@VPP,H@HPP,H@VPP,D@HPP,D@VPP]
 
         current_set+=[*elems,*projections]
 
