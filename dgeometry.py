@@ -2582,13 +2582,13 @@ class TriangularPyramid(TriangularPrism):
     
 class TetragonalPrism(GeometricalCase):
 
-    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2.5,3,3.5]  ]
 
-    point_B=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    point_B=  [Point(x,y,z) for x in range(0,2) for y in range(7,10) for z in range(4,6) ]
     
-    point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
+    point_C = [Point(x,y,z) for x in [2,2.5,3,3.5] for y in [13.5,14,14.5,15.5] for z in [6.5,7,7.5] ]
     
-    point_Z=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    point_Z=  [Point(x,y,z) for x in range(4,8) for y in range(11,13) for z in [2,2.5,3,3.5] ]
     
     point_O = [Point(x,y,z) for x in range(7,10) for y in [6,6.5,7,7.5,8.5] for z in range(6,9) ]
     
@@ -2689,7 +2689,7 @@ class TruncatedTetragonalPrism(GeometricalCase):
     
     point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
     
-    point_Z=  [Point(x,y,z) for x in range(4,6) for y in [6,6.5,7,7.5] for z in [2,2.5,3,3.5] ]
+    point_Z=  [Point(x,y,z) for x in range(4,6) for y in [6,6.5,7,7.5] for z in [7.5,8,8.5] ]
     
 #     point_O = [Point(x,y,z) for x in range(7,10) for y in [6,6.5,7,7.5,8.5] for z in range(6,9) ]
     
@@ -2819,7 +2819,7 @@ class TruncatedTetragonalPrismByEdgePlane(TruncatedTetragonalPrism):
     
     point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
     
-    point_Z=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [7.5,8,8.5] ]
+    point_Z=  [Point(x,y,z) for x in range(4,6) for y in [10.5,11,11.5,12,12.5,13,13.5] for z in [7.5,8,8.5] ]
     
     
 
