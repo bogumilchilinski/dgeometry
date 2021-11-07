@@ -2580,6 +2580,8 @@ class TriangularPyramid(TriangularPrism):
     
     point_O = [Point(x,y,z) for x in range(7,10) for y in [6,6.5,7,7.5,8.5] for z in range(6,9) ]
     
+
+    
 class TetragonalPrism(GeometricalCase):
 
     point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2.5,3,3.5]  ]
@@ -2985,4 +2987,68 @@ class TruncatedTriangularPrismByEdgePlane(TruncatedTriangularPrism):
         parameters_dict[Symbol('N')]=(point_M+point_O)*0.5+Point(3,0,0)
 
         return parameters_dict
+
     
+class LineRotation(GeometricalCase):
+
+
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]
+
+    point_B=[Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [8,8.5,9,9.5,10] for z in [4,4.5,5,5.5,6,6.5] ]
+
+    def __init__(self,point_A=None,point_B=None,**kwargs):
+
+        super().__init__()
+
+        if point_A and point_B:
+            projections=(point_A@HPP,point_B@HPP,point_A@VPP,point_B@VPP,Line(point_A@HPP,point_B@HPP),Line(point_A@VPP,point_B@VPP),)
+        else:
+            projections=[]
+
+        self._assumptions=DrawingSet(*projections)
+
+        self._point_A=point_A
+        self._point_B=point_B
+
+        self._given_data={'A':point_A,'B':point_B,}
+
+        self._solution_step.append(self._assumptions)
+
+    def solution(self):
+        current_obj=copy.deepcopy(self)
+
+        A=current_obj._point_A
+        B=current_obj._point_B
+
+        current_set=DrawingSet(*current_obj._solution_step[-1])
+
+        line_a=Line(A,B)('a')
+        S=Point(B.x,B.y,A.z)('S')
+        line_l=Line(B,S)('l')
+        epsilon=HorizontalPlane(A)
+        A_0=Point(B.x,B.y+(B@HPP).distance(A@HPP),A.z)
+        line_k=Line(B,A_0)
+
+        elems=[line_a,S,line_l,epsilon,A_0,line_k,]
+
+        projections=[line_l@HPP,line_k@HPP,line_l@VPP,line_k@VPP,line_a@HPP,line_a@VPP,S@VPP,S@HPP,A_0@VPP,A_0@HPP]
+        current_set+=[*elems,*projections]
+
+        current_obj._solution_step.append(current_set)
+        current_obj.point_S=S
+
+        current_obj.point_A_0=A_0
+        current_obj._assumptions=DrawingSet(*elems,*projections)
+
+        return current_obj
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        point_B = self.__class__.point_B
+        
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('B'): point_B,
+        }
+        return default_data_dict
