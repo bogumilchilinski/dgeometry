@@ -1328,60 +1328,108 @@ class VerticalLineOnPlane(GeometricalCase):
             Symbol('O'): [Point(1,6,2),Point(0,7,1),],
         }
         return default_data_dict
-
-class HorizontalLineOnPlane(GeometricalCase):
+class FrontalLineOnPlane(GeometricalCase):
     
     def __init__(self,point_A=None,point_B=None,point_O=None,**kwargs):
         
         super().__init__()
-        
-        self._assumptions=DrawingSet(point_A,point_B,point_O)
-        self._given_data=None
+        if point_A and point_B and point_O:
+            projections=(point_A@HPP,point_B@HPP,point_A@VPP,point_B@VPP,point_O@HPP,point_O@VPP)
+        else:
+            projections=[]
+        self._assumptions=DrawingSet(*projections)
 
         self._point_A=point_A
         self._point_B=point_B
         self._point_O=point_O
+        self._given_data={'A':point_A,'B':point_B,'O':point_O}
 
+        self._solution_step.append(self._assumptions)
     def solution(self):
-        
-        O=self._point_O
-        A=self._point_A
-        B=self._point_B
-        
-        a=Line(A,B)('a')
+        current_obj=copy.deepcopy(self)
+        O=current_obj._point_O
+        A=current_obj._point_A
+        B=current_obj._point_B
+        current_set=DrawingSet(*current_obj._solution_step[-1])
+        f=Line(A,B)('a')
         
         alpha=Plane(A,B,O)('alpha')
-        beta=HorizontalPlane(O)('beta')
+        beta=VerticalPlane(O)('beta')
         
-        k=alpha.intersection(beta)[0] # k should be dg.Line, why is 'enity_convert' used
+        k=alpha.intersection(beta)[0] 
         P=entity_convert(k._coding_points()[0])
-        p=Line(P,O)('p')
+        p=Line(P,O)('f')
         
-        I=a.intersection(p)[0]('I')
+        I=f.intersection(p)[0]('I')
+        current_obj._point_I=I
+        elems=[O,A,B]
+        projections=[O@HPP,A@HPP,B@HPP,I@HPP]
+        current_set+=[*elems,*projections]
         
-        new_set= DrawingSet(self._assumptions )
-        new_set += [alpha]
-        new_set += [beta]
-        new_set += [p]
-        new_set += [I]
-        
-        self._solution_step.append(new_set)
-        
-        return copy.deepcopy(self)
+        return current_obj
     
     def get_default_data(self):
 
 
         default_data_dict = {
             Symbol('A'): [Point(4,5,8),Point(4,6,8),Point(5,10,8),Point(6,10,8),Point(7,10,8),Point(8,10,8),Point(-1,10,8),Point(3,10,8)],
-            Symbol('B'): [Point(6,2,3),Point(4,2,5),Point(6,7,1),],
-            Symbol('O'): [Point(6,4,7),Point(6,8,2),],
+            Symbol('B'): [Point(6,2,3),Point(4,2,5),Point(8,7,1),],
+            Symbol('O'): [Point(5,4,7),Point(4,8,2),],
+        }
+        return default_data_dict
+class HorizontalLineOnPlane(GeometricalCase):
+    
+    def __init__(self,point_A=None,point_B=None,point_O=None,**kwargs):
+        
+        super().__init__()
+        if point_A and point_B and point_O:
+            projections=(point_A@HPP,point_B@HPP,point_A@VPP,point_B@VPP,point_O@HPP,point_O@VPP)
+        else:
+            projections=[]
+        self._assumptions=DrawingSet(*projections)
+
+        self._point_A=point_A
+        self._point_B=point_B
+        self._point_O=point_O
+        self._given_data={'A':point_A,'B':point_B,'O':point_O}
+
+        self._solution_step.append(self._assumptions)
+    def solution(self):
+        current_obj=copy.deepcopy(self)
+        O=current_obj._point_O
+        A=current_obj._point_A
+        B=current_obj._point_B
+        current_set=DrawingSet(*current_obj._solution_step[-1])
+        f=Line(A,B)('a')
+        
+        alpha=Plane(A,B,O)('alpha')
+        beta=HorizontalPlane(O)('beta')
+        
+        k=alpha.intersection(beta)[0] 
+        P=entity_convert(k._coding_points()[0])
+        p=Line(P,O)('f')
+        
+        I=f.intersection(p)[0]('I')
+        current_obj._point_I=I
+        elems=[O,A,B]
+        projections=[O@VPP,A@VPP,B@VPP,I@VPP]
+        current_set+=[*elems,*projections]
+        
+        return current_obj
+    
+    def get_default_data(self):
+
+
+        default_data_dict = {
+            Symbol('A'): [Point(4,5,8),Point(4,6,8),Point(5,10,8),Point(6,10,8),Point(7,10,8),Point(8,10,8),Point(-1,10,8),Point(3,10,8)],
+            Symbol('B'): [Point(6,2,3),Point(4,2,5),Point(8,7,1),],
+            Symbol('O'): [Point(5,4,7),Point(4,8,2),],
         }
         return default_data_dict
 
 class LineOnPlane(GeometricalCase):
 
-    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in range(2,6) for z in [1,1.5,2,2.5,3,3.5] ]
+    point_A = [Point(x,y,z) for x in [2,2.5,3,3.5] for y in range(1,6) for z in [1.5,2,2.5,3,3.5] ]
 #     distance_AO = [Point(2,4,2),Point(2,5,2),Point(2,6,2),Point(3,4,4)]
 
 #     point_O = [pt + dist  for pt,dist   in  it.product(point_A,distance_AO)]
@@ -1455,11 +1503,11 @@ class LineOnPlane(GeometricalCase):
         current_set=DrawingSet(*current_obj._solution_step[-1])
 
         base_plane=Plane(A,B,O)('base')
-        line_a=Line(A,O)('a')
-        line_b=Line(B,O)('b')
+        line_a=Line(self._point_C,self._point_C+Point(15,0,0))('a')
+        line_b=Line(self._point_D,self._point_D+Point(15,0,0))('b')
 
-        plane_v=Plane(n.p1,n.p2,n.p1@VPP)('alpha') #why is the line created? #looks unnecessary
-        plane_h=Plane(n.p1,n.p2,n.p1@HPP)('beta')
+        plane_v=base_plane('alpha') #why is the line created? #looks unnecessary
+        #plane_h=Plane(n.p1,n.p2,n.p1@HPP)('beta')
         #int_line_h=Line(plane_h.intersection(line_a)[0],plane_h.intersection(line_b)[0])('n')
         int_line_v=Line(plane_v.intersection(line_a)[0],plane_v.intersection(line_b)[0])('n') 
 
@@ -2685,13 +2733,13 @@ class TetragonalPrism(GeometricalCase):
     
 class TruncatedTetragonalPrism(GeometricalCase):
 
-    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2.5,3,3.5]  ]
 
-    point_B=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    point_B=  [Point(x,y,z) for x in range(0,2) for y in range(7,10) for z in range(4,6) ]
     
-    point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
+    point_C = [Point(x,y,z) for x in [2,2.5,3,3.5] for y in [13.5,14,14.5,15.5] for z in [6.5,7,7.5] ]
     
-    point_Z=  [Point(x,y,z) for x in range(4,6) for y in [6,6.5,7,7.5] for z in [7.5,8,8.5] ]
+    point_Z=  [Point(x,y,z) for x in range(4,8) for y in range(11,13) for z in [2,2.5,3,3.5] ]
     
 #     point_O = [Point(x,y,z) for x in range(7,10) for y in [6,6.5,7,7.5,8.5] for z in range(6,9) ]
     
@@ -2815,13 +2863,13 @@ class TruncatedTetragonalPrism(GeometricalCase):
 
 class TruncatedTetragonalPrismByEdgePlane(TruncatedTetragonalPrism):
 
-    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2.5,3,3.5]  ]
 
-    point_B=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    point_B=  [Point(x,y,z) for x in range(0,2) for y in range(7,10) for z in range(4,6) ]
     
-    point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
+    point_C = [Point(x,y,z) for x in [2,2.5,3,3.5] for y in [13.5,14,14.5,15.5] for z in [6.5,7,7.5] ]
     
-    point_Z=  [Point(x,y,z) for x in range(4,6) for y in [10.5,11,11.5,12,12.5,13,13.5] for z in [7.5,8,8.5] ]
+    point_Z=  [Point(x,y,z) for x in range(4,8) for y in range(11,13) for z in [2,2.5,3,3.5] ]
     
     
 
@@ -2992,16 +3040,16 @@ class TruncatedTriangularPrismByEdgePlane(TruncatedTriangularPrism):
 class LineRotation(GeometricalCase):
 
 
-    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [2,2.5,3,3.5,4] for z in [1,1.5,2,2.5,3,3.5] ]
 
-    point_B=[Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [8,8.5,9,9.5,10] for z in [4,4.5,5,5.5,6,6.5] ]
+    point_B=[Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [6.5,7,7.5,8,8.5,9] for z in [4,4.5,5,5.5,6,6.5] ]
 
     def __init__(self,point_A=None,point_B=None,**kwargs):
 
         super().__init__()
 
         if point_A and point_B:
-            projections=(point_A@HPP,point_B@HPP,point_A@VPP,point_B@VPP,Line(point_A@HPP,point_B@HPP),Line(point_A@VPP,point_B@VPP),)
+            projections=(point_A@HPP,point_B@HPP,point_A@VPP,point_B@VPP)
         else:
             projections=[]
 
@@ -3052,3 +3100,144 @@ class LineRotation(GeometricalCase):
             Symbol('B'): point_B,
         }
         return default_data_dict
+
+class PlaneRotation(GeometricalCase):
+
+
+    point_A = [Point(x,y,z) for x in [8,8.5,9,7.5,7] for y in [5,5.5,6,6.5] for z in   [8,8.5,7.5,7]  ]
+
+    point_B=[Point(x,y,z) for x in [5,5.5,6,6.5] for y in [8,8.5,9,9.5,10] for z in   [4,4.5,5,5.5] ]
+
+    point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5]  for z in [1,1.5,2,2.5] ]
+
+
+
+
+
+    def __init__(self,point_A=None,point_B=None,point_C=None,**kwargs):
+
+        super().__init__()
+
+        if point_A and point_B and point_C:
+            projections=(point_A@HPP,point_B@HPP,point_A@VPP,point_B@VPP,point_C@HPP,point_C@VPP,)
+        else:
+            projections=[]
+
+        self._assumptions=DrawingSet(*projections)
+
+        self._point_A=point_A
+        self._point_B=point_B
+        self._point_C=point_C
+
+        
+        self._given_data={'A':point_A,'B':point_B,'C':point_C}
+        
+        self._solution_step.append(self._assumptions)
+
+    def solution(self):
+        current_obj=copy.deepcopy(self)
+        
+        A=current_obj._point_A
+        B=current_obj._point_B
+        C=current_obj._point_C
+
+
+        
+        current_set=DrawingSet(*current_obj._solution_step[-1])
+
+        line_a=Line(A,B)('a')
+        line_b=Line(C,A)('b')
+        plane_alpha=Plane(A,B,C)
+
+        plane_beta=HorizontalPlane(C)
+
+        line_k = plane_alpha.intersection(plane_beta)[0]
+
+        elems=self._assumptions
+        projections=[]
+        point_0_dict={}
+        for point_I in [A,B]:
+        
+            S_I = (point_I @ line_k)('k')
+
+
+
+            # zaimplementować w metode dla punktu 
+            dir_I_on_HPP =(point_I @ plane_beta) - S_I
+            
+            #display(dir_I_on_HPP.coordinates)
+            #display((point_I @ plane_beta).distance( S_I ))
+            #display(point_I.distance( S_I ))
+            
+            ratio = (point_I.distance( S_I )) /(point_I @ plane_beta).distance( S_I )
+            
+            I_o =(S_I+(dir_I_on_HPP)*ratio)(point_I._label+'_0')
+            
+            point_0_dict[str(point_I)]=I_o
+            elems += [I_o]
+            projections+=[I_o@HPP,I_o@VPP]
+
+            
+        line_kk=Line(C,S_I)
+        #print(point_0_dict)
+        elems+=[line_a,line_b,#,E,F,G,H,line_s1,line_s2,line_s3,line_s4
+              ]
+
+        projections+=[line_a@HPP,line_a@VPP,line_b@HPP,line_b@VPP,line_kk@HPP,line_kk@VPP,#line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
+                     #line_s4@HPP,line_s4@VPP
+                    ]
+        current_set+=[*elems,*projections]
+        current_obj.A0=point_0_dict['A']
+        current_obj.B0=point_0_dict['B']
+        current_obj.C0=C
+        current_obj._solution_step.append(current_set)
+        current_obj._assumptions=DrawingSet(*elems,*projections)
+
+        return current_obj
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        point_B = self.__class__.point_B
+        point_C = self.__class__.point_C
+
+
+        
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('B'): point_B,
+            Symbol('C'): point_C,
+
+
+        }
+        return default_data_dict
+
+    
+class TriangularPyramidHFLines(TriangularPyramid):
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+
+    point_B = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in [5,5.5,6,6.5,7] ]
+
+
+    point_C=[Point(x,y,z) for x in [4,4.5,5,5.5,6] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5] ]
+
+
+    point_O=[Point(x,y,z) for x in range(9,12) for y in [6,6.5,7,7.5,8.5] for z in range(9,12) ]
+
+
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_A=parameters_dict[Symbol('A')]
+        point_B=parameters_dict[Symbol('B')] 
+        point_C=parameters_dict[Symbol('C')] 
+
+        
+        parameters_dict[Symbol('B')]=Point(point_A.x,point_C.y,point_C.z)
+        parameters_dict[Symbol('C')]=Point(point_B.x,point_B.y,point_A.z)
+
+        return parameters_dict
+    
