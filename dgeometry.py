@@ -2705,7 +2705,7 @@ class TetragonalPrism(GeometricalCase):
         current_obj.frontal_line_cross_BC = (VerticalPlane(A) & (B^C))[0]
         
         current_obj.point_P=(O@plane_alpha)('P')
-        
+        current_obj.point_D=D
         current_obj.point_E=E
         current_obj.point_F=F
         current_obj.point_G=G
@@ -3085,9 +3085,8 @@ class LineRotation(GeometricalCase):
         current_obj._solution_step.append(current_set)
         current_obj.point_S=S
 
-        current_obj.point_A_0=A_0
+        #current_obj.point_A_0=A_0
         current_obj._assumptions=DrawingSet(*elems,*projections)
-
         return current_obj
 
     def get_default_data(self):
