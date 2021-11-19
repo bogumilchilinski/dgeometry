@@ -3239,4 +3239,272 @@ class TriangularPyramidHFLines(TriangularPyramid):
         parameters_dict[Symbol('C')]=Point(point_B.x,point_B.y,point_A.z)
 
         return parameters_dict
+
+class EquilateralTriangleRotation(GeometricalCase):
+
+
+    point_A = [Point(x,y,z) for x in [8,8.5,9,7.5,7] for y in [5,5.5,6,6.5] for z in   [8,8.5,7.5,7]  ]
+
+    point_O=[Point(x,y,z) for x in [5,5.5,6,6.5] for y in [8,8.5,9,9.5,10] for z in   [4,4.5,5,5.5] ]
+
+    point_P = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5]  for z in [1,1.5,2,2.5] ]
+
+
+
+
+
+    def __init__(self,point_A=None,point_P=None,point_O=None,**kwargs):
+
+        super().__init__()
+
+        if point_A and point_O and point_P:
+            projections=(point_A@HPP,point_O@HPP,point_O@VPP,point_P@VPP,point_P@HPP,point_A@VPP,)
+        else:
+            projections=[]
+
+        self._assumptions=DrawingSet(*projections)
+
+        self._point_A=point_A
+        self._point_P=point_P
+        self._point_O=point_O
+
+        
+        self._given_data={'A':point_A,'P':point_P,'O':point_O}
+        
+        self._solution_step.append(self._assumptions)
+
+    def solution(self):
+        current_obj=copy.deepcopy(self)
+        
+        A=current_obj._point_A
+        O=current_obj._point_O
+        P=current_obj._point_P
+        
+        S = (A @ (O^P))('S') #'Srodek' podstawy
+        
+        dirPS = P-S
+        dirOS = O-S
+        triangle_height = A.distance(S)
+        triangle_side =  triangle_height / ((3**(1/2))/2)
+        
+        B = (S + dirPS/(P.distance(S))*(triangle_side/2))('B')
+        C = (S - dirPS/(P.distance(S))*(triangle_side/2))('C')
+
+
+        
+        current_set=DrawingSet(*current_obj._solution_step[-1])
+
+        line_a=Line(A,B)('a')
+        line_b=Line(C,A)('b')
+        plane_alpha=Plane(A,O,P)
+
+        plane_beta=HorizontalPlane(P)
+
+        line_k = plane_alpha.intersection(plane_beta)[0]
+
+        elems=self._assumptions
+        projections=[]
+        point_0_dict={}
+        for point_I in [A,B,C,O]:
+        
+            S_I = (point_I @ line_k)('k')
+
+
+
+            # zaimplementować w metode dla punktu 
+            dir_I_on_HPP =(point_I @ plane_beta) - S_I
+            
+            #display(dir_I_on_HPP.coordinates)
+            #display((point_I @ plane_beta).distance( S_I ))
+            #display(point_I.distance( S_I ))
+            
+            ratio = (point_I.distance( S_I )) /(point_I @ plane_beta).distance( S_I )
+            
+            I_o =(S_I+(dir_I_on_HPP)*ratio)(point_I._label+'_0')
+            
+            point_0_dict[str(point_I)]=I_o
+            elems += [I_o]
+            projections+=[I_o@HPP,I_o@VPP]
+
+            
+        line_kk=Line(P,S_I)('k')
+        
+        current_obj.A0=point_0_dict['A']
+        current_obj.B0=point_0_dict['B']
+        current_obj.C0=point_0_dict['C']
+        
+        
+        #print(point_0_dict)
+        elems+=[line_a,line_b,#,E,F,G,H,line_s1,line_s2,line_s3,line_s4
+              ]
+
+        projections+=[current_obj.A0@HPP,current_obj.A0@VPP,current_obj.B0@HPP,current_obj.B0@VPP,
+                      current_obj.C0@HPP,current_obj.C0@VPP,B@HPP,B@VPP,C@HPP,C@VPP,line_a@HPP,line_a@VPP,line_b@HPP,line_b@VPP,
+                      line_kk@HPP,line_kk@VPP,#line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
+                     #line_s4@HPP,line_s4@VPP
+                    ]
+        current_set+=[*elems,*projections]
+
+        current_obj._solution_step.append(current_set)
+        current_obj._assumptions=DrawingSet(*elems,*projections)
+        current_obj._point_B=B
+        current_obj._point_C=C
+        return current_obj
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        point_O = self.__class__.point_O
+        point_P = self.__class__.point_P
+
+
+        
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('P'): point_P,
+            Symbol('O'): point_O,
+
+
+
+        }
+        return default_data_dict
     
+class SquareRotation(GeometricalCase):
+
+
+    point_A = [Point(x,y,z) for x in [8,8.5,9,7.5,7] for y in [5,5.5,6,6.5] for z in   [8,8.5,7.5,7]  ]
+
+    point_O=[Point(x,y,z) for x in [5,5.5,6,6.5] for y in [8,8.5,9,9.5,10] for z in   [4,4.5,5,5.5] ]
+
+    point_P = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5]  for z in [1,1.5,2,2.5] ]
+
+
+
+
+
+    def __init__(self,point_A=None,point_P=None,point_O=None,**kwargs):
+
+        super().__init__()
+
+        if point_A and point_O and point_P:
+            projections=(point_A@HPP,point_O@HPP,point_O@VPP,point_P@VPP,point_P@HPP,point_A@VPP,)
+        else:
+            projections=[]
+
+        self._assumptions=DrawingSet(*projections)
+
+        self._point_A=point_A
+        self._point_P=point_P
+        self._point_O=point_O
+
+        
+        self._given_data={'A':point_A,'P':point_P,'O':point_O}
+        
+        self._solution_step.append(self._assumptions)
+
+    def solution(self):
+        current_obj=copy.deepcopy(self)
+        
+        A=current_obj._point_A
+        O=current_obj._point_O
+        P=current_obj._point_P
+        
+        S = (A @ (O^P))('S') #'Srodek' podstawy
+        
+        dirPS = P-S
+        dirOS = O-S
+        dirAS = S-A
+        square_diagonal = 2*A.distance(S)
+        #square_side =  square_diagonal / (((3)**(1/2))/2)
+        print(square_diagonal)
+        B = (S + dirPS/(P.distance(S))*(square_diagonal/2))('B')
+        D = (S - dirPS/(P.distance(S))*(square_diagonal/2))('D')
+        C = (A + 2*dirAS)('C')
+#         line_AD=A^D
+#         line_AB=A^B
+#         line_BC=line_AD.parallel_line(P)
+#         line_AS=Line(A,S)
+#         C=line_BC.intersection(line_AS)[0]
+
+
+        
+        current_set=DrawingSet(*current_obj._solution_step[-1])
+
+        line_a=Line(A,B)('a')
+        line_b=Line(B,C)('b')
+        line_c=Line(C,D)('c')
+        line_d=Line(D,A)('d')
+        plane_alpha=Plane(A,O,P)
+
+        plane_beta=HorizontalPlane(P)
+
+        line_k = plane_alpha.intersection(plane_beta)[0]
+
+        elems=self._assumptions
+        projections=[]
+        point_0_dict={}
+        for point_I in [A,B,C,D,O]:
+        
+            S_I = (point_I @ line_k)('k')
+
+
+
+            # zaimplementować w metode dla punktu 
+            dir_I_on_HPP =(point_I @ plane_beta) - S_I
+            
+            #display(dir_I_on_HPP.coordinates)
+            #display((point_I @ plane_beta).distance( S_I ))
+            #display(point_I.distance( S_I ))
+            
+            ratio = (point_I.distance( S_I )) /(point_I @ plane_beta).distance( S_I )
+            
+            I_o =(S_I+(dir_I_on_HPP)*ratio)(point_I._label+'_0')
+            
+            point_0_dict[str(point_I)]=I_o
+            elems += [I_o]
+            projections+=[I_o@HPP,I_o@VPP]
+
+            
+        line_kk=Line(P,S_I)('k')
+        
+        current_obj.A0=point_0_dict['A']
+        current_obj.B0=point_0_dict['B']
+        current_obj.C0=point_0_dict['C']
+        current_obj.D0=point_0_dict['D']
+        
+        #print(point_0_dict)
+        elems+=[line_a,line_b,#,E,F,G,H,line_s1,line_s2,line_s3,line_s4
+              ]
+
+        projections+=[current_obj.D0@HPP,current_obj.D0@VPP,D@HPP,D@VPP,
+            current_obj.A0@HPP,current_obj.A0@VPP,current_obj.B0@HPP,current_obj.B0@VPP,
+                      current_obj.C0@HPP,current_obj.C0@VPP,B@HPP,B@VPP,C@HPP,C@VPP,line_a@HPP,line_a@VPP,line_b@HPP,line_b@VPP,
+                      line_kk@HPP,line_kk@VPP,#line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
+                     #line_s4@HPP,line_s4@VPP
+                    ]
+        current_set+=[*elems,*projections]
+
+        current_obj._solution_step.append(current_set)
+        current_obj._assumptions=DrawingSet(*elems,*projections)
+        current_obj._point_B=B
+        current_obj._point_C=C
+        current_obj._point_D=D
+        return current_obj
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        point_O = self.__class__.point_O
+        point_P = self.__class__.point_P
+
+
+        
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('P'): point_P,
+            Symbol('O'): point_O,
+
+
+
+        }
+        return default_data_dict
