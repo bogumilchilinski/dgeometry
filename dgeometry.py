@@ -183,10 +183,10 @@ class Entity:
         
     def __call__(self,
                  label=None,
-                 fmt='b',
+                 fmt=None,
                  color=None,
-                 marker='o',
-                 style='-',
+                 marker=None,
+                 style=None,
                  text=None,
                  *args,
                  **kwargs):
@@ -194,14 +194,21 @@ class Entity:
         The object allows to assign a variable symbol (letter)
         to the points in the plane
         """
-        self._label = label
-        self.__color = color
+        obj = copy.deepcopy(self)
+        if label is not None:
+            obj._label = label
+            
+        if color is not None:
+            obj.__color = color
+        
+        if marker is not None:
+            obj.__marker = marker
+            
+        if style is not None:
+            obj.__style = style
+        obj.__fmt = fmt
 
-        self.__marker = marker
-        self.__style = style
-        self.__fmt = fmt
-
-        return self
+        return obj
 
 #     def _coding_points(self):
 #         return [geo.Point3D(0,0,0)]
@@ -246,7 +253,7 @@ class Entity:
         color=None,
         style='-',
         text=None,
-        fontsize=20,
+        fontsize=13,
         scene=GeometryScene.ax_3d,
     ):
         '''
@@ -265,6 +272,9 @@ class Entity:
         if marker is None:
             marker = self.__marker
 
+        if color is None:
+            color = self.__color
+            
         points_cooridinates = self._generating_points()
 
         
@@ -290,7 +300,7 @@ class Entity:
         color=None,
         style='-',
         text=None,
-        fontsize=20,
+        fontsize=13,
         scene=GeometryScene.ax_2d,
     ):
         '''
@@ -309,8 +319,8 @@ class Entity:
         if marker is None:
             marker = self.__marker
 
-        print("plot_hp",self)
-        print(self._projection)
+        if color is None:
+            color = self.__color
             
         if str(self)[-1]=="\'" and str(self)[-2]!="\'":
             points_cooridinates = self._generating_points()
@@ -336,7 +346,7 @@ class Entity:
         color=None,
         style='-',
         text=None,
-        fontsize=20,
+        fontsize=13,
         scene=GeometryScene.ax_2d,
     ):
         '''
@@ -354,6 +364,9 @@ class Entity:
         if marker is None:
             marker = self.__marker
 
+        if color is None:
+            color = self.__color
+            
         points_cooridinates = self._generating_points()
 
         # plt.figure(figsize=(12,9))
@@ -396,7 +409,7 @@ class Entity:
                         style='-',
                         color=None,
                         text=None,
-                        fontsize=20):
+                        fontsize=13):
         '''
         Set the coordinates of the points with the text explanation 
         Return: Line with the text that presents the actual point on the chosen plane
@@ -704,6 +717,19 @@ class DrawingSet(Entity,list):
 
         self += list(entities)
 
+    def set_label(self,label):
+        
+        obj = copy.deepcopy(self)
+        obj._label = label
+        
+        return obj
+        
+    def __repr__(self):
+        return super().__repr__() + f' labeled {self._label}'
+
+    def __str__(self):
+        return super().__str__() + f' labeled {self._label}'
+    
     def plot(
         self,
         fmt=None,
@@ -711,14 +737,21 @@ class DrawingSet(Entity,list):
         color=None,
         style='-',
         text=None,
-        fontsize=20,
+        fontsize=13,
         scene=GeometryScene.ax_3d,
         ):
 
-        for elem in self:
+        obj = copy.deepcopy(self)
+        
+        for elem in obj:
             elem.plot(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
-
-        return copy.deepcopy(self)
+            
+        obj._label = self._label
+        plt.title(obj._label)
+            
+            
+            
+        return obj
 
     def plot_hp(
         self,
@@ -727,14 +760,22 @@ class DrawingSet(Entity,list):
         color=None,
         style='-',
         text=None,
-        fontsize=20,
+        fontsize=13,
         scene=GeometryScene.ax_2d,
         ):
 
-        for elem in self:
-            elem.plot_hp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
 
-        return copy.deepcopy(self)
+        obj = copy.deepcopy(self)
+        
+        for elem in obj:
+            elem.plot_hp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
+            
+        obj._label = self._label
+        plt.title(obj._label)
+            
+            
+            
+        return obj
 
     def plot_vp(
         self,
@@ -743,14 +784,21 @@ class DrawingSet(Entity,list):
         color=None,
         style='-',
         text=None,
-        fontsize=20,
+        fontsize=13,
         scene=GeometryScene.ax_2d,
         ):
 
-        for elem in self:
+        obj = copy.deepcopy(self)
+        
+        for elem in obj:
             elem.plot_vp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
-
-        return copy.deepcopy(self)
+            
+        obj._label = self._label
+        plt.title(obj._label)
+            
+            
+            
+        return obj
 
 
 
@@ -786,7 +834,14 @@ class GeometricalCase(DrawingSet):
     def preview(self, example=False):
         GeometryScene()
 
-        self._assumptions.plot()
+        print('preview')
+        print(self._assumptions3d)
+        if self._assumptions3d is None:
+            self._assumptions3d = self._assumptions
+            
+        print(self._assumptions3d)        
+        
+        self._assumptions3d.plot()
         self._assumptions.plot_hp()
         self._assumptions.plot_vp()
 
@@ -834,6 +889,9 @@ class GeometricalCase(DrawingSet):
         super().__init__()
         self._label = None
         self._assumptions=DrawingSet(*assumptions)
+        
+        self._assumptions3d=None
+        
         self._given_data={str(elem):elem  for no,elem in enumerate(assumptions)}
         
         self._solution_step=list(assumptions)
@@ -846,14 +904,17 @@ class GeometricalCase(DrawingSet):
         color=None,
         style='-',
         text=None,
-        fontsize=20,
+        fontsize=13,
         scene=GeometryScene.ax_3d,
         ):
 
         print(type(self._assumptions))
         print(self._assumptions)
 
-        self._assumptions.plot(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
+        if self._assumptions3d is None:
+            self._assumptions3d=self._assumptions
+        
+        self._assumptions3d.plot(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
 
         return copy.deepcopy(self)
 
@@ -864,7 +925,7 @@ class GeometricalCase(DrawingSet):
         color=None,
         style='-',
         text=None,
-        fontsize=20,
+        fontsize=13,
         scene=GeometryScene.ax_2d,
         ):
 
@@ -881,7 +942,7 @@ class GeometricalCase(DrawingSet):
         color=None,
         style='-',
         text=None,
-        fontsize=20,
+        fontsize=13,
         scene=GeometryScene.ax_3d,
         ):
 
