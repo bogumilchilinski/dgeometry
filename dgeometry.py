@@ -3706,7 +3706,6 @@ class IsoscelesRightTriangleRotation(GeometricalCase):
         return default_data_dict
 
     
-    
 class IsoscelesRightTrianglePrism(GeometricalCase):
 
     #quite good data
@@ -3731,13 +3730,18 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
     def __init__(self,point_A=None,point_P=None,point_O=None,point_H=None,**kwargs):
 
         super().__init__()
+        self._solution_step=[]
+        self._solution3d_step=[]
 
         if point_A and point_O and point_P and point_H:
             projections=(point_A@HPP,point_O@HPP,point_O@VPP,point_P@VPP,point_P@HPP,point_A@VPP,point_H@VPP,point_H@HPP)
+            
         else:
             projections=[]
 
-        self._assumptions=DrawingSet(*projections)
+        self._assumptions=DrawingSet(*projections)('Assumptions')
+        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        
 
         self._point_A=point_A
         self._point_P=point_P
@@ -3748,6 +3752,7 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
         
         self._solution_step.append(self._assumptions)
+        self._solution3d_step.append(self._assumptions3d)
 
     def solution(self):
         current_obj=copy.deepcopy(self)
@@ -3776,12 +3781,30 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         plane_alpha=Plane(A,O,P)
 
         plane_beta=HorizontalPlane(P)
+        
+        
 
-        line_k = plane_alpha.intersection(plane_beta)[0]
+        line_k = plane_alpha.intersection(plane_beta)[0]('a')
+        
+        
+        point_P1 = plane_beta.intersection(A^O)[0]('1')
+        line_kk = (P^point_P1)('a')
+        
+        
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
+        current_step3d=[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
+        
+        
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 1 - axis of rotation'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 1 - axis of rotation'))
+
 
         elems=self._assumptions
         projections=[]
         point_0_dict={}
+        eps_dict={}
+        
         for point_I in [A,B,C,O]:
         
             S_I = (point_I @ line_k)('k')
@@ -3800,27 +3823,107 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
             I_o =(S_I+(dir_I_on_HPP)*ratio)(point_I._label+'_0')
             
             point_0_dict[str(point_I)]=I_o
+            eps_dict[str(point_I)]=(I_o^(S_I-(dir_I_on_HPP)*ratio))('eps'+point_I._label)
+            
             elems += [I_o]
             projections+=[I_o@HPP,I_o@VPP]
 
             
-        line_kk=Line(P,S_I)('k')
+#         line_kk=Line(P,S_I)('k')
         
         current_obj.A0=point_0_dict['A']
         current_obj.B0=point_0_dict['B']
         current_obj.C0=point_0_dict['C']
+        current_obj.O0=point_0_dict['O']
+        
+        A0= current_obj.A0
+        O0= current_obj.O0
+
+
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[eps_dict['A'],eps_dict['O']]
+        current_step3d=[eps_dict['A'],eps_dict['O']]
         
         
-        #plane_beta=Plane(H,H+(B-A),H-(C-A))
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 2 - planes of rotation for A and O'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 2 - planes of rotation for A and O'))
+        
+        
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[A0,O0]
+        current_step3d=[A0,O0]
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 3 - rotated A0 and O0'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 3 - rotated A0 and O0'))
+        
+        current_step3d=[(P^O0)('PO0')]
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(P^O0)('PO0')]
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 4 - P0O0 line'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 4 - P0O0 line'))
+        
+        B0= current_obj.B0
+        C0= current_obj.C0
+        
+        
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[B0,C0]
+        current_step3d=[B0,C0]
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 5 - triangle vertices B0 and C0'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 5 - triangle vertices B0 and C0'))
+        
+        
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[eps_dict['B'],eps_dict['C']]
+        current_step3d=[eps_dict['B'],eps_dict['C']]
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 6 - planes of rotation for B and C'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 6 - planes of rotation for B and C'))
+        
+        
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[C,B]
+        current_step3d=[C,B]
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 7 - triangle vertices B and C'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 7 - triangle vertices B and C'))
+        
         plane_beta=Plane(H,H+(A-P),H-(O-P))
+        
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[((H+(A-P))^H)('e'),(H+(O-P)^H)('f')]
+        current_step3d=[((H+(A-P))^H)('e'),(H+(O-P)^H)('f')]
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 8 - parallel plane'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 8 - parallel plane'))
+        
+        
+        
+        
         D=(A@plane_beta)('D')
         E=(B@plane_beta)('E')
         F=(C@plane_beta)('F')
 
 
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(B^E)('n')]
+        current_step3d=[(B^E)('n')]
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 9 - perpendicular line (prism height)'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 9 - perpendicular line (prism height)'))
+        
+        
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[D,E,F]
+        current_step3d=[D,E,F]
+
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 10 - prims vertices'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 10 - prims vertices'))
+        
         line_ad=Line(A,D)('a')
         line_be=Line(B,E)('b')
         line_cf=Line(C,F)('c')
+        
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[line_ad,line_be,line_cf,(A^B)('_'),(B^C)('_'),(A^C)('_'), (D^E)('_'),(E^F)('_'),(F^D)('_')]
+        current_step3d=[line_ad,line_be,line_cf,(A^B)('_'),(B^C)('_'),(A^C)('_'), (D^E)('_'),(E^F)('_'),(F^D)('_')]
+        
+        current_obj._solution3d_step.append(DrawingSet(*current_step3d)('Step 11 - solid'))
+        current_obj._solution_step.append(DrawingSet(*([obj@HPP for obj  in current_step3d] + [obj@VPP for obj  in current_step3d])   )('Step 11 - solid'))
+        
 
         elems+=[D,E,F,plane_alpha,line_ad,line_be,line_cf]
 
@@ -3846,8 +3949,46 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         current_obj.point_D=D
         current_obj.point_E=E
         current_obj.point_F=F
+
         return current_obj
 
+    def present_solution(self):
+        
+        doc_model = Document(f'{self.__class__.__name__} solution')
+
+        doc_model.packages.append(Package('booktabs'))
+        doc_model.packages.append(Package('float'))
+        doc_model.packages.append(Package('standalone'))
+        doc_model.packages.append(Package('siunitx'))
+
+
+        ReportText.set_container(doc_model)
+        ReportText.set_directory('./SDAresults')
+
+        for no,step3d in enumerate(self._solution3d_step):
+            GeometryScene()
+            
+            for elem in range(no):
+                self._solution3d_step[elem].plot(color='k')
+                self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
+                
+            
+            self._solution3d_step[no].plot(color='r')
+            self._solution_step[no].plot_vp(color='r').plot_hp(color='r')
+                
+            with doc_model.create(Figure(position='H')) as fig:
+                #path=f'./images/image{no}.png'
+                #plt.savefig(path)
+                #fig.add_image(path)
+                fig.add_plot(width=NoEscape(r'1.4\textwidth'))
+                
+                if step3d._label is not None:
+                    fig.add_caption(step3d._label)
+            
+            plt.show()
+            
+        return doc_model
+    
     def get_default_data(self):
 
         point_A = self.__class__.point_A
@@ -3867,7 +4008,6 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
 
         }
         return default_data_dict
-
 
 class SquarePrism(GeometricalCase):
 
