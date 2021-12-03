@@ -16,6 +16,7 @@ import numpy as np
 from sympy import Symbol, symbols
 import copy
 
+
 import itertools as it
 
 def plots_no():
@@ -671,15 +672,17 @@ class Plane(Entity):
             
         self._geo_ref = geo.Plane(p1=p1._geo_ref, a=a, b=b, **kwargs)
         
+        self._p1 = p1
+        
         if a is None:
             self._p2=entity_convert(self._geo_ref.arbitrary_point('u','v').subs({'u':1,'v':0}))
         else:
-            self._p2=a
+            self._p2=entity_convert(a)
         
         if b is None:
             self._p3=entity_convert(self._geo_ref.arbitrary_point('u','v').subs({'u':0,'v':1}))
         else:
-            self._p3=b
+            self._p3=entity_convert(b)
         
 #         if a == normal_vector:
 #             self._geo_ref = geo.Plane(p1=p1._geo_ref, a = normal_vector._geo_ref, b = None, **kwargs)
@@ -688,8 +691,9 @@ class Plane(Entity):
 #         elif a == self._p2 and b == self._p3 :
 #             self._geo_ref = geo.Plane(p1=p1._geo_ref, a=a._geo_ref, b=b._geo_ref, **kwargs)
             
-
-        
+    def _vertices(self):
+        return self._p1,self._p2,self._p3
+    
     def _coding_points(self):
         return (self._geo_ref.p1,self._p2,self._p3,self._geo_ref.p1)
 
