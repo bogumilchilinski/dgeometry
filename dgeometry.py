@@ -16,6 +16,12 @@ import numpy as np
 from sympy import Symbol, symbols
 import copy
 
+from pylatex import Document, Section, Subsection, Subsubsection, Itemize, Package, HorizontalSpace, Description, Marker, Ref, Marker, Figure
+from pylatex.section import Paragraph, Chapter
+from pylatex.utils import italic, NoEscape
+
+
+
 
 import itertools as it
 
@@ -665,24 +671,24 @@ class Plane(Entity):
         super().__init__()
         
         if a is not None:
-            a = a._geo_ref
+            _a_geo_ref = a._geo_ref
 
         if b is not None:
-            b = b._geo_ref
+            _b_geo_ref = b._geo_ref
             
-        self._geo_ref = geo.Plane(p1=p1._geo_ref, a=a, b=b, **kwargs)
+        self._geo_ref = geo.Plane(p1=p1._geo_ref, a=_a_geo_ref, b=_b_geo_ref, **kwargs)
         
         self._p1 = p1
         
         if a is None:
             self._p2=entity_convert(self._geo_ref.arbitrary_point('u','v').subs({'u':1,'v':0}))
         else:
-            self._p2=entity_convert(a)
+            self._p2=a
         
         if b is None:
             self._p3=entity_convert(self._geo_ref.arbitrary_point('u','v').subs({'u':0,'v':1}))
         else:
-            self._p3=entity_convert(b)
+            self._p3=b
         
 #         if a == normal_vector:
 #             self._geo_ref = geo.Plane(p1=p1._geo_ref, a = normal_vector._geo_ref, b = None, **kwargs)
@@ -924,10 +930,14 @@ class GeometricalCase(DrawingSet):
 
     def __init__(self,*assumptions,**kwargs):
         super().__init__()
-        self._label = None
-        self._assumptions=DrawingSet(*assumptions)
+        self._solution_step=[]
+        self._solution3d_step=[]
         
-        self._assumptions3d=None
+        
+        self._label = None
+
+        self._assumptions=DrawingSet(*([elem@HPP for  elem in assumptions] + [elem@VPP for  elem in assumptions]  ))('Assumptions')
+        self._assumptions3d=DrawingSet(*assumptions)
         
         self._given_data={str(elem):elem  for no,elem in enumerate(assumptions)}
         
@@ -936,6 +946,22 @@ class GeometricalCase(DrawingSet):
         self._cached_solution=None
 
 
+    def add_solution_step(self,title,elements=[],projections=None):
+
+        elements_set=DrawingSet(*elements)(title)
+
+        if projections is None:
+            projections = [obj@HPP for obj  in elements] + [obj@VPP for obj  in elements]
+
+        projections_set = DrawingSet(*projections)(title)
+
+        #it sets the step elements
+        self._solution3d_step.append(elements_set)
+        self._solution_step.append(projections_set)
+
+        return DrawingSet(*elements,*projections)(f'{title} - preview')
+        
+        
     def plot(
         self,
         fmt=None,
@@ -1003,8 +1029,6 @@ class GeometricalCase(DrawingSet):
 
     def get_default_data(self):
 
-        
-
         return None
 
     def get_random_parameters(self):
@@ -1036,6 +1060,55 @@ class GeometricalCase(DrawingSet):
             #new_obj._cached_solution=None
             
         return new_obj
+        
+        
+class Prism(GeometricalCase):
+
+    names=['D','E','F','G','H']
+    
+    @classmethod
+    def right_from_parallel_plane(cls,base,point,names=None,**kwargs):
+        
+        point_at_base = point @ base
+        
+        return cls(base=base,height=(point - point_at_base  ),names=names)
+        
+    
+    
+    def __init__(self,base,height,names=None,**kwargs):
+
+        super().__init__()
+
+
+        self._base=base
+        self._height=height
+        
+        
+        if names is not None: self.names=names
+
+        upper_base = [(vertex+height)(self.names[no])  for  no,vertex  in enumerate(base._vertices())]
+        
+        
+        elements= [*base._vertices(),*upper_base, *[proj@HPP for proj in base._vertices()], *[proj@VPP for proj in base._vertices()],
+                                    *[proj@HPP for proj in upper_base], *[proj@VPP for proj in upper_base]
+                   ]
+
+        self._assumptions=DrawingSet(*elements)
+        
+        self += [*base._vertices(),*upper_base]
+
+        
+        
+        
+    def solution(self):
+        
+        
+        current_obj=copy.deepcopy(self)
+
+        return current_obj
+        
+        
+######################################################### cases
         
 class PyramidWithSquareBaseFromDiagonalAndPoint(GeometricalCase):
 
@@ -4009,8 +4082,8 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         doc_model.packages.append(Package('siunitx'))
 
 
-        ReportText.set_container(doc_model)
-        ReportText.set_directory('./SDAresults')
+        #ReportText.set_container(doc_model)
+        #ReportText.set_directory('./SDAresults')
 
         for no,step3d in enumerate(self._solution3d_step):
             GeometryScene()
@@ -5276,8 +5349,8 @@ class HFLinesIsoscelesRightTrianglePyramid(GeometricalCase):
         doc_model.packages.append(Package('siunitx'))
 
 
-        ReportText.set_container(doc_model)
-        ReportText.set_directory('./SDAresults')
+#         ReportText.set_container(doc_model)
+#         ReportText.set_directory('./SDAresults')
 
         for no,step3d in enumerate(self._solution3d_step):
             GeometryScene()
@@ -5529,8 +5602,8 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
         doc_model.packages.append(Package('siunitx'))
 
 
-        ReportText.set_container(doc_model)
-        ReportText.set_directory('./SDAresults')
+#         ReportText.set_container(doc_model)
+#         ReportText.set_directory('./SDAresults')
 
         for no,step3d in enumerate(self._solution3d_step):
             GeometryScene()
