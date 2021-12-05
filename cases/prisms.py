@@ -57,9 +57,10 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
 
             
         # it creates first step of solution
-        self._assumptions=DrawingSet(*projections)('Assumptions')
-        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+        #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
         
+        #self += [point_A,point_O,point_P,point_H]
 
         self._point_A=point_A
         self._point_P=point_P
@@ -69,8 +70,7 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
         
-        self._solution_step.append(self._assumptions)
-        self._solution3d_step.append(self._assumptions3d)
+
         
         
     def solution(self):
@@ -85,6 +85,9 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
         
         S = (A @ (O^P))('S') #'Srodek' podstawy
         
+        
+        
+        
         dirPS = P-S
         dirOS = O-S
         triangle_height = A.distance(S).n(5)
@@ -92,7 +95,7 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
         
         B = (S + dirPS/(P.distance(S))*(triangle_height))('B')
         C = (S - dirPS/(P.distance(S))*(triangle_height))('C')
-
+        triangle_plane=Plane(A,B,C)
 
         
         current_set=DrawingSet(*current_obj._solution_step[-1])
@@ -117,7 +120,7 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
         #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
         #it sets the step elements
-        current_obj._add_solution_step('Step 1 - axis of rotation',[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')])
+        current_obj.add_solution_step('Step 1 - axis of rotation',[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')])
 
 
 
@@ -136,17 +139,24 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
         
         line_kk=Line(P, (O@line_k)  )('k')
 
-        current_obj.A0=A.rotate_about(axis=line_k)('A_0')
+        A0=A.rotate_about(axis=line_k)('A_0')
+        current_obj.A0=A0
         
         ### Step 2 #####
         ###  plane of rotation of A ####
+        
+        current_obj.add_solution_step('Point A rotation',[A0])
         
         #### Step 3 ####
         ### rotated point A0 of A #####
         
         
         
-        current_obj.B0=B.rotate_about(axis=line_k)('B_0')
+        
+        B0=B.rotate_about(axis=line_k)('B_0')
+        current_obj.B0=B0
+        
+        current_obj.add_solution_step('Point B rotation',[B0])
         
         #### Step 4 ####
         ### postion of B0 (based on triangle geometry) #####       
@@ -174,11 +184,14 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
         
 
         
-        D = (A + dirHG/distance_HG*triangle_height)('D')
-        E = (B + dirHG/distance_HG*triangle_height)('E')
-        F = (C + dirHG/distance_HG*triangle_height)('F')
+        #D = (A + dirHG/distance_HG*triangle_height)('D')
+        #E = (B + dirHG/distance_HG*triangle_height)('E')
+        #F = (C + dirHG/distance_HG*triangle_height)('F')
+        
+        A,B,C,D,E,F = Prism(triangle_plane, dirHG/distance_HG*triangle_height)
+        
 
-      
+        current_obj.add_solution_step('Vertices D,E,F',[D,E,F])
 
 
         
@@ -202,6 +215,10 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
 
         current_obj._solution_step.append(current_set)
         current_obj._assumptions=DrawingSet(*elems,*projections)
+        
+        current_obj._assumptions=DrawingSet(*projections)('Solution')
+        current_obj._assumptions3d=DrawingSet(*elems)
+        
         current_obj._point_B=B
         current_obj._point_C=C
         current_obj.point_D=D
@@ -397,7 +414,7 @@ class EquilateralTrianglePrism(GeometricalCase):
 
         triangle_plane=Plane(A,B,C)
 
-        A,B,C,D,E,F = [*Prism].right_from_parallel_plane(triangle_plane, H)
+        A,B,C,D,E,F = Prism.right_from_parallel_plane(triangle_plane, H)
 
         line_ad=Line(A,D)('a')
         line_be=Line(B,E)('b')

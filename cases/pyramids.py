@@ -655,6 +655,10 @@ class RightTriangleLongLegAtPOPyramid(GeometricalCase):
     
     shift = [Point(x,y,z) for x in [-1,-0.5,0,0.5,1] for y in [-1,-0.5,0,1,1.5,2] for z in [-1,-0.5,0,0.5,1] ]
     
+
+    
+    
+    
     def __init__(self,point_A=None,point_P=None,point_O=None,point_H=None,*args,**kwargs):
 
         super().__init__()
@@ -664,7 +668,11 @@ class RightTriangleLongLegAtPOPyramid(GeometricalCase):
         else:
             projections=[]
 
-        self._assumptions=DrawingSet(*projections)
+        # it creates first step of solution
+        self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+        #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        
+        #self += [point_A,point_O,point_P,point_H]
 
         self._point_A=point_A
         self._point_P=point_P
@@ -674,7 +682,7 @@ class RightTriangleLongLegAtPOPyramid(GeometricalCase):
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
         
-        self._solution_step.append(self._assumptions)
+
 
     def solution(self):
         
@@ -696,50 +704,101 @@ class RightTriangleLongLegAtPOPyramid(GeometricalCase):
             dirAS = S-A
             longer_leg = 2*A.distance(S)
 
-            #square_side =  square_diagonal / (((3)**(1/2))/2)
-    #         print(square_diagonal)
             C = (S + dirPS/(P.distance(S))*(longer_leg))('C')
-    #         D = (S - dirPS/(P.distance(S))*(diamond_diagonal))('D')
             B = (A @ (O^P))('B')
-    #         line_AD=A^D
-    #         line_AB=A^B
-    #         line_BC=line_AD.parallel_line(P)
-    #         line_AS=Line(A,S)
-    #         C=line_BC.intersection(line_AS)[0]
 
+            triangle_plane=Plane(A,B,C)
 
-
-            current_set=DrawingSet(*current_obj._solution_step[-1])
 
             line_a=Line(A,B)('a')
-            line_b=Line(B,C)('b')
-            line_c=Line(C,A)('c')
-            #line_d=Line(D,A)('d')
+            line_b=Line(C,A)('b')
             plane_alpha=Plane(A,O,P)
 
             plane_beta=HorizontalPlane(P)
 
-            line_k = plane_alpha.intersection(plane_beta)[0]
+
+
+            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+
+
+            point_P1 = plane_beta.intersection(A^O)[0]('1')
+            current_obj.P1=point_P1
+            line_kk = (P^point_P1)('a')
+
+
+
+            # it creates next step of solution - lines are presented
+            #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
+
+            #it sets the step elements
+            current_obj.add_solution_step('Step 1 - axis of rotation',[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')])
+
+
 
             elems=self._assumptions
             projections=[]
             point_0_dict={}
+            eps_dict={}
 
+
+            point_B=B
+            point_C=C
+            point_O=O
+
+
+            ##################   plane rotation
 
             line_kk=Line(P, (O@line_k)  )('k')
 
-            current_obj.A0=A.rotate_about(axis=line_k)('A_0')
-            current_obj.B0=B.rotate_about(axis=line_k)('B_0')
+            A0=A.rotate_about(axis=line_k)('A_0')
+            current_obj.A0=A0
+
+            ### Step 2 #####
+            ###  plane of rotation of A ####
+
+            current_obj.add_solution_step('Point A rotation',[A0])
+
+            #### Step 3 ####
+            ### rotated point A0 of A #####
+
+
+
+
+            B0=B.rotate_about(axis=line_k)('B_0')
+            current_obj.B0=B0
+
+            current_obj.add_solution_step('Point B rotation',[B0])
+
+            #### Step 4 ####
+            ### postion of B0 (based on triangle geometry) #####       
+
+
+
+
             current_obj.C0=C.rotate_about(axis=line_k)('C_0')
+
+            #### Step 5 ####
+            ### postion of C0 (based on triangle geometry) #####      
+
             #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
             current_obj.O0=O.rotate_about(axis=line_k)('O_0')
 
 
-            #plane_beta=Plane(H,H+(B-A),H-(C-A))
+
+            G = (H@plane_alpha)('G')
+
+
+            ############  upper  base
+
+
+
+            
             plane_beta=Plane(H,H+(A-P),H-(O-P))
             E=(A@plane_beta)('E')
 
-
+            current_obj.add_solution_step('Vertex E',[E])
+            
+            
             line_ae=Line(S,E)('a')
 
             elems+=[E,plane_alpha,line_ae]
@@ -749,10 +808,11 @@ class RightTriangleLongLegAtPOPyramid(GeometricalCase):
 
 
             #print(point_0_dict)
-            elems+=[line_a,line_b,#,E,F,G,H,line_s1,line_s2,line_s3,line_s4
-                  ]
+            elems+=[point_P1,line_a,line_b,#,E,F,G,H,line_s1,line_s2,line_s3,line_s4
+                   ]
 
-            projections+=[current_obj.A0@HPP,current_obj.A0@VPP,current_obj.B0@HPP,current_obj.B0@VPP,
+            projections+=[point_P1@HPP,point_P1@VPP,
+                          current_obj.A0@HPP,current_obj.A0@VPP,current_obj.B0@HPP,current_obj.B0@VPP,
                           current_obj.C0@HPP,current_obj.C0@VPP,
                           #current_obj.D0@HPP,current_obj.D0@VPP,
                           B@HPP,B@VPP,C@HPP,C@VPP,
@@ -761,14 +821,17 @@ class RightTriangleLongLegAtPOPyramid(GeometricalCase):
                           line_kk@HPP,line_kk@VPP,#line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
                          #line_s4@HPP,line_s4@VPP
                         ]
-            current_set+=[*elems,*projections]
+            #current_set+=[*elems,*projections]
 
-            current_obj._solution_step.append(current_set)
+            #current_obj._solution_step.append(current_set)
             current_obj._assumptions=DrawingSet(*elems,*projections)
             current_obj._point_B=B
             current_obj._point_C=C
             #current_obj._point_D=D
             current_obj.point_E=E
+            
+            current_obj._assumptions=DrawingSet(*current_obj.get_projections())('Solution')
+            current_obj._assumptions3d=DrawingSet(*current_obj)
             
             self._cached_solution = current_obj
             
@@ -988,7 +1051,7 @@ class SquarePyramid(GeometricalCase):
         }
         return default_data_dict
 
-class TriangularPyramid(TriangularPrism):
+class TriangularPyramid(GeometricalCase):
 
     point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
 
@@ -1000,7 +1063,7 @@ class TriangularPyramid(TriangularPrism):
     
 
     
-class TriangularPyramidHFLines(TriangularPyramid):
+class TriangularPyramidHFLines(GeometricalCase):
     point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
 
     point_B = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in [5,5.5,6,6.5,7] ]
