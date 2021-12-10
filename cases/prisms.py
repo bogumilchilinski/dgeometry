@@ -21,6 +21,9 @@ import copy
 import itertools as it
 from ..dgeometry import *
 
+
+
+
 class GivenHeightHFLinesIsoscelesRightTrianglePrism(GeometricalCase):
 
     #quite good data

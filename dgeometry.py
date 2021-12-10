@@ -20,7 +20,7 @@ from pylatex import Document, Section, Subsection, Subsubsection, Itemize, Packa
 from pylatex.section import Paragraph, Chapter
 from pylatex.utils import italic, NoEscape
 
-
+from dynpy.utilities.report import ReportText
 
 
 import itertools as it
@@ -681,25 +681,34 @@ class Plane(Entity):
     def __init__(self,p1, a=None, b=None, **kwargs):
         super().__init__()
         
+        
         if a is not None:
             _a_geo_ref = a._geo_ref
+        else:
+            _a_geo_ref=a
 
         if b is not None:
             _b_geo_ref = b._geo_ref
+        else:
+            _b_geo_ref=b
             
         self._geo_ref = geo.Plane(p1=p1._geo_ref, a=_a_geo_ref, b=_b_geo_ref, **kwargs)
         
         self._p1 = p1
         
         if a is None:
-            self._p2=entity_convert(self._geo_ref.arbitrary_point('u','v').subs({'u':1,'v':0}))
+            _a_geo_ref= self._geo_ref.arbitrary_point('u','v').subs({'u':1,'v':0})
+            self._p2=entity_convert(_a_geo_ref)
         else:
             self._p2=a
         
         if b is None:
-            self._p3=entity_convert(self._geo_ref.arbitrary_point('u','v').subs({'u':0,'v':1}))
+            _b_geo_ref=self._geo_ref.arbitrary_point('u','v').subs({'u':0,'v':1})
+            self._p3=entity_convert(_b_geo_ref)
         else:
             self._p3=b
+            
+        
         
 #         if a == normal_vector:
 #             self._geo_ref = geo.Plane(p1=p1._geo_ref, a = normal_vector._geo_ref, b = None, **kwargs)
