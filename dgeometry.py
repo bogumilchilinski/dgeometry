@@ -748,6 +748,65 @@ class Plane(Entity):
 
         return entity_convert(self._geo_ref.parallel_plane(p._geo_ref))
     
+class Tetragon(Plane):
+    _label = 'Tetragon'
+
+    
+    
+    def __init__(self,p1, a=None, b=None,c=None, **kwargs):
+#         super().__init__()
+        
+        
+        if a is not None:
+            _a_geo_ref = a._geo_ref
+        else:
+            _a_geo_ref=a
+
+        if b is not None:
+            _b_geo_ref = b._geo_ref
+        else:
+            _b_geo_ref=b
+            
+        if c is not None:
+            _c_geo_ref = c._geo_ref
+        else:
+            _c_geo_ref=c
+            
+        self._geo_ref = geo.Plane(p1=p1._geo_ref, a=_a_geo_ref, b=_b_geo_ref, **kwargs)
+        
+        self._p1 = p1
+        
+        if a is None:
+            _a_geo_ref= self._geo_ref.arbitrary_point('u','v').subs({'u':1,'v':0})
+            self._p2=entity_convert(_a_geo_ref)
+        else:
+            self._p2=a
+        
+        if b is None:
+            _b_geo_ref=self._geo_ref.arbitrary_point('u','v').subs({'u':0,'v':1})
+            self._p3=entity_convert(_b_geo_ref)
+        else:
+            self._p3=b
+        if c is None:
+            _c_geo_ref=self._geo_ref.arbitrary_point('u','v').subs({'u':0,'v':1})
+            self._p4=entity_convert(_c_geo_ref)
+        else:
+            self._p4=c
+            
+        
+        
+#         if a == normal_vector:
+#             self._geo_ref = geo.Plane(p1=p1._geo_ref, a = normal_vector._geo_ref, b = None, **kwargs)
+#             b = Point(-20,-20,solve(Eq(self.equation(-20,-20),0))[0])
+        
+#         elif a == self._p2 and b == self._p3 :
+#             self._geo_ref = geo.Plane(p1=p1._geo_ref, a=a._geo_ref, b=b._geo_ref, **kwargs)
+            
+    def _vertices(self):
+        return self._p1,self._p2,self._p3,self._p4
+
+
+    
 class HorizontalPlane(Plane):
     _at_symbol=''
     def __init__(self,p1=None):
@@ -1151,7 +1210,10 @@ class Prism(GeometricalCase):
 
         return current_obj
         
-        
+class TetraPrism(Prism):
+
+    names=['E','F','G','H']
+
 ######################################################### cases
         
 # class PyramidWithSquareBaseFromDiagonalAndPoint(GeometricalCase):
