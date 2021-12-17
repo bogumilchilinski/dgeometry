@@ -1130,6 +1130,45 @@ class GeometricalCase(DrawingSet):
 
         return new_obj
 
+    
+    def present_solution(self):
+        
+        doc_model = Document(f'{self.__class__.__name__} solution')
+
+        doc_model.packages.append(Package('booktabs'))
+        doc_model.packages.append(Package('float'))
+        doc_model.packages.append(Package('standalone'))
+        doc_model.packages.append(Package('siunitx'))
+
+
+        ReportText.set_container(doc_model)
+        ReportText.set_directory('./SDAresults')
+
+        for no,step3d in enumerate(self._solution3d_step):
+            GeometryScene()
+            
+            for elem in range(no):
+                self._solution3d_step[elem].plot(color='k')
+                self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
+                
+            
+            self._solution3d_step[no].plot(color='r')
+            self._solution_step[no].plot_vp(color='r').plot_hp(color='r')
+                
+            with doc_model.create(Figure(position='H')) as fig:
+                #path=f'./images/image{no}.png'
+                #plt.savefig(path)
+                #fig.add_image(path)
+                fig.add_plot(width=NoEscape(r'1.4\textwidth'))
+                
+                if step3d._label is not None:
+                    fig.add_caption(step3d._label)
+            
+            plt.show()
+            
+        return doc_model
+    
+    
     def get_default_data(self):
 
         return None

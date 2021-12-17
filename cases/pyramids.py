@@ -18,7 +18,7 @@ import copy
 
 
 import itertools as it
-from ..dgeometry import *
+from ..dgeometry import *#wyskakuje bład w jupku nie wiem czemu
 
 
 class RectangularBaseACDiagonalPyramid(GeometricalCase):
@@ -279,7 +279,7 @@ class RectangularBaseACDiagonalPyramid(GeometricalCase):
         return parameters_dict
 
 
-class RightTriangleBaseACSidePyramid(GeometricalCase):
+class RightTriangleBaseACSidePyramid(GeometricalCase):#TO DO
 
 
     point_A = [Point(x,y,z) for x in [6,6.5] for y in [7,7.5,8] for z in   [8,8.5]  ]
@@ -563,7 +563,7 @@ class RightTriangleBaseACSidePyramid(GeometricalCase):
 
 
 
-class RightTriangleBaseACHypotenusePyramid(GeometricalCase):
+class RightTriangleBaseACHypotenusePyramid(GeometricalCase):#TO DO
 
 
 
@@ -874,10 +874,10 @@ class HFLinesRectangleLongSideAtPOPyramid(GeometricalCase):
         else:
             projections=[]
 
-        self._assumptions=DrawingSet(*projections)('Assumptions')
-        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+#         self._assumptions=DrawingSet(*projections)('Assumptions')
+#         self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
         
-        self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+#         self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
 
         self._point_A=point_A
         self._point_P=point_P
@@ -885,10 +885,13 @@ class HFLinesRectangleLongSideAtPOPyramid(GeometricalCase):
         self._point_H=point_H
 
         
-        self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
+#         self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
         
-        #self._solution_step.append(self._assumptions)
-        #self._solution3d_step.append(self._assumptions3d)
+#         self._solution_step.append(self._assumptions)
+#         self._solution3d_step.append(self._assumptions3d)
+        self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        self._assumptions=DrawingSet(*projections)
 
     def solution(self):
         
@@ -942,31 +945,49 @@ class HFLinesRectangleLongSideAtPOPyramid(GeometricalCase):
 
             self.add_solution_step('Axis of rotation',[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')])
 
-
-
-
             elems=self._assumptions
             projections=[]
             point_0_dict={}
             eps_dict={}
-
-
+            
+            #### Step 1 ####
+            #### Point A rotation ####
 
             current_obj.A0=A.rotate_about(axis=line_k)('A_0')
+            current_obj.A0=point_A
+            current_obj.add_solution_step('Point A rotation',[point_A])
+            
+            #### Step 2 ####
+            #### Point B rotation ####
+            
             current_obj.B0=B.rotate_about(axis=line_k)('B_0')
+            current_obj.B0=point_B
+            current_obj.add_solution_step('Point B rotation',[point_B])
+            
+            #### Step 3 ####
+            #### Point C rotation ####
+            
             current_obj.C0=C.rotate_about(axis=line_k)('C_0')
+            current_obj.C0=point_C
+            current_obj.add_solution_step('Point C rotation',[point_C])
+            
+            #### Step 4 ####
+            #### Point D rotation ####
+            
             current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+            current_obj.D0=point_D
+            current_obj.add_solution_step('Point D rotation',[point_D])
+            
+            #### Step 5 ####
+            #### Point O rotation ####
+            
             current_obj.O0=O.rotate_about(axis=line_k)('O_0')
-
+            current_obj.O0=point_O
+            current_obj.add_solution_step('Point O rotation',[point_O])
 
             point_B=B
             point_C=C
             point_O=O
-            #current_obj.A0=point_
-            current_obj.B0=point_B
-            current_obj.C0=point_C
-            current_obj.O0=point_O
-
 
             triangle_plane=Plane(A,B,C)
 
@@ -975,7 +996,10 @@ class HFLinesRectangleLongSideAtPOPyramid(GeometricalCase):
             E=(A@plane_beta)('E')
 
             self.add_solution_step('Rotated points',[B,C,E])
-
+            
+            current_obj.E=point_E
+            current_obj.add_solution_step('Point E rotation',[point_E])
+            
             elems+=[E]
 
             projections+=[
@@ -1119,10 +1143,10 @@ class HFLinesIsoscelesRightTrianglePyramid(GeometricalCase):
         else:
             projections=[]
 
-        self._assumptions=DrawingSet(*projections)('Assumptions')
-        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+#         self._assumptions=DrawingSet(*projections)('Assumptions')
+#         self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
         
-        self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+#         self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
 
         self._point_A=point_A
         self._point_P=point_P
@@ -1134,6 +1158,9 @@ class HFLinesIsoscelesRightTrianglePyramid(GeometricalCase):
         
         #self._solution_step.append(self._assumptions)
         #self._solution3d_step.append(self._assumptions3d)
+        self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        self._assumptions=DrawingSet(*projections)
 
     def solution(self):
         
@@ -1190,31 +1217,54 @@ class HFLinesIsoscelesRightTrianglePyramid(GeometricalCase):
             point_0_dict={}
             eps_dict={}
 
-
+            #### Step 1 ####
+            #### Point A rotation ####
 
             current_obj.A0=A.rotate_about(axis=line_k)('A_0')
+            current_obj.A0=point_A
+            current_obj.add_solution_step('Point A rotation',[point_A])
+            
+            #### Step 2 ####
+            #### Point B rotation ####
+            
             current_obj.B0=B.rotate_about(axis=line_k)('B_0')
+            current_obj.B0=point_B
+            current_obj.add_solution_step('Point B rotation',[point_B])
+            
+            #### Step 3 ####
+            #### Point C rotation ####
+            
             current_obj.C0=C.rotate_about(axis=line_k)('C_0')
+            current_obj.C0=point_C
+            current_obj.add_solution_step('Point C rotation',[point_C])
+            
+            #### Step 4 ####
+            #### Point D rotation ####
+            
             #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
             current_obj.O0=O.rotate_about(axis=line_k)('O_0')
+            current_obj.O0=point_O
+            current_obj.add_solution_step('Point O rotation',[point_O])
 
 
             point_B=B
             point_C=C
             point_O=O
             #current_obj.A0=point_
-            current_obj.B0=point_B
-            current_obj.C0=point_C
-            current_obj.O0=point_O
-
+#             current_obj.B0=point_B
+#             current_obj.C0=point_C
+#             current_obj.O0=point_O
 
             triangle_plane=Plane(A,B,C)
 
             #plane_beta=Plane(H,H+(B-A),H-(C-A))
             plane_beta=Plane(H,H+(A-P),H-(O-P))
+            
             D=(A@plane_beta)('D')
+            current_obj.D=point_D
+            current_obj.add_solution_step('Point O rotation',[point_O])
 
-            self.add_solution_step('Axis of rotation',[D])
+#             self.add_solution_step('Axis of rotation',[D])
 
             elems+=[D]
 
@@ -1352,7 +1402,10 @@ class RectangleLongSideAtPOPyramid(GeometricalCase):
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
         
-        self._solution_step.append(self._assumptions)
+#         self._solution_step.append(self._assumptions)
+        self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        self._assumptions=DrawingSet(*projections)
 
     def solution(self):
         current_obj=copy.deepcopy(self)
@@ -1423,11 +1476,40 @@ class RectangleLongSideAtPOPyramid(GeometricalCase):
             
 #         line_kk=Line(P,S_I)('k')
 
+        #### Step 1 ####
+        #### Point A rotation ####
+
         current_obj.A0=A.rotate_about(axis=line_k)('A_0')
+        current_obj.A0=point_A
+        current_obj.add_solution_step('Point A rotation',[point_A])
+        
+        #### Step 2 ####
+        #### Point B rotation ####
+        
         current_obj.B0=B.rotate_about(axis=line_k)('B_0')
+        current_obj.B0=point_B
+        current_obj.add_solution_step('Point B rotation',[point_B])
+        
+        #### Step 3 ####
+        #### Point C rotation ####
+        
         current_obj.C0=C.rotate_about(axis=line_k)('C_0')
+        current_obj.C0=point_C
+        current_obj.add_solution_step('Point C rotation',[point_C])
+        
+        #### Step 4 ####
+        #### Point D rotation ####
+        
         current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+        current_obj.D0=point_D
+        current_obj.add_solution_step('Point D rotation',[point_D])
+        
+        #### Step 5 ####
+        #### Point O rotation ####
+        
         current_obj.O0=O.rotate_about(axis=line_k)('O_0')
+        current_obj.O0=point_O
+        current_obj.add_solution_step('Point O rotation',[point_O])
         
 #         current_obj.A0=point_0_dict['A']
 #         current_obj.B0=point_0_dict['B']
@@ -1529,8 +1611,11 @@ class RightTriangleShortLegAtPOPyramid(GeometricalCase):
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
         
+#         self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+#         self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+#         self._assumptions=DrawingSet(*projections)
         self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
-        #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
         self._assumptions=DrawingSet(*projections)
 
     def solution(self):
@@ -1774,6 +1859,9 @@ class RightTriangleLongLegAtPOPyramid(GeometricalCase):
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
         
+        self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        self._assumptions=DrawingSet(*projections)
 
 
     def solution(self):
@@ -2009,7 +2097,11 @@ class SquarePyramid(GeometricalCase):
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
         
-        self._solution_step.append(self._assumptions)
+#         self._solution_step.append(self._assumptions)
+        
+        self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
+        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        self._assumptions=DrawingSet(*projections)
 
     def solution(self):
         current_obj=copy.deepcopy(self)
@@ -2077,11 +2169,40 @@ class SquarePyramid(GeometricalCase):
 #             elems += [I_o]
 #             projections+=[I_o@HPP,I_o@VPP]
 
+        #### Step 1 ####
+        #### Point A rotation ####
+
         current_obj.A0=A.rotate_about(axis=line_k)('A_0')
+        current_obj.A0=point_A
+        current_obj.add_solution_step('Point A rotation',[point_A])
+            
+        #### Step 2 ####
+        #### Point B rotation ####
+            
         current_obj.B0=B.rotate_about(axis=line_k)('B_0')
+        current_obj.B0=point_B
+        current_obj.add_solution_step('Point B rotation',[point_B])
+            
+        #### Step 3 ####
+        #### Point C rotation ####
+            
         current_obj.C0=C.rotate_about(axis=line_k)('C_0')
+        current_obj.C0=point_C
+        current_obj.add_solution_step('Point C rotation',[point_C])
+            
+        #### Step 4 ####
+        #### Point D rotation ####
+            
         current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+        current_obj.D0=point_D
+        current_obj.add_solution_step('Point D rotation',[point_D])
+        
+        #### Step 5 ####
+        #### Point O rotation ####
+        
         current_obj.O0=O.rotate_about(axis=line_k)('O_0')
+        current_obj.O0=point_O
+        current_obj.add_solution_step('Point O rotation',[point_O])
     
 #        line_kk=Line(P,S_I)('k')
         
@@ -2094,7 +2215,8 @@ class SquarePyramid(GeometricalCase):
         #plane_beta=Plane(H,H+(B-A),H-(C-A))
         plane_beta=Plane(H,H+(A-P),H-(O-P))
         E=(S@plane_beta)('E')
-
+        current_obj.E=point_E
+        current_obj.add_solution_step('Point E rotation',[point_E])
 
         line_ae=Line(S,E)('a')
 
