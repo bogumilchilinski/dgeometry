@@ -1177,6 +1177,11 @@ class HFLinesIsoscelesRightTrianglePyramid(GeometricalCase):
             P=current_obj._point_P
             H=current_obj._point_H
 
+            point_O=O
+            point_P=P
+            point_H=H
+
+
             S = (A @ (O^P))('S') #'Srodek' podstawy
 
             dirPS = P-S
@@ -1187,6 +1192,9 @@ class HFLinesIsoscelesRightTrianglePyramid(GeometricalCase):
             B = (S + dirPS/(P.distance(S))*(triangle_height))('B')
             C = (S - dirPS/(P.distance(S))*(triangle_height))('C')
 
+            point_A=A
+            point_B=B
+            point_C=C
 
 
             current_set=DrawingSet(*current_obj._solution_step[-1])
