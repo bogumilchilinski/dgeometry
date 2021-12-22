@@ -1078,7 +1078,7 @@ class TetragonalPrism(GeometricalCase):
         return default_data_dict
     
 class ParallelogramPrism(GeometricalCase):
-<<<<<<< HEAD
+#<<<<<<< HEAD
 
     point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in range(0,1)  ]
 
@@ -1286,8 +1286,8 @@ class TiltedTetragonalPrism(TetragonalPrism):
         parameters_dict[Symbol('C')]=(point_B+point_Z)*0.5+Point(-1,0,0)
         return parameters_dict
 class TriangularPrism(GeometricalCase):
-=======
->>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
+#=======
+#>>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
 
     point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in range(0,1)  ]
 
@@ -1590,13 +1590,13 @@ class TruncatedParallelogramPrism(GeometricalCase):
         }
         return default_data_dict
     
-<<<<<<< HEAD
+#<<<<<<< HEAD
 class GivenHeightHFLinesIsoscelesRightTrianglePrism2(GivenHeightHFLinesIsoscelesRightTrianglePrism):
 
     point_A = [Point(x,y,z) for x in [6,6.5] for y in [7,7.5,8] for z in   [8,8.5]  ]
 
     point_C=[Point(x,y,z) for x in  [3,3.5,4,4.5] for y in [2,2.5,3] for z in   [2,2.5,3,4,5]]
-=======
+#=======
 
     
     def get_random_parameters(self):
@@ -1995,13 +1995,13 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
     point_A = [Point(x,y,z) for x in [6,6.5] for y in [7,7.5,8] for z in   [8,8.5]  ]
 
     point_O =[Point(x,y,z) for x in  [3,3.5,4,4.5] for y in [2,2.5,3] for z in   [2,2.5,3,4,5]]
->>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
+# >>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
 
     point_P = [Point(x,y,z) for x in [2,2.5] for y in [10,10.5,11]  for z in [4,5,6] ]
 
     point_H = [Point(x,y,z) for x in [9,9.5,10] for y in [2,2.5,3] for z in range(6,8) ]
     
-<<<<<<< HEAD
+# <<<<<<< HEAD
     shift = [Point(x,y,z) for x in [-3,-2.5,-2,-1,-0.5,0,0.5,1] for y in [2,2.5,3] for z in [-2,-1.5,-1,-0.5,0] ]
     
 
@@ -2009,7 +2009,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
     
     def get_default_data(self):
 
-=======
+# =======
     shift = [Point(x,y,z) for x in [-1,0,0.5,1,1.5,2] for y in [-1,-.5,0] for z in [-2,-1.5,-1,-0.5,0] ]
     
 
@@ -2246,38 +2246,38 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
 
 
->>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
+#>>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
         point_A = self.__class__.point_A
         point_O = self.__class__.point_O 
         point_P=self.__class__.point_P
         point_H=self.__class__.point_H
 
-<<<<<<< HEAD
+#<<<<<<< HEAD
 
 
-=======
+#=======
         shift = self.shift
->>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
+#>>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
 
         
         default_data_dict = {
             Symbol('A'): point_A,
             Symbol('P'): point_P,
             Symbol('O'): point_O,
-<<<<<<< HEAD
+#<<<<<<< HEAD
             
 
             Symbol('H'): point_H,
-=======
+#=======
             Symbol('H'): point_H,
             'shift':shift
 
->>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
+#>>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
 
 
         }
         return default_data_dict
-<<<<<<< HEAD
+#<<<<<<< HEAD
 =======
     
     def get_random_parameters(self):
@@ -3261,4 +3261,4 @@ class GivenHeightRhomboidPrism(GeometricalCase):
 
         return parameters_dict
     
->>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
+#>>>>>>> 69abd7d9dd4ed6a8e29a9c2c18ecccdcec683cd0
