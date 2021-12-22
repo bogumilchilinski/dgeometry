@@ -1740,7 +1740,7 @@ class TriangularPrism(GeometricalCase):
 #         plane_gamma=Plane(D,E,F)
 
         triangle_plane=Plane(A,B,C)
-        A,B,C,D,E,F = [*Prism].right_from_parallel_plane(triangle_plane, O)
+        A,B,C,D,E,F = Prism.right_from_parallel_plane(triangle_plane, O)
 
         line_ad=Line(A,D)('a')
         line_be=Line(B,E)('b')
