@@ -39,15 +39,15 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
         super().__init__()
 
 
-        if point_A and point_O and point_P and point_H:
-            projections=(point_A@HPP,point_O@HPP,point_O@VPP,point_P@VPP,point_P@HPP,point_A@VPP,point_H@VPP,point_H@HPP)
+        if point_A and point_O and point_P:  ### and point_H
+            projections=(point_A@HPP,point_O@HPP,point_O@VPP,point_P@VPP,point_P@HPP,point_A@VPP,point_H@VPP,point_H@HPP)  
             
         else:
             projections=[]
 
 
             
-        # Firs step
+        # First step
         self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
         self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
         self._assumptions=DrawingSet(*projections)
@@ -70,24 +70,19 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             A=current_obj._point_A
             O=current_obj._point_O
             P=current_obj._point_P
-
             H=current_obj._point_H
 
 
-            S = (A @ (O^P))('S') #Middle of the base, of the triangle.
-
-
-
+            S = (A @ (O^P))('S') # Middle of the base, of the triangle.
 
             dirPS = P-S
             dirOS = O-S
             triangle_height = A.distance(S).n(5)
-            #triangle_side =  triangle_height / ((3**(1/2))/2)
+            triangle_side =  triangle_height / ((3**(1/2))/2)
 
             B = (S + dirPS/(P.distance(S))*(triangle_height))('B')
             C = (S - dirPS/(P.distance(S))*(triangle_height))('C')
             triangle_plane=Plane(A,B,C)
-
 
             current_set=DrawingSet(*current_obj._solution_step[-1])
 
@@ -108,7 +103,6 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             current_obj.P1=point_P1
             line_kk = (P^point_P1)('a')
             line_f = (P^point_P2)('f')
-
 
 
             # it creates next step of solution - lines are presented
@@ -168,8 +162,11 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
             #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
             current_obj.O0=O.rotate_about(axis=line_k)('O_0')
+            line_ab=Line(A,B)('|AB|')
+            line_bc=Line(B,C)('|BC|')
+            line_ca=Line(C,A)('|CA|')
             
-            current_obj.add_solution_step('Base ABC',[A,B,C])
+            current_obj.add_solution_step('Base ABC',[A,B,C,line_ab,line_bc,line_ca])
 
 
 
@@ -191,22 +188,18 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
 
 
+            line_de=Line(D,E)('|DE|')
+            line_ef=Line(E,F)('|EF|', color='g')
+            line_fd=Line(F,D)('|FD|')
             
+            current_obj.add_solution_step('Prism',[D,E,F,line_de,line_ef,line_fd])
             
-            current_obj.add_solution_step('Vertices D,E,F',[D,E,F])
-
-
-
-
-            elems+=[D,E,F,G]
-
-            projections+=[G@HPP,G@VPP,
-                         D@HPP,D@VPP,E@HPP,E@VPP,F@HPP,F@VPP]
-
-
-
-
-
+            line_eb=Line(E,B)('|EB|')
+            line_da=Line(D,A)('|DA|')
+            line_fc=Line(F,C)('|FC|')
+            
+            current_obj.add_solution_step('Vertices D,E,F',[D,E,F,line_de,line_fd,line_ab,line_bc,line_ca,line_eb,line_da,line_fc])
+            
             current_obj._assumptions=DrawingSet(*current_obj.get_projections())('Solution')
             current_obj._assumptions3d=DrawingSet(*current_obj)
 
@@ -215,6 +208,8 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             current_obj.point_D=D
             current_obj.point_E=E
             current_obj.point_F=F
+           
+
             self._cached_solution = current_obj
         else:
             current_obj = copy.deepcopy(self._cached_solution)
@@ -240,7 +235,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             
             for elem in range(no):
                 self._solution3d_step[elem].plot(color='k')
-                self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
+                self._solution_step[elem].plot_vp( ='k').plot_hp(color='k')
                 
             
             self._solution3d_step[no].plot(color='r')
