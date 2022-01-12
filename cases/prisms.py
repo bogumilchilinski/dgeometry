@@ -1630,7 +1630,6 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             
         # it creates first step of solution
         self.add_solution_step('Assumptions',[point_A,point_O,point_P,point_H])
-        
         self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
         self._assumptions=DrawingSet(*projections)
         #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
