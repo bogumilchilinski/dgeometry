@@ -2045,3 +2045,216 @@ class EquilateralTriangleRotation(GeometricalCase):
 
         }
         return default_data_dict
+    
+    
+    
+    
+class SquareOnPlane(GeometricalCase):
+
+
+    point_A = [Point(x,y,z) for x in [8,8.5,9,7.5,7] for y in [5,5.5,6,6.5] for z in   [8,8.5,7.5,7]  ]
+
+    point_O=[Point(x,y,z) for x in [5,5.5,6,6.5] for y in [8,8.5,9,9.5,10] for z in   [4,4.5,5,5.5] ]
+
+    point_P = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5]  for z in [1,1.5,2,2.5] ]
+
+
+
+
+
+    def __init__(self,point_A=None,point_P=None,point_O=None,**kwargs):
+
+        super().__init__()
+
+        if point_A and point_O and point_P:
+            projections=(point_A@HPP,point_O@HPP,point_O@VPP,point_P@VPP,point_P@HPP,point_A@VPP,)
+        else:
+            projections=[]
+
+        self._assumptions=DrawingSet(*projections)
+
+        self._point_A=point_A
+        self._point_P=point_P
+        self._point_O=point_O
+
+        
+        self._given_data={'A':point_A,'P':point_P,'O':point_O}
+        
+        self._solution_step.append(self._assumptions)
+
+
+
+    
+
+    def solution(self):
+        if self._cached_solution is None:
+            current_obj = copy.deepcopy(self)
+
+            A = current_obj._point_A
+            O = current_obj._point_O
+            P = current_obj._point_P
+
+
+
+            S = (A @ (O ^ P))('S')  #'Srodek' podstawy
+
+            dirPS = P - S
+            dirOS = O - S
+            square_diagonal = 2 * A.distance(S).n(5)
+            #triangle_side =  triangle_height / ((3**(1/2))/2)
+
+            B = (S + dirPS / (P.distance(S)) * (square_diagonal / 2))('B')
+            D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
+            C = (S + (S - A))('C')
+            triangle_plane = Plane(A, B, C)
+
+            
+            
+            current_set = DrawingSet(*current_obj._solution_step[-1])
+
+            line_a = Line(A, B)('a')
+            line_b = Line(C, A)('b')
+            plane_alpha = Plane(A, O, P)
+
+            plane_beta = HorizontalPlane(P)
+            plane_eta = VerticalPlane(P)
+
+            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+
+            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
+            current_obj.P1 = point_P1
+            line_kk = (P ^ point_P1)('a')            
+
+            
+            current_obj.add_solution_step(
+                f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}. 
+                The {point_P1._label} point has to be found, in order to determine axis position''', [point_P1,
+                                     (P ^ point_P1)('a')])
+            
+            
+            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+
+            line_f = (P ^ point_P2)('f')
+
+            # it creates next step of solution - lines are presented
+            #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
+
+            #it sets the step elements
+
+
+            
+            current_obj.add_solution_step(
+                f'Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}', [point_P2, line_f])
+            
+            elems = self._assumptions
+            projections = []
+            point_0_dict = {}
+            eps_dict = {}
+
+            point_B = B
+            point_C = C
+            point_O = O
+
+            ##################   plane rotation
+
+            line_kk = Line(P, (O @ line_k))('k')
+
+            A0 = A.rotate_about(axis=line_k)('A_0')
+            current_obj.A0 = A0
+
+            ### Step 2 #####
+            ###  plane of rotation of A ####
+
+            current_obj.add_solution_step('Point A rotation', [A0])
+
+            #### Step 3 ####
+            ### rotated point A0 of A #####
+
+            B0 = B.rotate_about(axis=line_k)('B_0')
+            current_obj.B0 = B0
+
+            current_obj.add_solution_step('Point B rotation', [B0])
+
+            #### Step 4 ####
+            ### postion of B0 (based on triangle geometry) #####
+
+            C0 = C.rotate_about(axis=line_k)('C_0')
+            current_obj.C0 = C0
+            current_obj.add_solution_step('Point C rotation', [C0])
+
+            #### Step 5 ####
+            ### postion of C0 (based on triangle geometry) #####
+
+            D0 = D.rotate_about(axis=line_k)('D_0')
+            current_obj.D0 = D0
+            current_obj.add_solution_step('Point D rotation', [D0])
+
+            #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+            current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+
+            current_obj.add_solution_step('Base ABCD', [A, B, C, D])
+
+
+            self._cached_solution = current_obj
+            current_obj._cached_solution = current_obj
+        else:
+            current_obj = copy.deepcopy(self._cached_solution)
+        return current_obj
+
+
+
+    def present_solution(self):
+
+        doc_model = Document(f'{self.__class__.__name__} solution')
+
+        doc_model.packages.append(Package('booktabs'))
+        doc_model.packages.append(Package('float'))
+        doc_model.packages.append(Package('standalone'))
+        doc_model.packages.append(Package('siunitx'))
+
+        #ReportText.set_container(doc_model)
+        #ReportText.set_directory('./SDAresults')
+
+        for no, step3d in enumerate(self._solution3d_step):
+            GeometryScene()
+
+            for elem in range(no):
+                self._solution3d_step[elem].plot(color='k')
+                self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
+
+            self._solution3d_step[no].plot(color='r')
+            self._solution_step[no].plot_vp(color='r').plot_hp(color='r')
+
+            with doc_model.create(Figure(position='H')) as fig:
+                #path=f'./images/image{no}.png'
+                #plt.savefig(path)
+                #fig.add_image(path)
+                fig.add_plot(width=NoEscape(r'1.4\textwidth'))
+
+                if step3d._label is not None:
+                    fig.add_caption(step3d._label)
+
+            plt.show()
+
+        return doc_model
+    
+    
+    
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        point_O = self.__class__.point_O
+        point_P = self.__class__.point_P
+
+
+        
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('P'): point_P,
+            Symbol('O'): point_O,
+
+
+
+        }
+        return default_data_dict
+    

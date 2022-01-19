@@ -3330,7 +3330,7 @@ class GivenHeightSquarePrism(GeometricalCase):
             current_obj = copy.deepcopy(self._cached_solution)
         return current_obj
 
-        return current_obj
+
 
     def present_solution(self):
 
