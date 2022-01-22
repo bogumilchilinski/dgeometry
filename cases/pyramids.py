@@ -2283,6 +2283,12 @@ class TriangularPyramid(GeometricalCase):
     
     point_O = [Point(x,y,z) for x in range(7,10) for y in [6,6.5,7,7.5,8.5] for z in range(6,9) ]
     
+    shift = [
+        Point(x, y, z) for x in [-1, -0.5, 0, 0.5, 1]
+        for y in [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
+        for z in [-1, -0.5, 0, 0.5, 1]
+    ]
+    
     def __init__(self,
                  point_A=None,
                  point_B=None,
@@ -2410,14 +2416,35 @@ class TriangularPyramid(GeometricalCase):
         point_B = self.__class__.point_B
         point_C = self.__class__.point_C
         point_O = self.__class__.point_O
+        shift = self.shift
 
         default_data_dict = {
             Symbol('A'): point_A,
             Symbol('B'): point_B,
             Symbol('C'): point_C,
             Symbol('O'): point_O,
+            'shift': shift,
         }
         return default_data_dict
+    
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_B = parameters_dict[Symbol('B')]
+        point_O = parameters_dict[Symbol('O')]
+        point_A = parameters_dict[Symbol('A')]
+        point_C = parameters_dict[Symbol('C')]
+
+        shift = parameters_dict['shift']
+        parameters_dict.pop('shift')
+
+        for point in symbols('A B C O'):
+            parameters_dict[point] = parameters_dict[point] + shift
+
+        return parameters_dict
+
+    
     
     
     def present_solution(self):
@@ -2454,6 +2481,15 @@ class TriangularPyramid(GeometricalCase):
             plt.show()
 
         return doc_model
+    
+    
+class TriangularPyramidSwappedProjections(TriangularPyramid):
+
+    shift = [
+        Point(x, y, z) for x in [-11, -10.5, -10, -9.5, -9, -8.5, -8]
+        for y in [0] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+    ]
+
     
     
     
