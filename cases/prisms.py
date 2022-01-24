@@ -1753,7 +1753,7 @@ class TriangularPrism(GeometricalCase):
             self.add_solution_step('Horizontal and forntal lines',
                                    [point_P1, point_P2])
 
-            D = (A + (C - B))('D')   
+            D = (A + (C - B))('D')
 
             current_obj.add_solution_step('Vertices A,B,C,D', [A, B, C, D])
 
@@ -3329,8 +3329,6 @@ class GivenHeightSquarePrism(GeometricalCase):
         else:
             current_obj = copy.deepcopy(self._cached_solution)
         return current_obj
-
-
 
     def present_solution(self):
 
