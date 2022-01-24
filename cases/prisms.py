@@ -1753,7 +1753,7 @@ class TriangularPrism(GeometricalCase):
             self.add_solution_step('Horizontal and forntal lines',
                                    [point_P1, point_P2])
 
-            D = (A + (C - B))('D')   
+            D = (A + (C - B))('D')
 
             current_obj.add_solution_step('Vertices A,B,C,D', [A, B, C, D])
 
@@ -1830,6 +1830,12 @@ class TriangularPrism(GeometricalCase):
 
         return parameters_dict
 
+    
+class TriangularPrismSwappedProjections(TriangularPrism):
+    shift = [
+        Point(x, y, z) for x in [-11, -10.5, -10, -9.5, -9, -8.5, -8]
+        for y in [0] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+    ]
 
 class ParallelogramPrismSwappedProjections(ParallelogramPrism):
 
@@ -3329,8 +3335,6 @@ class GivenHeightSquarePrism(GeometricalCase):
         else:
             current_obj = copy.deepcopy(self._cached_solution)
         return current_obj
-
-
 
     def present_solution(self):
 
