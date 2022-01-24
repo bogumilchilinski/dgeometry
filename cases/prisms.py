@@ -1830,6 +1830,12 @@ class TriangularPrism(GeometricalCase):
 
         return parameters_dict
 
+    
+class TriangularPrismSwappedProjections(TriangularPrism):
+    shift = [
+        Point(x, y, z) for x in [-11, -10.5, -10, -9.5, -9, -8.5, -8]
+        for y in [0] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+    ]
 
 class ParallelogramPrismSwappedProjections(ParallelogramPrism):
 
