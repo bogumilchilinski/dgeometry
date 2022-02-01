@@ -226,6 +226,8 @@ class VerticalLineOnPlane(GeometricalCase):
         self._point_O=point_O
         
         self._given_data={'A':point_A,'B':point_B,'O':point_O}
+        
+        self._solution_step.append(self._assumptions)
 
     def solution(self):
         
@@ -248,11 +250,9 @@ class VerticalLineOnPlane(GeometricalCase):
         
         new_set= DrawingSet(self._assumptions)
         
-        
-        
         current_obj._solution_step.append(new_set)
         current_obj.point_P=I
-        
+
         return current_obj
     
     def get_default_data(self):
@@ -2077,7 +2077,8 @@ class ShapeOnPlane(GeometricalCase):
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O}
         
-        self._solution_step.append(self._assumptions)
+        self.add_solution_step(
+                f'''Assumptions''', [A,P,O])
 
 
     def _rotation_of_base(self,base_plane):
@@ -2457,6 +2458,7 @@ class SquareOnPlane(GeometricalCase):
 
                 if step3d._label is not None:
                     fig.add_caption(step3d._label)
+
 
             plt.show()
 

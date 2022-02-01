@@ -25,6 +25,11 @@ from dynpy.utilities.report import ReportText
 
 import itertools as it
 
+
+linewidth = 0.5
+
+
+
 def plots_no():
     num = 0
     while True:
@@ -272,6 +277,7 @@ class Entity:
         style='-',
         text=None,
         fontsize=13,
+        linewidth=linewidth,
         scene=GeometryScene.ax_3d,
     ):
         '''
@@ -301,6 +307,7 @@ class Entity:
                    points_cooridinates['z'],
                    linestyle=style,
                    color=color,
+                   linewidth=linewidth,
                    marker=marker)
         scene.text(*[
             sum(points_cooridinates[coord_name]) /
@@ -319,6 +326,7 @@ class Entity:
         style='-',
         text=None,
         fontsize=13,
+        linewidth=linewidth,
         scene=GeometryScene.ax_2d,
     ):
         '''
@@ -347,6 +355,7 @@ class Entity:
                        points_cooridinates['x'],
                        linestyle=style,
                        color=color,
+                       linewidth=linewidth,
                        marker=marker)
             scene.text(*[
                 sum(points_cooridinates[coord_name]) /
@@ -365,6 +374,7 @@ class Entity:
         style='-',
         text=None,
         fontsize=13,
+        linewidth=linewidth,
         scene=GeometryScene.ax_2d,
     ):
         '''
@@ -410,6 +420,7 @@ class Entity:
                        points_cooridinates['z'],
                        linestyle=style,
                        color=color,
+                       linewidth=linewidth,
                        marker=marker)
             scene.text(*[
                 sum(points_cooridinates[coord_name]) /
@@ -443,6 +454,7 @@ class Entity:
                    points_cooridinates['z'],
                    linestyle=style,
                    color=color,
+                   linewidth=linewidth,
                    marker=marker)
         scene.text(*[
             sum(points_cooridinates[coord_name].values()) /
@@ -624,7 +636,7 @@ class Line(Entity):
     def __init__(self, p1, p2, **kwargs):
         self._p1=p1
         self._p2=p2
-        super().__init__()
+        super().__init__(marker=None)
         self._geo_ref = geo.Line3D(p1=p1._geo_ref,pt=p2._geo_ref,**kwargs)
 
 #     def __repr__(self):
@@ -682,7 +694,7 @@ class Plane(Entity):
     
     
     def __init__(self,p1, a=None, b=None, **kwargs):
-        super().__init__()
+        super().__init__(marker=None)
         
         
         if a is not None:
@@ -1172,6 +1184,7 @@ class GeometricalCase(DrawingSet):
                 if step3d._label is not None:
                     fig.add_caption(step3d._label)
 
+            print('\n +++++++++++++++++++++++++++ \n')
             plt.show()
 
         return doc_model
@@ -1213,62 +1226,7 @@ class GeometricalCase(DrawingSet):
         
         
         
-class RotatedPoint(GeometricalCase):
-        
-    def __init__(self,point=Point(1,2,3),axis=None,plane=None,**kwargs):
 
-        super().__init__()
-
-
-        self._axis=axis
-        self._plane = plane
-        self._point = point
-        
-
-        rot_point = point.rotate_about(axis=axis,plane=plane)
-        axis = rot_point._axis
-        plane = rot_point._plane
-        
-        
-        self.add_solution_step(f'The {point._label} point and axis of rotation {axis._label} are currently highlighted - initial set for rotation process',[point,axis])
-        
-
-        point_e1=rot_point+((rot_point@axis)-rot_point)*1.2
-        point_e2=(rot_point@axis)+((rot_point@axis)-rot_point)*(-1.2)
-        
-        self._eps_for_point = (point_e1^point_e2)(f'eps_{point._label}')
-        
-        self.add_solution_step(f'A rotation plane of {point._label} point passes {point._label} and is perpendicular to {axis._label} axis.',[self._eps_for_point(f'eps_{point._label}')])
-
-        self.add_solution_step(f'S_{point._label} point - Center of rotation',[point@axis])
-        
-        self._rotated_point = rot_point
-        
-        
-        self.add_solution_step(f'''The position of A0 can be determined by utilization of true length of the radius of rotation ({point._label} - S_{point._label})
-        - the pytagoras theorem has to be applied (auxiliary right triangle)''',[rot_point(f'{point._label}0')])
-        
-    def solution(self):
-        
-        
-        current_obj=copy.deepcopy(self)
-
-        return current_obj
-        
-    def get_default_data(self):
-
-
-
-
-        
-        default_data_dict = {
-            Symbol('point'): [Point(x,y,z) for x in [8,8.5,9,7.5,7] for y in [5,5.5,6,6.5] for z in   [8,8.5,7.5,7]  ],
-            Symbol('axis'): [(Point(1,2,3)^Point(5,11,3))],
-
-
-
-        }
-        return default_data_dict
         
 class Prism(GeometricalCase):
 
