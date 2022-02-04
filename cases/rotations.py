@@ -86,7 +86,7 @@ class RotatedPoint(PointRotation):
         
         rot_center=(point@axis)
         
-        self.add_solution_step(f'The {point._label} point and axis of rotation {axis._label} are currently highlighted - initial set for rotation process',[point,axis])
+        self.add_solution_step(f'The ${point._label}$ point and axis of rotation ${axis._label}$ are currently highlighted - initial set for rotation process',[point,axis])
         
         if rot_center.coordinates == rot_point.coordinates:
 
@@ -102,7 +102,7 @@ class RotatedPoint(PointRotation):
 
             self.add_solution_step(f'A rotation plane of {point._label} point passes {point._label} and is perpendicular to {axis._label} axis.',[self._eps_for_point(f'eps_{point._label}')])
 
-            self.add_solution_step(f'S_{point._label} point - Center of rotation',[rot_center])
+            self.add_solution_step(f'S_{point._label} point - center of rotation',[rot_center])
 
             
 
