@@ -67,7 +67,16 @@ class EquilateralTrianglePrism(GeometricalCase):
         else:
             projections = []
 
+        # it creates first step of solution
+        self.add_solution_step('Assumptions',
+                               [point_A, point_O, point_P, point_H])
+
+        self._assumptions3d = DrawingSet(point_A, point_O, point_P,
+                                         point_H)('Assumptions')
         self._assumptions = DrawingSet(*projections)
+        #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+
+        #self += [point_A,point_O,point_P,point_H]
 
         self._point_A = point_A
         self._point_P = point_P
@@ -81,142 +90,132 @@ class EquilateralTrianglePrism(GeometricalCase):
             'H': point_H
         }
 
-        self._solution_step.append(self._assumptions)
-
     def solution(self):
-        current_obj = copy.deepcopy(self)
+        if self._cached_solution is None:
+            current_obj = copy.deepcopy(self)
 
-        A = current_obj._point_A
-        O = current_obj._point_O
-        P = current_obj._point_P
-        H = current_obj._point_H
+            A = current_obj._point_A
+            O = current_obj._point_O
+            P = current_obj._point_P
 
-        S = (A @ (O ^ P))('S')  #'Srodek' podstawy
+            H = current_obj._point_H
 
-        dirPS = P - S
-        dirOS = O - S
-        triangle_height = A.distance(S)
-        triangle_side = triangle_height / ((3**(1 / 2)) / 2)
+            S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
-        B = (S + dirPS / (P.distance(S)) * (triangle_side / 2))('B')
-        C = (S - dirPS / (P.distance(S)) * (triangle_side / 2))('C')
+            dirPS = P - S
+            dirOS = O - S
+            triangle_height = A.distance(S)
+            triangle_side = triangle_height / ((3**(1 / 2)) / 2)
 
-        current_set = DrawingSet(*current_obj._solution_step[-1])
+            B = (S + dirPS / (P.distance(S)) * (triangle_side / 2))('B')
+            C = (S - dirPS / (P.distance(S)) * (triangle_side / 2))('C')
 
-        line_a = Line(A, B)('a')
-        line_b = Line(C, A)('b')
-        plane_alpha = Plane(A, O, P)
+            triangle_plane = Plane(A, B, C)
 
-        plane_beta = HorizontalPlane(P)
+            current_set = DrawingSet(*current_obj._solution_step[-1])
 
-        line_k = plane_alpha.intersection(plane_beta)[0]
+            line_a = Line(A, B)('a')
+            line_b = Line(C, A)('b')
+            plane_alpha = Plane(A, O, P)
 
-        elems = self._assumptions
-        projections = []
-        point_0_dict = {}
+            plane_beta = HorizontalPlane(P)
+            plane_eta = VerticalPlane(P)
 
-        ##################   plane rotation
+            line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
-        line_kk = Line(P, (O @ line_k))('k')
+            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
+            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+            current_obj.P1 = point_P1
+            line_kk = (P ^ point_P1)('a')
+            line_f = (P ^ point_P2)('f')
 
-        current_obj.A0 = A.rotate_about(axis=line_k)('A_0')
-        current_obj.B0 = B.rotate_about(axis=line_k)('B_0')
-        current_obj.C0 = C.rotate_about(axis=line_k)('C_0')
-        #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-        current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+            # it creates next step of solution - lines are presented
+            #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
-        #print(point_0_dict)
-        elems += [
-            line_a,
-            line_b,  #,E,F,G,H,line_s1,line_s2,line_s3,line_s4
-        ]
+            #it sets the step elements
+            current_obj.add_solution_step(
+                'Axis of rotation', [(A ^ point_P1)('AO'), point_P1,
+                                     (P ^ point_P1)('a'), point_P2, line_f])
 
-        projections += [
-            current_obj.A0 @ HPP,
-            current_obj.A0 @ VPP,
-            current_obj.B0 @ HPP,
-            current_obj.B0 @ VPP,
-            current_obj.C0 @ HPP,
-            current_obj.C0 @ VPP,
-            B @ HPP,
-            B @ VPP,
-            C @ HPP,
-            C @ VPP,
-            line_a @ HPP,
-            line_a @ VPP,
-            line_b @ HPP,
-            line_b @ VPP,
-            line_kk @ HPP,
-            line_kk
-            @ VPP,  #line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
-            #line_s4@HPP,line_s4@VPP
-        ]
-        current_set += [*elems, *projections]
+            elems = self._assumptions
+            projections = []
+            point_0_dict = {}
+            eps_dict = {}
 
-        current_obj._solution_step.append(current_set)
-        current_obj._assumptions = DrawingSet(*elems, *projections)
-        current_obj._point_B = B
-        current_obj._point_C = C
+            point_B = B
+            point_C = C
+            point_O = O
 
-        triangle_plane = Plane(A, B, C)
+            ##################   plane rotation
 
-        A, B, C, D, E, F = Prism.right_from_parallel_plane(triangle_plane, H)
+            line_kk = Line(P, (O @ line_k))('k')
 
-        line_ad = Line(A, D)('a')
-        line_be = Line(B, E)('b')
-        line_cf = Line(C, F)('c')
+            A0 = A.rotate_about(axis=line_k)('A_0')
+            current_obj.A0 = A0
 
-        elems += [D, E, F, plane_alpha, line_ad, line_be, line_cf]
+            ### Step 2 #####
+            ###  plane of rotation of A ####
 
-        projections += [
-            line_ad @ HPP,
-            line_ad @ VPP,
-            line_be @ HPP,
-            line_be @ VPP,
-            line_cf @ HPP,
-            line_cf @ VPP,
-            D @ HPP,
-            D @ VPP,
-            E @ HPP,
-            E @ VPP,
-            F @ HPP,
-            F @ VPP,
-        ]
+            current_obj.add_solution_step('Point A rotation', [A0])
 
-        #print(point_0_dict)
-        elems += [
-            line_a,
-            line_b,  #,E,F,G,H,line_s1,line_s2,line_s3,line_s4
-        ]
+            #### Step 3 ####
+            ### rotated point A0 of A #####
 
-        projections += [
-            current_obj.A0 @ HPP,
-            current_obj.A0 @ VPP,
-            current_obj.B0 @ HPP,
-            current_obj.B0 @ VPP,
-            current_obj.C0 @ HPP,
-            current_obj.C0 @ VPP,
-            B @ HPP,
-            B @ VPP,
-            C @ HPP,
-            C @ VPP,
-            line_a @ HPP,
-            line_a @ VPP,
-            line_b @ HPP,
-            line_b @ VPP,
-            line_kk @ HPP,
-            line_kk
-            @ VPP,  #line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
-            #line_s4@HPP,line_s4@VPP
-        ]
-        current_set += [*elems, *projections]
+            B0 = B.rotate_about(axis=line_k)('B_0')
+            current_obj.B0 = B0
 
-        current_obj._solution_step.append(current_set)
-        current_obj._assumptions = DrawingSet(*elems, *projections)
+            current_obj.add_solution_step('Point B rotation', [B0])
 
-        current_obj.point_D = D
-        current_obj.point_E = E
-        current_obj.point_F = F
+            #### Step 4 ####
+            ### postion of B0 (based on triangle geometry) #####
+
+            C0 = C.rotate_about(axis=line_k)('C_0')
+            current_obj.C0 = C0
+            current_obj.add_solution_step('Point C rotation', [C0])
+
+            #### Step 5 ####
+            ### postion of C0 (based on triangle geometry) #####
+
+            #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+            current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+
+            current_obj.add_solution_step('Base ABC', [A, B, C])
+
+            G = (H @ plane_alpha)('G')
+
+            ############  upper  base
+
+            dirHG = H - G
+            distance_HG = (H.distance(G)).n(5)
+
+            #D = (A + dirHG/distance_HG*triangle_height)('D')
+            #E = (B + dirHG/distance_HG*triangle_height)('E')
+            #F = (C + dirHG/distance_HG*triangle_height)('F')
+
+            A, B, C, D, E, F = Prism(triangle_plane,
+                                     dirHG)
+
+            current_obj.add_solution_step('Vertices D,E,F', [D, E, F])
+
+            elems += [D, E, F, G]
+
+            projections += [
+                G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
+                F @ VPP
+            ]
+
+            current_obj._assumptions = DrawingSet(
+                *current_obj.get_projections())('Solution')
+            current_obj._assumptions3d = DrawingSet(*current_obj)
+
+            current_obj._point_B = B
+            current_obj._point_C = C
+            current_obj.point_D = D
+            current_obj.point_E = E
+            current_obj.point_F = F
+            self._cached_solution = current_obj
+        else:
+            current_obj = copy.deepcopy(self._cached_solution)
         return current_obj
 
     def get_default_data(self):
@@ -233,7 +232,40 @@ class EquilateralTrianglePrism(GeometricalCase):
             Symbol('H'): point_H,
         }
         return default_data_dict
+    def present_solution(self):
 
+        doc_model = Document(f'{self.__class__.__name__} solution')
+
+        doc_model.packages.append(Package('booktabs'))
+        doc_model.packages.append(Package('float'))
+        doc_model.packages.append(Package('standalone'))
+        doc_model.packages.append(Package('siunitx'))
+
+        #ReportText.set_container(doc_model)
+        #ReportText.set_directory('./SDAresults')
+
+        for no, step3d in enumerate(self._solution3d_step):
+            GeometryScene()
+
+            for elem in range(no):
+                self._solution3d_step[elem].plot(color='k')
+                self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
+
+            self._solution3d_step[no].plot(color='r')
+            self._solution_step[no].plot_vp(color='r').plot_hp(color='r')
+
+            with doc_model.create(Figure(position='H')) as fig:
+                #path=f'./images/image{no}.png'
+                #plt.savefig(path)
+                #fig.add_image(path)
+                fig.add_plot(width=NoEscape(r'1.4\textwidth'))
+
+                if step3d._label is not None:
+                    fig.add_caption(step3d._label)
+
+            plt.show()
+
+        return doc_model
 
 class SquarePrism(GeometricalCase):
 
@@ -1464,6 +1496,9 @@ class ParallelogramPrism(GeometricalCase):
             #         plane_gamma=Plane(E,F,G)
 
             tetragonal_plane = Tetragon(A, B, C, D)
+            
+            self.add_solution_step('Base', [A, B, C, D])
+            
             A, B, C, D, E, F, G, H = TetraPrism.right_from_parallel_plane(
                 tetragonal_plane, O)
             self.add_solution_step('Prism', [A, B, C, D, O, E, F, G, H])
@@ -1481,9 +1516,12 @@ class ParallelogramPrism(GeometricalCase):
                 H @ VPP, D @ HPP, D @ VPP
             ]
 
+            
+
+            
             current_set += [*elems, *projections]
 
-            current_obj._solution_step.append(current_set)
+            
 
             current_obj.horizontal_line_cross_BC = (HorizontalPlane(A) &
                                                     (B ^ C))[0]
@@ -1503,7 +1541,42 @@ class ParallelogramPrism(GeometricalCase):
         else:
             current_obj = copy.deepcopy(self._cached_solution)
         return current_obj
+    
+    def present_solution(self):
 
+        doc_model = Document(f'{self.__class__.__name__} solution')
+
+        doc_model.packages.append(Package('booktabs'))
+        doc_model.packages.append(Package('float'))
+        doc_model.packages.append(Package('standalone'))
+        doc_model.packages.append(Package('siunitx'))
+
+        #ReportText.set_container(doc_model)
+        #ReportText.set_directory('./SDAresults')
+
+        for no, step3d in enumerate(self._solution3d_step):
+            GeometryScene()
+
+            for elem in range(no):
+                self._solution3d_step[elem].plot(color='k')
+                self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
+
+            self._solution3d_step[no].plot(color='r')
+            self._solution_step[no].plot_vp(color='r').plot_hp(color='r')
+
+            with doc_model.create(Figure(position='H')) as fig:
+                #path=f'./images/image{no}.png'
+                #plt.savefig(path)
+                #fig.add_image(path)
+                fig.add_plot(width=NoEscape(r'1.4\textwidth'))
+
+                if step3d._label is not None:
+                    fig.add_caption(step3d._label)
+
+            plt.show()
+
+        return doc_model
+    
     def get_default_data(self):
 
         point_A = self.__class__.point_A
@@ -2216,6 +2289,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             current_obj.point_E = E
             current_obj.point_F = F
             self._cached_solution = current_obj
+            self._cached_solution = current_obj
         else:
             current_obj = copy.deepcopy(self._cached_solution)
         return current_obj
@@ -2292,6 +2366,15 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
         return parameters_dict
 
+class GivenHeightIsoscelesRightTrianglePrismSwappedProjections(GivenHeightIsoscelesRightTrianglePrism):
+
+    shift = [
+        Point(x, y, z) for x in [-11, -10.5, -10, -9.5, -9, -8.5, -8]
+        for y in [0] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+    ]
+
+    
+    
 
 class GivenHeightHFLinesIsoscelesRightTrianglePrism(
         GivenHeightIsoscelesRightTrianglePrism):
@@ -2491,7 +2574,7 @@ class VerticalTiltedTetragonalPrism(TetragonalPrism):
 
             plane_alpha = Plane(A, B, C)
             line_z = Line(Z, Z @ HPP)
-            D = line_z.intersection(plane_alpha)[0]('D')
+            D = (A + (C-B)) ('D')
 
             #         plane_beta=Plane(O,O+(B-A),O+(C-A))
             #         E=(A@plane_beta)('E')
@@ -2503,7 +2586,7 @@ class VerticalTiltedTetragonalPrism(TetragonalPrism):
             tetragonal_plane = Tetragon(A, B, C, D)
             A, B, C, D, E, F, G, H = TetraPrism.right_from_parallel_plane(
                 tetragonal_plane, O)
-            current_obj.add_solution_step('Prism', [A, B, C, Z, O, E, F, G, H])
+            current_obj.add_solution_step('Prism', [A, B, C, D, O, E, F, G, H])
             line_ae = Line(A, E)('a')
             line_bf = Line(B, F)('b')
             line_cg = Line(C, G)('c')
@@ -2522,8 +2605,8 @@ class VerticalTiltedTetragonalPrism(TetragonalPrism):
             current_obj._solution_step.append(current_set)
 
             current_obj.horizontal_line_cross_BC = (HorizontalPlane(A) &
-                                                    (B ^ C))[0]
-            current_obj.frontal_line_cross_BC = (VerticalPlane(A) & (B ^ C))[0]
+                                                    (B ^ C))[0]('I')
+            current_obj.frontal_line_cross_BC = (VerticalPlane(A) & (B ^ C))[0]('J')
             I = current_obj.horizontal_line_cross_BC
             J = current_obj.frontal_line_cross_BC
             current_obj.add_solution_step('Frontal & Horizontal', [I, J])
@@ -3406,7 +3489,13 @@ class GivenHeightSquarePrism(GeometricalCase):
 
         return parameters_dict
 
+class GivenHeightSquarePrismSwappedProjections(GivenHeightSquarePrism):
+    shift = [
+        Point(x, y, z) for x in [ -8,-7]
+        for y in [0] for z in [ -6,-5]
+    ]
 
+    
 class GivenHeightRhomboidPrism(GeometricalCase):
 
     point_A = [

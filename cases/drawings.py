@@ -262,18 +262,19 @@ step_mod_dec_flange = lambda step: random.choice([
 ])
 
 step_mod_inc_threads = lambda step: random.choice([
-    step,
+    #step,
     sol.ChamferedCylinder(
         step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
     sol.Thread(step.height, step.diameter),
 ])
 step_mod_dec_threads = lambda step: random.choice([
     step,
-    sol.ChamferedCylinder(step.height,
-                          step.diameter,
-                          chamfer_angle=45,
-                          chamfer_length=1,
-                          chamfer_pos='right'),
+    #     sol.ChamferedCylinder(step.height,
+    #                           step.diameter,
+    #                           chamfer_angle=45,
+    #                           chamfer_length=1,
+    #                           chamfer_pos='right'),
+    sol.Thread(step.height, step.diameter),
 ])
 
 step_mod_inc_chamfer = lambda step: random.choice([
@@ -324,9 +325,9 @@ step_mod_dec_gear = lambda step: random.choice([
 
 def create_random_profile(max_steps_no,
                           min_steps_no=4,
-                          initial_diameter=[40,45,50],
+                          initial_diameter=[50,55,60,65],
                           increase_values=[2, 3, 4, 5],
-                          step_lengths=[40,45,50],
+                          step_lengths=[50,55,60],
                           step_type=sol.Cylinder,
                           step_modificator=lambda step: step):
     steps_no = random.randint(min_steps_no, max_steps_no - 1)
@@ -388,25 +389,33 @@ class ShaftSketch(GeometricalCase):
     scheme_name = 'absxyz'
     real_name = 'abs'
 
-    steps_no={'max':4,'min':1}
-    
-    shafts = [ create_random_profile(
-        4,
-        1,
-        increase_values=[
-            4,
-            5,
-            6,
-        ]) + create_random_profile(
-            2,
-            1,
-            increase_values=[
+    steps_no = {'max': 4, 'min': 1}
+    shafts=None
+
+    @classmethod
+    def _solids(cls):
+
+        if cls.shafts is None:
+            cls.shafts = cls._structure_generator()
+
+        return cls.shafts
+
+    @classmethod
+    def _structure_generator(cls):
+        shafts = [
+            create_random_profile(4, 1, increase_values=[
+                4,
+                5,
+                6,
+            ]) + create_random_profile(2, 1, increase_values=[
                 -4,
                 -5,
                 -6,
-            ]) for i in range(50)]
-    
-    
+            ]) for i in range(50)
+        ]
+
+        return shafts
+
     @classmethod
     def from_random_data(cls):
         new_obj = cls()
@@ -415,44 +424,36 @@ class ShaftSketch(GeometricalCase):
         entities = [elem for label, elem in data_set.items()]
         print(entities)
         return cls(*entities)
-    
-    
 
     def __init__(self, *assumptions, **kwargs):
         super().__init__()
         self._solution_step = []
         self._solution3d_step = []
-        
-        steps_no=self.steps_no
 
-
+        steps_no = self.steps_no
 
         shaft = assumptions
 
         self._label = None
 
-        
         self._solid_structure = sol.ComposedPart(*assumptions)
-        
-        if len(assumptions)!=0:
+
+        if len(assumptions) != 0:
             self._solid_structure = sol.ComposedPart(*assumptions[0])
-        
+
         self._given_data = {
             str(no + 1): val
             for no, val in enumerate(assumptions)
         }
 
-        
-        
         self._cached_solution = None
 
     def get_default_data(self):
 
-        shafts = self.__class__.shafts
+        shafts = self._solids()
 
         #default_data_dict = {no:step.str_pl()    for no,step  in enumerate(shaft) }
-        default_data_dict = {'shaft':shafts }
-        
+        default_data_dict = {'shaft': shafts}
 
         return default_data_dict
 
@@ -469,13 +470,170 @@ class ShaftSketch(GeometricalCase):
             #new_obj._cached_solution=None
 
         return new_obj
-    
-#     def get_random_parameters(self):
 
-#         parameters_dict = super().get_random_parameters()
 
-#         if parameters_dict['1'] == parameters_dict['2']:
-#             #print('lock action')
-#             parameters_dict = self.get_random_parameters()
+class SleeveSketch(ShaftSketch
+                   #GeometricalCase
+                   ):
 
-#         return parameters_dict
+    steps_no = {'max': 4, 'min': 1}
+
+    @classmethod
+    def _structure_generator(cls):
+        shafts = [
+            create_random_profile(4, 1, increase_values=[
+                4,
+                5,
+                6,
+            ]) + create_random_profile(2, 1, increase_values=[
+                -4,
+                -5,
+                -6,
+            ]) + create_random_profile(2,
+                                       1,
+                                       initial_diameter=[10, 15],
+                                       increase_values=[
+                                           -2,
+                                           -3,
+                                           -4,
+                                       ],
+                                       step_lengths=[27, 29],
+                                       step_type=sol.Hole) for i in range(50)
+        ]
+
+        return shafts
+
+
+class SleeveWithThreadsSketch(ShaftSketch
+                              #GeometricalCase
+                              ):
+
+    steps_no = {'max': 4, 'min': 1}
+
+    @classmethod
+    def _structure_generator(cls):
+        shafts = shafts = [
+            create_random_profile(2,
+                                  1,
+                                  increase_values=[
+                                      4,
+                                      5,
+                                      6,
+                                  ],
+                                  step_modificator=step_mod_inc_threads) +
+            create_random_profile(2,
+                                  1,
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_modificator=step_mod_dec_threads) +
+            create_random_profile(2,
+                                  1,
+                                  initial_diameter=[25, 22],
+                                  increase_values=[
+                                      -2,
+                                      -3,
+                                  ],
+                                  step_lengths=[27, 29],
+                                  step_modificator=step_mod_dec_hole_chamfer,
+                                  step_type=sol.Hole) +
+            [sol.ThreadedOpenHole(6)] for i in range(50)
+        ]
+
+        return shafts
+
+
+class SleeveWithThreadedHoleSketch(ShaftSketch
+                                   #GeometricalCase
+                                   ):
+
+    steps_no = {'max': 4, 'min': 1}
+
+    @classmethod
+    def _structure_generator(cls):
+
+
+        shafts =  []
+        for i in range(50):
+            shaft = create_random_profile(2,
+                                  1,
+                                  increase_values=[
+                                      4,
+                                      5,
+                                      6,
+                                  ],
+                                  step_modificator=step_mod_inc_threads) 
+            
+            shaft +=create_random_profile(2,
+                                  1,
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_modificator=step_mod_dec_threads)
+            
+            shaft += create_random_profile(3,
+                                  2,
+                                  initial_diameter=[30,25,20],
+                                  increase_values=[
+                                      -2,
+                                      -3,
+                                      -4,
+                                  ],
+                                  step_lengths=[27, 29],
+                                  step_modificator=step_mod_dec_hole_chamfer,
+                                  step_type=sol.Hole) 
+            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,1.4)]
+            
+            shafts.append(shaft)
+        
+        
+        return shafts
+
+
+class SleeveWithGrearsSketch(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 4, 'min': 1}
+
+    @classmethod
+    def _structure_generator(cls):
+        shafts =  []
+        for i in range(50):
+            shaft = [sol.Gear(25, 40, 2)] + create_random_profile(1,
+                                  0,
+                                  increase_values=[
+                                      4,
+                                      5,
+                                      6,
+                                  ],
+                                  step_modificator=step_mod_inc_gear) 
+            
+            shaft +=create_random_profile(1,
+                                  0,
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_modificator=step_mod_inc_gear)
+            
+            shaft += create_random_profile(3,
+                                  2,
+                                  initial_diameter=[30,25,20],
+                                  increase_values=[
+                                      -2,
+                                      -3,
+                                      -4,
+                                  ],
+                                  step_lengths=[27, 29],
+                                  step_modificator=step_mod_dec_hole_chamfer,
+                                  step_type=sol.Hole) 
+            shafts.append(shaft)
+        
+
+        return shafts
