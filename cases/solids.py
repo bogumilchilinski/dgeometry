@@ -1057,12 +1057,12 @@ class Gear(Solid):
             *self._parameters)
         
     def str_en(self):
-        return f'Gear with outside diameter {self.height}, module {self.module} and {self.chamfer_length}x{self.chamfer_angle} chamfers on both sides'
+        return f'Gear with teeth number {self.teeth_no}, module {self.module}, width {self.height} and {self.chamfer_length}x{self.chamfer_angle} chamfers on both sides'
 
 
 #         super().__init__(View(horizontal_lines,vertical_lines,diagonal_lines,horizontal_dimensions,vertical_dimensions,diagonal_dimensions))
     def str_pl(self):
-        return f'Koło zębate o średnicy wierzchołkowej {self.height}, module {self.module} z fazą {self.chamfer_length}x{self.chamfer_angle} po obu stronach'
+        return f'Koło zębate o liczbie zębów {self.teeth_no}, module {self.module} oraz szerokości {self.height} z fazą {self.chamfer_length}x{self.chamfer_angle} po obu stronach'
 
 
 class HexagonalPrism(Solid):
