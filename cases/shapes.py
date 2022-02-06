@@ -237,7 +237,7 @@ class SquareOnPlane(ShapeOnPlane):
         B= self.B 
         D = self.D
         
-        self.add_solution_step('Rotated Base (triangle BAD - half of square ABCD)', [A^B,A^D])
+        self.add_solution_step('Counter for rotation loop check --  Rotated Base (triangle BAD - half of square ABCD)', [A^B,A^D])
         
         return  B,D
     
