@@ -133,12 +133,12 @@ class UnrotatedPoint(PointRotation):
         rot_center=(point@axis)
         
         self.add_solution_step(
-            f'''The {rot_point._label} rotated point, axis of rotation {axis._label} and {reference._label} line are currently highlighted 
+            f'''The {rot_point._label} rotated point, axis of rotation ${axis._label}$ and {reference._label} line are currently highlighted 
             - data needed to find orginal position of the point''',[rot_point,axis,reference])
         
         if rot_center.coordinates == rot_point.coordinates:
 
-            self.add_solution_step(f'Rotated point {rot_point._label} is the same as {point._label} point - there is nothing to do',[rot_point(f'{point._label}0 = {point._label}')])
+            self.add_solution_step(f'$ {rot_point._label} \in {point._label} $   %%%   Rotated point {rot_point._label} is the same as {point._label} point - there is nothing to do',[rot_point(f'{point._label}0 = {point._label}')])
             
         else:
 

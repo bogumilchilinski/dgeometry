@@ -220,7 +220,7 @@ class SquareOnPlane(ShapeOnPlane):
         D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
         C = (S + (S - A))('C')
 
-        self.add_solution_step('Creating a point C0 based on triangle geometry', [A^B,B^C])
+        self.add_solution_step('Dawid Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
         
         self.A = A
         self.B = B
@@ -237,7 +237,9 @@ class SquareOnPlane(ShapeOnPlane):
         B= self.B 
         D = self.D
         
-        self.add_solution_step('Counter for rotation loop check --  Rotated Base (triangle BAD - half of square ABCD)', [A^B,A^D])
+        print('++++++++++++++++++++++++++ COUNTER +++++++++++')
+        self.add_solution_step('Counter for rotation loop check --  Rotated Base (triangle BAD - half of square $ABCD$)', [A^B,A^D])
+
         
         return  B,D
     
