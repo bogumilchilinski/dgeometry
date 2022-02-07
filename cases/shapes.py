@@ -143,6 +143,7 @@ class ShapeOnPlane(GeometricalCase):
 
             line_k = Line(P, (O @ line_k))('k')
             current_obj._axis = line_k
+            current_obj._hor_plane =plane_beta
 
             A0,O0,P0 = current_obj._rotation_of_given_plane()
                 
@@ -220,7 +221,7 @@ class SquareOnPlane(ShapeOnPlane):
         D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
         C = (S + (S - A))('C')
 
-        self.add_solution_step('Dawid Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
+        #self.add_solution_step('Dawid Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
         
         self.A = A
         self.B = B
@@ -237,8 +238,12 @@ class SquareOnPlane(ShapeOnPlane):
         B= self.B 
         D = self.D
         
-        print('++++++++++++++++++++++++++ COUNTER +++++++++++')
-        self.add_solution_step('Counter for rotation loop check --  Rotated Base (triangle BAD - half of square $ABCD$)', [A^B,A^D])
+        A0 = self.A0
+        B0 = B.rotate_about(self._axis)
+        D0 = D.rotate_about(self._axis)
+        
+        print('===================== COUNTER +++++++++++'*3)
+        self.add_solution_step('Counter for rotation loop check --  Rotated Base (triangle BAD - half of square $ABCD$)', [A0^B0,A0^D0])
 
         
         return  B,D
