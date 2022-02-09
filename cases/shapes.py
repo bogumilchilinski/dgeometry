@@ -105,6 +105,13 @@ class ShapeOnPlane(GeometricalCase):
 
         return base_plane
         
+    def _shape_points(self):
+        
+        A,O,P  =  self._base_shape()
+        self.add_solution_step('Last step - shape outline', [A^O,O^P,P^A])
+        
+        return A,O,P
+        
         
     def solution(self):
         if self._cached_solution is None:
@@ -160,6 +167,8 @@ class ShapeOnPlane(GeometricalCase):
                 current_obj._append_case(shape_unrotation_case)
 
 
+            current_obj._shape_points()
+                
             current_obj._cached_solution = current_obj
         else:
             current_obj = copy.deepcopy(self._cached_solution)
@@ -221,8 +230,8 @@ class SquareOnPlane(ShapeOnPlane):
         D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
         C = (S + (S - A))('C')
 
-        #self.add_solution_step('Dawid Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
-        
+
+
         self.A = A
         self.B = B
         self.D = D
@@ -238,13 +247,22 @@ class SquareOnPlane(ShapeOnPlane):
         B= self.B 
         D = self.D
         
-        A0 = self.A0
-        B0 = B.rotate_about(self._axis)
-        D0 = D.rotate_about(self._axis)
-        
-        print('===================== COUNTER +++++++++++'*3)
-        self.add_solution_step('Counter for rotation loop check --  Rotated Base (triangle BAD - half of square $ABCD$)', [A0^B0,A0^D0])
+        A0 = self.A0('A_0')
+        B0 = B.rotate_about(self._axis)('B_0')
+        D0 = D.rotate_about(self._axis)()('D_0')
+        C0 = (B0+ (D0-A0))('C_0')
+
+        #\u25A1
+        self.add_solution_step(f'Rotated Base (  ${A0._label}{B0}{0} $ triangle - half of  $ {A0}{B0}{C0}{D0}$ square )', [A0^B0,A0^D0],caption='check for captions')
 
         
         return  B,D
-    
+    def _shape_points(self):
+        
+        A,B, D  =  self._given_plane()
+        
+        C = B+ (D-A)
+        
+        self.add_solution_step('Obtained shape - $ {A}{B}{C}{D}$ square ', [(A^B)('_'),(B^C)('_'),(C^D)('_'),(D^A)('_')])
+        
+        return A,B,C,D

@@ -187,6 +187,7 @@ class Entity:
         self.__style = style
         self.__fmt = None
         self._projection=projection
+        self._caption = None
 
 
 
@@ -200,6 +201,7 @@ class Entity:
                  marker=None,
                  style=None,
                  text=None,
+                 caption=None,
                  *args,
                  **kwargs):
         """
@@ -219,6 +221,8 @@ class Entity:
         if style is not None:
             obj.__style = style
         obj.__fmt = fmt
+        
+        obj._caption=caption
 
         return obj
 
@@ -1057,27 +1061,31 @@ class GeometricalCase(DrawingSet):
         self._cached_solution=None
 
 
-    def add_solution_step(self,title,elements=[],projections=None):
+    def add_solution_step(self,title,elements=[],projections=None,caption=None):
         
         self+=elements
 
-        elements_set=DrawingSet(*elements)(title)
+        print(f'solution step name: {caption}')
+        
+        elements_set=DrawingSet(*elements)(title,caption=caption)
 
         if projections is None:
             projections = elements_set.get_projections()
 
-        projections_set = DrawingSet(*projections)(title)
+        projections_set = DrawingSet(*projections)(title,caption=caption)
 
         #it sets the step elements
         self._solution3d_step.append(elements_set)
         self._solution_step.append(projections_set)
 
-        return DrawingSet(*elements,*projections)(f'{title} - preview')
+        return DrawingSet(*elements,*projections)(f'{title} - preview',caption=caption)
         
         
     def _add_solution_steps(self,steps_3d,steps_2d):
         
-        result=[self.add_solution_step(step_3d._label,list(step_3d),list(step_2d))  for step_3d,step_2d in zip(steps_3d,steps_2d)]
+        
+        
+        result=[self.add_solution_step(step_3d._label,list(step_3d),list(step_2d),caption=step_3d._caption)  for step_3d,step_2d in zip(steps_3d,steps_2d)]
             
 
         return DrawingSet(*sum([list(entity)  for entity  in result],[]))
@@ -1181,9 +1189,17 @@ class GeometricalCase(DrawingSet):
                 #fig.add_image(path)
                 fig.add_plot(width=NoEscape(r'1.4\textwidth'))
 
-                if step3d._label is not None:
-                    fig.add_caption(step3d._label)
+                if step3d._caption is not None:
+                    caption = step3d._caption
+                else:
+                    caption = step3d._label
+                
+                
+                
+                if caption is not None:
+                    fig.add_caption(caption)
 
+            print(f"it's given  caption - {caption}")
             print('\n +++++++++++++++++++++++++++ \n')
             plt.show()
 
