@@ -127,7 +127,7 @@ class ShapeOnPlane(GeometricalCase):
 
             
             current_obj.add_solution_step(
-                f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}. 
+                f'''$ A_O \in \epsilon_A $ Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}. 
                 The {point_P1._label} point has to be found, in order to determine axis position''', [point_P1,
                                      (P ^ point_P1)('a')])
             point_P2 = plane_eta.intersection(A ^ O)[0]('2')
