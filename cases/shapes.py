@@ -231,6 +231,10 @@ class SquareOnPlane(ShapeOnPlane):
         C = (S + (S - A))('C')
 
 
+        #self.add_solution_step('Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
+
+        #self.add_solution_step('Dawid Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
+
 
         self.A = A
         self.B = B
