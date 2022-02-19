@@ -22,6 +22,7 @@ from ..dgeometry import *
 from . import solids as sol
 
 
+
 class DrawingSheets(GeometricalCase):
 
     _case_no = plots_no()
@@ -389,9 +390,25 @@ class ShaftSketch(GeometricalCase):
     scheme_name = 'absxyz'
     real_name = 'abs'
 
-    steps_no = {'max': 4, 'min': 1}
+    steps_no = {'max': 3, 'min': 1}
+    holes_no = {'max': 3, 'min': 2}
+    
     shafts=None
 
+    @classmethod
+    def set_steps_number(cls,steps=None,holes=None):
+        if steps is not None and isinstance(steps,dict):
+            cls.steps_no = step
+        else:
+            raise TypeError(f'obj steps of {type(steps)} is not a dict')
+            
+        if holes is not None and isinstance(holes,dict):
+            cls.holes_no = holes
+        else:
+            raise TypeError(f'obj holes of {type(holes)} is not a dict')
+        
+        return cls
+    
     @classmethod
     def _solids(cls):
 
@@ -402,18 +419,20 @@ class ShaftSketch(GeometricalCase):
 
     @classmethod
     def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
         shafts = [
-            create_random_profile(4, 1, increase_values=[
+            create_random_profile(steps['max'],steps['min'], increase_values=[
                 4,
                 5,
                 6,
-            ]) + create_random_profile(2, 1, increase_values=[
+            ]) + create_random_profile(steps['max'],steps['min'], increase_values=[
                 -4,
                 -5,
                 -6,
-            ]) for i in range(50)
-        ]
-
+            ]) for i in range(50)]
         return shafts
 
     @classmethod

@@ -108,7 +108,7 @@ class RotatedPoint(PointRotation):
 
 
             self.add_solution_step(f'''The position of {point._label}0 point can be determined by utilization of true length of the radius of rotation ({point._label} - S_{point._label})
-            - the pytagoras theorem has to be applied (auxiliary right triangle)''',[rot_point(f'{point._label}')])
+            - the pytagoras theorem has to be applied (auxiliary right triangle)''',[rot_point(f'{point._label}')],caption='$\\square$')
     
     
 class UnrotatedPoint(PointRotation):
@@ -146,7 +146,7 @@ class UnrotatedPoint(PointRotation):
             point_e1=rot_point+(rot_center-rot_point)*(1+(0.5/rot_center.distance(rot_point)))
             point_e2=(rot_center)+((rot_center)-rot_point)*(-1-(0.5/rot_center.distance(rot_point)))
 
-            self._eps_for_point = (point_e1^point_e2)(f'eps_{point._label}')
+            self._eps_for_point = (point_e1^point_e2)(f'$\epsilon_{point._label}$')
 
             self.add_solution_step(f'A rotation plane of  point {point._label} passes  {rot_point._label}  and is perpendicular to {axis._label} axis.',[self._eps_for_point(f'eps_{point._label}')])
 
