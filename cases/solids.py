@@ -1,3 +1,7 @@
+import matplotlib.pyplot as plt
+from ..dgeometry import GeometryScene
+import numpy as np
+
 class DrawingObject:
     def __init__(self, **kwargs):
         self._element_dict = kwargs
@@ -53,6 +57,17 @@ class Solid:
         self._name = {}
         self._name['pl'] = 'Bryła'
 
+        
+    def _plot_2d(self):
+        
+        class_name  = self.__class__.__name__
+        
+        span = np.linspace(0,len(class_name),100)
+        print(f'plot_2d is called for {class_name}')
+        res=GeometryScene.ax_2d.plot(span,np.cos(span),label=class_name)
+        print(res)
+        
+        
     @property
     def views(self):
         return self._views
@@ -113,19 +128,29 @@ class ComposedPart:
 
         return path
 
-    @classmethod
-    def preview(cls, example=False):
-        if example:
-            path = cls._real_example()
+    
+    def preview(self, example=False):
+        
+        
+        print(*list(enumerate(self.elements)))
+        
+        for no,elem in enumerate(self.elements):
+            print(f'++++++{no}+++++')
+            print(f'++++++{elem}+++++')
+            
+            elem._plot_2d()
+            
+#         if example:
+#             path = cls._real_example()
 
-        else:
-            path = cls._scheme()
+#         else:
+#             path = cls._scheme()
 
-        with open(f"{path}", "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read())
-        image_file.close()
+#         with open(f"{path}", "rb") as image_file:
+#             encoded_string = base64.b64encode(image_file.read())
+#         image_file.close()
 
-        return IP.display.Image(base64.b64decode(encoded_string))
+#         return IP.display.Image(base64.b64decode(encoded_string))
 
     def add(self, other):
 
@@ -512,6 +537,14 @@ class Cylinder(Solid):
         self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
             *self._parameters)
 
+    def _plot_2d(self):
+        
+        class_name  = self.__class__.__name__
+        
+        span = np.linspace(0,len(class_name),100)
+        print(f'plot_2d is called for {class_name}')
+        res=GeometryScene.ax_2d.plot(span,np.sin(span),label=class_name)
+        print(res)
 
 class Hole(Solid):
     """This object represents hole that can be made inside solid.
@@ -586,6 +619,15 @@ class Hole(Solid):
         self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
             *self._parameters)
 
+    def _plot_2d(self):
+        
+        class_name  = self.__class__.__name__
+        
+        span = np.linspace(0,len(class_name),100)
+        print(f'plot_2d is called for {class_name}')
+        res=GeometryScene.ax_2d.plot(span,(span)**2,label=class_name)
+        print(res)
+        
 
 class ChamferedHole(Solid):
     """This object represents chamfered hole that can be made inside solid.
