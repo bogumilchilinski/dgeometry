@@ -105,6 +105,13 @@ class ShapeOnPlane(GeometricalCase):
 
         return base_plane
         
+    def _shape_points(self):
+        
+        A,O,P  =  self._base_shape()
+        self.add_solution_step('Last step - shape outline', [A^O,O^P,P^A])
+        
+        return A,O,P
+        
         
     def solution(self):
         if self._cached_solution is None:
@@ -126,16 +133,13 @@ class ShapeOnPlane(GeometricalCase):
             line_kk = (P ^ point_P1)('a')            
 
             
-            current_obj.add_solution_step(
-                f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}. 
-                The {point_P1._label} point has to be found, in order to determine axis position''', [point_P1,
-                                     (P ^ point_P1)('a')])
+            
             point_P2 = plane_eta.intersection(A ^ O)[0]('2')
 
             line_f = (P ^ point_P2)('f') 
 
             current_obj.add_solution_step(
-                f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}''', [point_P2,
+                f'''Axis of rotation - it is common part between given plane $\\alpha({A._label},{O._label},{P._label})$  and horizontal plane $\\gamma$ which contains point {P._label}''', [point_P2,
                                      (P ^ point_P2)('f')])
 
 
@@ -160,6 +164,8 @@ class ShapeOnPlane(GeometricalCase):
                 current_obj._append_case(shape_unrotation_case)
 
 
+            current_obj._shape_points()
+                
             current_obj._cached_solution = current_obj
         else:
             current_obj = copy.deepcopy(self._cached_solution)
@@ -224,9 +230,9 @@ class SquareOnPlane(ShapeOnPlane):
 
         #self.add_solution_step('Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
 
-        #self.add_solution_step('Dawid Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
+        self.add_solution_step('Creating a point $\\C_0$ based on triangle geometry ', [A^B,B^C])
 
-        
+
         self.A = A
         self.B = B
         self.D = D
@@ -242,13 +248,22 @@ class SquareOnPlane(ShapeOnPlane):
         B= self.B 
         D = self.D
         
-        A0 = self.A0
-        B0 = B.rotate_about(self._axis)
-        D0 = D.rotate_about(self._axis)
-        
-        print('===================== COUNTER +++++++++++'*3)
-        self.add_solution_step('Counter for rotation loop check --  Rotated Base (triangle BAD - half of square $ABCD$)', [A0^B0,A0^D0])
+        A0 = self.A0('A_0')
+        B0 = B.rotate_about(self._axis)('B_0')
+        D0 = D.rotate_about(self._axis)()('D_0')
+        C0 = (B0+ (D0-A0))('C_0')
+
+        #\u25A1
+        self.add_solution_step(f'Title: Rotated Base (  ${A0._label}{B0}{0} $ triangle - half of  \\u25A1 $ {A0}{B0}{C0}{D0}$ square )', [A0^B0,A0^D0],caption='Rotated Base (  ${A0._label}{B0}{0} $ triangle - half of  $ \\square {A0}{B0}{C0}{D0}$ square )')
 
         
         return  B,D
-    
+    def _shape_points(self):
+        
+        A,B, D  =  self._given_plane()
+        
+        C = B+ (D-A)
+        
+        self.add_solution_step('Obtained shape - $ {A}{B}{C}{D}$ square ', [(A^B)('_'),(B^C)('_'),(C^D)('_'),(D^A)('_')])
+        
+        return A,B,C,D
