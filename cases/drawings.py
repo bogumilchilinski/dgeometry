@@ -330,7 +330,8 @@ def create_random_profile(max_steps_no,
                           increase_values=[2, 3, 4, 5],
                           step_lengths=[50,55,60],
                           step_type=sol.Cylinder,
-                          step_modificator=lambda step: step):
+                          step_modificator=lambda step: step,
+                          origin=None):
     steps_no = random.randint(min_steps_no, max_steps_no - 1)
 
     #boundary_node=random.randint(0,steps_no)
@@ -351,6 +352,8 @@ def create_random_profile(max_steps_no,
         for diameter in profile
     ]
 
+    steps_list=sympy.flatten([step_modificator(step) for step in base_geometry])
+    
     return sympy.flatten([step_modificator(step) for step in base_geometry])
 
 
