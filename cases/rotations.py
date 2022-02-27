@@ -33,7 +33,7 @@ class PointRotation(GeometricalCase):
         self._point = point
         
 
-        rot_point = point.rotate_about(axis=axis,plane=plane)(f'{point._label}0')
+        rot_point = point.rotate_about(axis=axis,plane=plane)(f'{point._label}')
         self._rotated_point = rot_point
         
         axis = rot_point._axis
@@ -78,7 +78,7 @@ class RotatedPoint(PointRotation):
         self._point = point
         
 
-        rot_point = point.rotate_about(axis=axis,plane=plane)(f'{point._label}0')
+        rot_point = point.rotate_about(axis=axis,plane=plane)(f'{point._label}_0')
         self._rotated_point = rot_point
         
         axis = rot_point._axis
@@ -90,7 +90,7 @@ class RotatedPoint(PointRotation):
         
         if rot_center.coordinates == rot_point.coordinates:
 
-            self.add_solution_step(f'Rotated point {rot_point._label} is the same as {point._label} point.',[rot_point(f'{point._label} = {point._label}0')])
+            self.add_solution_step(f'Rotated point ${rot_point._label}$ is the same as {point._label} point.',[rot_point(f'{point._label} = ${point._label}_0$')])
             
         else:    
 
@@ -100,14 +100,14 @@ class RotatedPoint(PointRotation):
 
             self._eps_for_point = (point_e1^point_e2)(f'eps_{point._label}')
 
-            self.add_solution_step(f'A rotation plane of {point._label} point passes {point._label} and is perpendicular to {axis._label} axis.',[self._eps_for_point(f'eps_{point._label}')])
+            self.add_solution_step(f'A rotation plane of {point._label} point passes {point._label} and is perpendicular to the {point._label} axis. \n \n ${point._label} \in \epsilon_{point._label}$         $\epsilon_{point._label}  \perp$ {axis._label}',[self._eps_for_point(f'eps_{point._label}')])
 
-            self.add_solution_step(f'S_{point._label} point - center of rotation',[rot_center])
+            self.add_solution_step(f'$S_{point._label}$ point - center of rotation \n \n $S_{point._label}: \epsilon_{point._label} \wedge {axis._label}$',[rot_center])
 
             
 
 
-            self.add_solution_step(f'''The position of {point._label}0 point can be determined by utilization of true length of the radius of rotation ({point._label} - S_{point._label})
+            self.add_solution_step(f'''The position of ${point._label}_0$ point can be determined by utilization of true length of the radius of rotation $({point._label} - S_{point._label}$)
             - the pytagoras theorem has to be applied (auxiliary right triangle)''',[rot_point(f'{point._label}')],caption='$\\square$')
     
     
@@ -133,12 +133,12 @@ class UnrotatedPoint(PointRotation):
         rot_center=(point@axis)
         
         self.add_solution_step(
-            f'''The {rot_point._label} rotated point, axis of rotation ${axis._label}$ and {reference._label} line are currently highlighted 
+            f'''The ${rot_point._label}$ rotated point, axis of rotation ${axis._label}$ and ${reference._label}$ line are currently highlighted 
             - data needed to find orginal position of the point''',[rot_point,axis,reference])
         
         if rot_center.coordinates == rot_point.coordinates:
 
-            self.add_solution_step(f'$ {rot_point._label} \in {point._label} $   %%%   Rotated point {rot_point._label} is the same as {point._label} point - there is nothing to do',[rot_point(f'{point._label}0 = {point._label}')])
+            self.add_solution_step(f'$ {rot_point._label} \in {point._label} $   %%%   Rotated point ${rot_point._label}$ is the same as ${point._label}$ point - there is nothing to do',[rot_point(f'${point._label}_0 = {point._label}$')])
             
         else:
 
@@ -148,12 +148,12 @@ class UnrotatedPoint(PointRotation):
 
             self._eps_for_point = (point_e1^point_e2)(f'$\epsilon_{point._label}$')
 
-            self.add_solution_step(f'A rotation plane of  point {point._label} passes  {rot_point._label}  and is perpendicular to {axis._label} axis.',[self._eps_for_point(f'eps_{point._label}')])
+            self.add_solution_step(f'A rotation plane of  point ${point._label}$ passes  ${rot_point._label}$  and is perpendicular to ${axis._label}$ axis.',[self._eps_for_point(f'$eps_{point._label}$')])
 
-            self.add_solution_step(f'S_{point._label} point - Center of rotation',[rot_center])
+            self.add_solution_step(f'$S_{point._label}$ point - Center of rotation',[rot_center])
 
             
 
 
-            self.add_solution_step(f'''=== The true position of {point._label} can be found as intersection of plane of rotation {self._eps_for_point._label} and {reference._label} line - 
-            {point._label} belongs simultaneously to {self._eps_for_point._label} and {reference._label}''',[point(f'{point._label}')])
+            self.add_solution_step(f'''The true position of {point._label} can be found as intersection of plane of rotation {self._eps_for_point._label} and ${reference._label}$ line - 
+            {point._label} belongs simultaneously to {self._eps_for_point._label} and ${reference._label}$''',[point(f'{point._label}')])

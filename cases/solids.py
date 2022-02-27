@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
 from ..dgeometry import GeometryScene
 import numpy as np
+from numbers import Number
+
 
 class DrawingObject:
+
     def __init__(self, **kwargs):
         self._element_dict = kwargs
 
@@ -40,6 +43,7 @@ class FrontView(DrawingObject):
 
 
 class Solid:
+
     def __init__(self, view, section, halfsection, front_view):
         self._parameters = tuple()
         self._class_description = 'with parameters'
@@ -49,25 +53,53 @@ class Solid:
             'halfsection': halfsection,
             'front_view': front_view
         }
-        
-#         print('views_dict')
-#         print(self._views)
+
+        #         print('views_dict')
+        #         print(self._views)
         self.elements = []
 
         self._name = {}
         self._name['pl'] = 'Bryła'
 
-        
+        self._ref_elem=None
+        self._origin = 25
+
+
+    @property
+    def origin(self):
+
+        if self._ref_elem is not None:
+            origin=self._ref_elem.end
+        else:
+            origin = self._origin
+
+
+
+        print(origin)
+        return origin
+
+    @property
+    def end(self):
+
+        end = self.origin + self.height
+
+        print('end =' + str(end))
+        return end
+
     def _plot_2d(self):
-        
-        class_name  = self.__class__.__name__
-        
-        span = np.linspace(0,len(class_name),100)
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
         print(f'plot_2d is called for {class_name}')
-        res=GeometryScene.ax_2d.plot(span,np.cos(span),label=class_name)
+        res = GeometryScene.ax_2d.plot(span,
+                                       np.cos(5 * len(class_name) * span),
+                                       label=class_name)
         print(res)
-        
-        
+
     @property
     def views(self):
         return self._views
@@ -128,18 +160,28 @@ class ComposedPart:
 
         return path
 
-    
     def preview(self, example=False):
-        
-        
+
         print(*list(enumerate(self.elements)))
+
         
-        for no,elem in enumerate(self.elements):
+        #self.elements[0]._origin = 0
+        #self.elements[-1]._origin = -30
+        
+        
+            
+        
+        
+        for no, elem in enumerate(self.elements):
             print(f'++++++{no}+++++')
             print(f'++++++{elem}+++++')
+
+            if no>0:
+                elem._ref_elem = self.elements[no-1]
+            
             
             elem._plot_2d()
-            
+
 #         if example:
 #             path = cls._real_example()
 
@@ -264,7 +306,7 @@ class ComposedPart:
             sum([
                 solid.section.get_lines_number('phi_dimensions')
                 for solid in self.elements
-            ]),            
+            ]),
         }
 
         return Section(**num_of_lines)
@@ -377,7 +419,7 @@ class ComposedPart:
 
     @property
     def views(self):
-        
+
         #print('simple check')
         return {
             'view': self.view,
@@ -452,6 +494,7 @@ class Cone(Solid):
     'o L=10mm, średnicy górnej podstawy = 4mm i średnicy dolnej podstawy=8mm'
     
     """
+
     def __init__(self, height, top_diameter, bottom_diameter):
 
         num_of_lines = {
@@ -461,11 +504,12 @@ class Cone(Solid):
             'horizontal_dimensions': 2,
             'vertical_dimensions': 1,
         }
-        
+
         num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
-        
+
         super().__init__(View(**num_of_lines), Section(**num_of_lines),
-                         HalfSection(**num_of_lines),FrontView(**num_of_lines_front))
+                         HalfSection(**num_of_lines),
+                         FrontView(**num_of_lines_front))
         self.height = height
         self.top_diameter = top_diameter
         self.bottom_diameter = bottom_diameter
@@ -511,6 +555,7 @@ class Cylinder(Solid):
     {'pl': 'Walec'}
     
     """
+
     def __init__(self, height, diameter):
         num_of_lines = {
             'horizontal_lines': 3,
@@ -519,13 +564,14 @@ class Cylinder(Solid):
             'vertical_dimensions': 1,
             'inclined_lines': 0,
         }
-        
+
         num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
 
         num_of_lines_front = {'circles': 1, 'phi_dimensions': 1}
-        
+
         super().__init__(View(**num_of_lines), Section(**num_of_lines),
-                         HalfSection(**num_of_lines),FrontView(**num_of_lines_front))
+                         HalfSection(**num_of_lines),
+                         FrontView(**num_of_lines_front))
         self.height = height
         self.diameter = diameter
 
@@ -538,13 +584,30 @@ class Cylinder(Solid):
             *self._parameters)
 
     def _plot_2d(self):
-        
-        class_name  = self.__class__.__name__
-        
-        span = np.linspace(0,len(class_name),100)
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
         print(f'plot_2d is called for {class_name}')
-        res=GeometryScene.ax_2d.plot(span,np.sin(span),label=class_name)
+
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        origin = self.origin / 10
+        end = self.end / 10
+        
+        t_l = origin + l / 4
+        t_r = (r + 1)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            color='k')
+        text = GeometryScene.ax_2d.text(t_l,t_r,f'{class_name}')
         print(res)
+
 
 class Hole(Solid):
     """This object represents hole that can be made inside solid.
@@ -578,6 +641,7 @@ class Hole(Solid):
     {'pl': 'Otwór'}
     
     """
+
     def __init__(self, height, diameter):
         num_of_lines_view = {
             'horizontal_lines': 1,
@@ -606,7 +670,7 @@ class Hole(Solid):
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec), 
+                         HalfSection(**num_of_lines_half_sec),
                          FrontView(**num_of_lines_front))
         self.height = height
         self.diameter = diameter
@@ -618,16 +682,28 @@ class Hole(Solid):
         self._name['pl'] = 'Otwór'
         self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
             *self._parameters)
-
+        
     def _plot_2d(self):
-        
-        class_name  = self.__class__.__name__
-        
-        span = np.linspace(0,len(class_name),100)
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
         print(f'plot_2d is called for {class_name}')
-        res=GeometryScene.ax_2d.plot(span,(span)**2,label=class_name)
-        print(res)
+       
+        origin = self.origin / 10
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        end = self.end / 10
         
+        t_l = origin + l / 4
+        t_r = (r + 1)
+
+        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
+                                       '--',
+                                       color='b')
+        text = GeometryScene.ax_2d.text(t_l,t_r,f'{class_name}')
+        print(res)
+
 
 class ChamferedHole(Solid):
     """This object represents chamfered hole that can be made inside solid.
@@ -670,6 +746,7 @@ class ChamferedHole(Solid):
     'with L=5mm and diameter=2mm'
     
     """
+
     def __init__(self,
                  height,
                  diameter,
@@ -733,6 +810,31 @@ class ChamferedHole(Solid):
             l_ch=self.chamfer_length,
             pos=self.chamfer_pos).replace('right',
                                           'prawej').replace('left', 'lewej')
+    
+    def _plot_2d(self):
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        print(f'plot_2d is called for {class_name}')
+       
+        origin = self.origin / 10
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        end = self.end / 10
+        
+        t_l = origin + l / 6
+        t_r = (r + 1)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin+c_l,origin+c_l,origin+l,origin+l,origin+c_l],[ -r, +r, +r, -r, -r],'--',color='c') + GeometryScene.ax_2d.plot(
+                [origin+c_l,origin,origin,origin+c_l],[ -r, -r-c_h, +r+c_h, +r],'--',color='c')+ GeometryScene.ax_2d.plot(
+                    [origin,origin+l],[ -r-c_h, -r-c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
+                        [origin,origin+l],[ +r+c_h, +r+c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
+                            [origin+l,origin+l],[r+c_h,-r-c_h],'--',color='c')
+        
+        text = GeometryScene.ax_2d.text(t_l,t_r,f'{class_name}')
+        print(res)
 
 
 class ChamferedCylinder(Solid):
@@ -776,6 +878,7 @@ class ChamferedCylinder(Solid):
     'with L=5mm and diameter=2mm'
     
     """
+
     def __init__(self,
                  height,
                  diameter,
@@ -842,8 +945,55 @@ class ChamferedCylinder(Solid):
             pos=self.chamfer_pos).replace('right',
                                           'prawej').replace('left', 'lewej')
 
+    def _plot_2d(self):
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        print(f'plot_2d is called for {class_name}')
+
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        c_l = self.chamfer_length / 10
+        c_a = self.chamfer_angle
+        c_h = c_l * np.tan(c_a)
+        
+        t_l = origin + l / 6
+        t_r = (r + 1)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + c_l, origin + c_l, origin + l, origin + l, origin + c_l], [-r, r, r, -r, -r],
+            color='g') + GeometryScene.ax_2d.plot(
+                [ origin + c_l, origin + 0, origin + 0, origin + c_l], [-r, -r + c_h, r - c_h, r],
+                color='g')
+        text = text = GeometryScene.ax_2d.text(t_l,t_r,f'{class_name}')
+        print(res)
+
+    def _plot_2d(self):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        print(f'plot_2d is called for {class_name}')
+
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        origin = self.origin/10
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            color='k')
+        print(res)
+
+        
+        
 
 class Thread(Solid):
+
     def __init__(self,
                  height,
                  diameter,
@@ -883,8 +1033,8 @@ class Thread(Solid):
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
                          HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front) )
-        
+                         FrontView(**num_of_lines_front))
+
         self.height = height
         self.diameter = diameter
         self.thread = thread
@@ -899,7 +1049,26 @@ class Thread(Solid):
         self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(
             *self._parameters)
 
-        
+    def _plot_2d(self):
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        print(f'plot_2d is called for {class_name}')
+
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        r_t = 0.8 * r
+
+        res = GeometryScene.ax_2d.plot([0, 0, l, l, 0], [-r, r, r, -r, -r],
+                                       color='k') + GeometryScene.ax_2d.plot(
+                                           [0, 0, l, l, 0],
+                                           [-r_t, r_t, r_t, -r_t, -r_t],
+                                           linewidth=1,
+                                           color='r')
+        print(res)
+
+
 class ThreadedOpenHole(Solid):
     """This object represents threaded hole that can be made inside solid.
     
@@ -941,6 +1110,7 @@ class ThreadedOpenHole(Solid):
     'with L=5mm and diameter=2mm'
     
     """
+
     def __init__(self,
                  diameter,
                  chamfer_length=1,
@@ -978,20 +1148,18 @@ class ThreadedOpenHole(Solid):
                          Section(**num_of_lines_sec),
                          HalfSection(**num_of_lines_half_sec),
                          FrontView(**num_of_lines_front))
-        
 
-        
         self.diameter = diameter
         self.chamfer_length = chamfer_length
         self.chamfer_angle = chamfer_angle
         self.thread = thread
-        self._parameters = thread,diameter,
+        self._parameters = thread, diameter,
         self._class_description = "Threaded open hole {}{}".format(
             *self._parameters)
 
     def str_en(self):
         return 'Open threaded hole (to the end of solid) {thread}{d} with {l_ch}x{angle} chamfers on both sides'.format(
-             thread=self.thread,
+            thread=self.thread,
             d=self.diameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length)
@@ -1002,8 +1170,34 @@ class ThreadedOpenHole(Solid):
             d=self.diameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length)
-        
-        
+
+    def _plot_2d(self):
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        print(f'plot_2d is called for {class_name}')
+
+        r = self.diameter / 2 / 10
+        l = self.diameter / 10 * 3
+        c_l = self.chamfer_length / 10
+        c_a = self.chamfer_angle
+        c_h = c_l * np.tan(c_a)
+        t = self.diameter / 10
+
+        res = GeometryScene.ax_2d.plot(
+            [0, 0, l, l, 0], [-r, r, r, -r, -r], '--',
+            color='c') + GeometryScene.ax_2d.plot(
+                [0, 0 - c_l, 0 - c_l, 0], [-r, -r - c_h, r + c_h, r],
+                '--',
+                color='c') + GeometryScene.ax_2d.plot(
+                    [-c_l, l], [-t, -t], '--', linewidth=1,
+                    color='c') + GeometryScene.ax_2d.plot(
+                        [-c_l, l], [t, t], '--', linewidth=1,
+                        color='c') + GeometryScene.ax_2d.plot(
+                            [+l, l], [t, -t], '--', color='c')
+        print(res)
+
 
 class Gear(Solid):
     """This object represents a gear.
@@ -1044,6 +1238,7 @@ class Gear(Solid):
 
     
     """
+
     def __init__(self,
                  height,
                  teeth_no,
@@ -1077,7 +1272,7 @@ class Gear(Solid):
             'vertical_dimensions': 1,
             'angular_dimensions': 2,
         }
-        
+
         num_of_lines_front = {'circles': 3, 'phi_dimensions': 0}
 
         super().__init__(View(**num_of_lines_view),
@@ -1097,17 +1292,19 @@ class Gear(Solid):
         self._name['pl'] = 'Koło zębate'
         self._class_description_pl = "o  L={}mm, z={}, m={} i fazie {}x{}".format(
             *self._parameters)
-        
+
     def str_en(self):
         return f'Gear with teeth number {self.teeth_no}, module {self.module}, width {self.height} and {self.chamfer_length}x{self.chamfer_angle} chamfers on both sides'
 
 
 #         super().__init__(View(horizontal_lines,vertical_lines,diagonal_lines,horizontal_dimensions,vertical_dimensions,diagonal_dimensions))
+
     def str_pl(self):
         return f'Koło zębate o liczbie zębów {self.teeth_no}, module {self.module} oraz szerokości {self.height} z fazą {self.chamfer_length}x{self.chamfer_angle} po obu stronach'
 
 
 class HexagonalPrism(Solid):
+
     def __init__(self, height, indiameter):
 
         num_of_lines_view = {
@@ -1136,14 +1333,14 @@ class HexagonalPrism(Solid):
             'vertical_dimensions': 1,
             'angular_dimensions': 0,
         }
-        
-        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0} # to improve
+
+        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
                          HalfSection(**num_of_lines_half_sec),
                          FrontView(**num_of_lines_front))
-        
+
         self.height = height
         self.indiameter = indiameter
         self.diameter = round(indiameter * 0.5)
@@ -1157,6 +1354,7 @@ class HexagonalPrism(Solid):
 
 
 class ChamferedHexagonalPrism(HexagonalPrism):
+
     def __init__(self,
                  height,
                  indiameter,
@@ -1193,8 +1391,8 @@ class ChamferedHexagonalPrism(HexagonalPrism):
             'vertical_dimensions': 1,
             'angular_dimensions': 1,
         }
-        
-        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0} # to improve
+
+        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
 
         super().__init__(height=height, indiameter=indiameter)
 
@@ -1202,7 +1400,7 @@ class ChamferedHexagonalPrism(HexagonalPrism):
             'view': View(**num_of_lines_view),
             'section': Section(**num_of_lines_sec),
             'halfsection': HalfSection(**num_of_lines_half_sec),
-            'front_view':FrontView(**num_of_lines_front)
+            'front_view': FrontView(**num_of_lines_front)
         }
 
         self.chamfer_length = chamfer_length
@@ -1219,6 +1417,7 @@ class ChamferedHexagonalPrism(HexagonalPrism):
 
 
 class FlangeWithHoles(Solid):
+
     def __init__(self,
                  height,
                  diameter,
@@ -1254,8 +1453,8 @@ class FlangeWithHoles(Solid):
             'vertical_dimensions': 2,
             'angular_dimensions': 2,
         }
-        
-        num_of_lines_front = {'circles': 2+holes_no, 'phi_dimensions': 0}
+
+        num_of_lines_front = {'circles': 2 + holes_no, 'phi_dimensions': 0}
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
@@ -1289,6 +1488,7 @@ class BlockBearingHolder(Solid):
     """
     Block with hole in every corner and bearing place on the top. It's drawn in the horizontal position (symmetry axis is horizontal line).
     """
+
     def __init__(self, height, width, length):
 
         self.height = height
@@ -1297,7 +1497,7 @@ class BlockBearingHolder(Solid):
         self._parameters = height, width, length
 
         num_of_lines_view = {
-            'horizontal_lines': 2+1, #axis included
+            'horizontal_lines': 2 + 1,  #axis included
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
@@ -1306,7 +1506,7 @@ class BlockBearingHolder(Solid):
         }
 
         num_of_lines_sec = {
-            'horizontal_lines': 2+1, #axis included
+            'horizontal_lines': 2 + 1,  #axis included
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
@@ -1315,25 +1515,22 @@ class BlockBearingHolder(Solid):
         }
 
         num_of_lines_half_sec = {
-            'horizontal_lines': 2+1, #axis included
+            'horizontal_lines': 2 + 1,  #axis included
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
             'vertical_dimensions': 1,
             'angular_dimensions': 0,
         }
-        
-        
+
         num_of_lines_front = {
-            'horizontal_lines': 2, #axis excluded
-            'vertical_lines': 2, #axis exclueded
+            'horizontal_lines': 2,  #axis excluded
+            'vertical_lines': 2,  #axis exclueded
             'inclined_lines': 0,
             'horizontal_dimensions': 2,
             'vertical_dimensions': 1,
             'angular_dimensions': 0,
         }
-        
-        
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
@@ -1351,6 +1548,7 @@ class BlockEdgeFillet(Solid):
     """
     Block with rounded corners.  It's drawn in the horizontal position (symmetry axis is horizontal line).
     """
+
     def __init__(self, height, width, length, fillet_radius=2):
 
         self.height = height
@@ -1360,7 +1558,7 @@ class BlockEdgeFillet(Solid):
         self._parameters = height, width, length, fillet_radius
 
         num_of_lines_view = {
-            'horizontal_lines': 3, #axis included
+            'horizontal_lines': 3,  #axis included
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
@@ -1369,7 +1567,7 @@ class BlockEdgeFillet(Solid):
         }
 
         num_of_lines_sec = {
-            'horizontal_lines': 3, #axis included
+            'horizontal_lines': 3,  #axis included
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
@@ -1378,17 +1576,17 @@ class BlockEdgeFillet(Solid):
         }
 
         num_of_lines_half_sec = {
-            'horizontal_lines': 3, #axis included
+            'horizontal_lines': 3,  #axis included
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
             'vertical_dimensions': 1,
             'angular_dimensions': 0,
         }
-        
+
         num_of_lines_front = {
-            'horizontal_lines': 2, #axis excluded
-            'vertical_lines': 2, #axis exclueded
+            'horizontal_lines': 2,  #axis excluded
+            'vertical_lines': 2,  #axis exclueded
             'inclined_lines': 0,
             'horizontal_dimensions': 2,
             'vertical_dimensions': 0,
@@ -1401,18 +1599,18 @@ class BlockEdgeFillet(Solid):
                          HalfSection(**num_of_lines_half_sec),
                          FrontView(**num_of_lines_front))
 
-
     def str_en(self):
         return f"Block with H={self.height}mm, W={self.width}mm, L={self.length}mm and fillet top edges R={self.fillet_radius}mm where H is height, W is width and L is length (depth looking from the front view) "
 
     def str_pl(self):
-        return f"Blok o H={self.height}mm, W={self.width}mm, L={self.length}mm oraz zaokrąglonych górnych krawędziach R={self.fillet_radius}mm"   
-    
+        return f"Blok o H={self.height}mm, W={self.width}mm, L={self.length}mm oraz zaokrąglonych górnych krawędziach R={self.fillet_radius}mm"
+
 
 class BlockInverseTShape(Solid):
     """
     Block with shape of inverted T.  It's drawn in the horizontal position (symmetry axis is horizontal line).
     """
+
     def __init__(self, height, width, length, cut_height, cut_width):
 
         self.height = height
@@ -1423,7 +1621,7 @@ class BlockInverseTShape(Solid):
         self._parameters = height, width, length, cut_height, cut_width
 
         num_of_lines_view = {
-            'horizontal_lines': 5, #axis included
+            'horizontal_lines': 5,  #axis included
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
@@ -1432,7 +1630,7 @@ class BlockInverseTShape(Solid):
         }
 
         num_of_lines_sec = {
-            'horizontal_lines': 4, #axis included
+            'horizontal_lines': 4,  #axis included
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
@@ -1441,17 +1639,17 @@ class BlockInverseTShape(Solid):
         }
 
         num_of_lines_half_sec = {
-            'horizontal_lines': 3, #axis included
+            'horizontal_lines': 3,  #axis included
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
             'vertical_dimensions': 1,
             'angular_dimensions': 0,
         }
-        
+
         num_of_lines_front = {
-            'horizontal_lines': 4, #axis excluded
-            'vertical_lines': 4, #axis excluede
+            'horizontal_lines': 4,  #axis excluded
+            'vertical_lines': 4,  #axis excluede
             'inclined_lines': 0,
             'horizontal_dimensions': 3,
             'vertical_dimensions': 1,
@@ -1464,21 +1662,24 @@ class BlockInverseTShape(Solid):
                          HalfSection(**num_of_lines_half_sec),
                          FrontView(**num_of_lines_front))
 
-
-
     def str_en(self):
         return f"Block with H={self.height}mm, W={self.width}mm, L={self.length}mm, symmetrical cut out (starting from the top of block) with H={self.cut_height}mm and W={self.cut_width}mm which makes the block look like inverted T and where H is height, W is width and L is length (depth looking from the front view)"
 
     def str_pl(self):
         return f"Blok o H={self.height}mm, W={self.width}mm, L={self.length}mm oraz symetrycznym wcięciu (licząc od górnej krawędzi bloku) o H={self.cut_height}mm i W={self.cut_width}mm co sprawia, że blok wygląda jak odwrócona litera T"
-    
+
+
 class DoubleChamferedHexagonalPrism(HexagonalPrism):
-    
-    def __init__(self, height, indiameter, chamfer_length=1, chamfer_angle=45, chamfer_pos='left'):
-        
-        
+
+    def __init__(self,
+                 height,
+                 indiameter,
+                 chamfer_length=1,
+                 chamfer_angle=45,
+                 chamfer_pos='left'):
+
         num_of_lines_view = {
-            'horizontal_lines': 5, #axis included
+            'horizontal_lines': 5,  #axis included
             'vertical_lines': 2,
             'inclined_lines': 4,
             'arcs': 6,
@@ -1488,7 +1689,7 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
         }
 
         num_of_lines_sec = {
-            'horizontal_lines': 3, #axis included
+            'horizontal_lines': 3,  #axis included
             'vertical_lines': 2,
             'inclined_lines': 4,
             'arcs': 0,
@@ -1498,7 +1699,7 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
         }
 
         num_of_lines_half_sec = {
-            'horizontal_lines': 4, # axis included
+            'horizontal_lines': 4,  # axis included
             'vertical_lines': 2,
             'inclined_lines': 4,
             'arcs': 4,
@@ -1506,8 +1707,8 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
             'vertical_dimensions': 1,
             'angular_dimensions': 2,
         }
-        
-        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0} # to improve
+
+        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
 
         super().__init__(height=height, indiameter=indiameter)
 
@@ -1515,9 +1716,9 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
             'view': View(**num_of_lines_view),
             'section': Section(**num_of_lines_sec),
             'halfsection': HalfSection(**num_of_lines_half_sec),
-            'front_view':FrontView(**num_of_lines_front)
+            'front_view': FrontView(**num_of_lines_front)
         }
-        
+
         self.chamfer_length = chamfer_length
         self.chamfer_angle = chamfer_angle
         #         self.chamfer=chamfer
@@ -1529,4 +1730,3 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
         self._name['pl'] = 'Łeb śruby ze sfazowaniem'
         self._class_description_pl = " o  L={}mm, wymiarze pod klucz ={} oraz sfazowaniu = {} po obu stronach".format(
             *self._parameters)
-    

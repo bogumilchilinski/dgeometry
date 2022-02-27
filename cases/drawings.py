@@ -453,7 +453,7 @@ class ShaftSketch(GeometricalCase):
             
         print(self._solid_structure)
         self._solid_structure.preview()
-        GeometryScene.ax_3d.plot([1,2,3],[1,4,9])
+        #GeometryScene.ax_3d.plot([1,2,3],[1,4,9])
 
         
         
@@ -543,6 +543,8 @@ class SleeveSketch(ShaftSketch
     @classmethod
     def _structure_generator(cls):
         
+        
+        print('struct gen for Sleeve')
         
         steps = cls.steps_no
         holes = cls.holes_no

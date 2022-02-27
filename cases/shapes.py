@@ -228,9 +228,9 @@ class SquareOnPlane(ShapeOnPlane):
         C = (S + (S - A))('C')
 
 
-        #self.add_solution_step('Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
+        self.add_solution_step('Creating a point $C_0$ based on triangle geometry ', [A^B,B^C])
 
-        self.add_solution_step('Creating a point $\\C_0$ based on triangle geometry ', [A^B,B^C])
+        #self.add_solution_step('Creating a point $\\C_0$ based on triangle geometry ', [A^B,B^C]) #<- to źle źle niedobrze połowa kroków się w ogóle nie wyświetla
 
 
         self.A = A
@@ -253,8 +253,10 @@ class SquareOnPlane(ShapeOnPlane):
         D0 = D.rotate_about(self._axis)()('D_0')
         C0 = (B0+ (D0-A0))('C_0')
 
-        #\u25A1
-        self.add_solution_step(f'Title: Rotated Base (  ${A0._label}{B0}{0} $ triangle - half of  \\u25A1 $ {A0}{B0}{C0}{D0}$ square )', [A0^B0,A0^D0],caption='Rotated Base (  ${A0._label}{B0}{0} $ triangle - half of  $ \\square {A0}{B0}{C0}{D0}$ square )')
+        #\u25A1  #symbole \square, \Box ani \triangle nie działają, a by się tu przydały  
+        #przy {A0._label}{B0}{0} powinno być ABO, a nie AB0 (zero), ale w jupyterze wyświetla że O nie zostało zdefiniowane, mimo że zostało w 146 linijce
+        
+        self.add_solution_step(f'Rotated Base (  $ {A0._label}{B0}{0} $ triangle - half of  $\u25A1$ ${A0}{B0}{C0}{D0}$ square )', [A0^B0,A0^D0],caption='Rotated Base (  ${A0._label}{B0}{0} $ triangle - half of  $ \\square {A0}{B0}{C0}{D0}$ square )')
 
         
         return  B,D

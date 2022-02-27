@@ -61,14 +61,14 @@ class GeometryScene:
     ax_3d.set_zlim(0, 16)
     plt.tight_layout()
     
-    def __init__(self):
+    def __init__(self,height=12,width=16,figsize=(12,9)):
 
-        plt.figure(figsize=(12,9))
+        plt.figure(figsize=figsize)
         ax_2d = plt.subplot(121)
         ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
 
-        plt.xlim(0, 16)
-        plt.ylim(-12, 12)
+        plt.xlim(0, width)
+        plt.ylim(-height, height)
         plt.grid(True)      
       
         
