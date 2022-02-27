@@ -331,7 +331,7 @@ def create_random_profile(max_steps_no,
                           step_lengths=[50,55,60],
                           step_type=sol.Cylinder,
                           step_modificator=lambda step: step,
-                          origin=None):
+                          origin=0):
     steps_no = random.randint(min_steps_no, max_steps_no - 1)
 
     #boundary_node=random.randint(0,steps_no)
@@ -354,7 +354,15 @@ def create_random_profile(max_steps_no,
 
     steps_list=sympy.flatten([step_modificator(step) for step in base_geometry])
     
-    return sympy.flatten([step_modificator(step) for step in base_geometry])
+    steps_list[0]._origin = origin
+    
+    for no,step in enumerate(steps_list):
+        step._ref_elem = steps_list[no-1]
+        
+    steps_list[0]._origin = origin
+    steps_list[0]._ref_elem = None
+    
+    return steps_list
 
 
 names_dict = {
@@ -426,17 +434,27 @@ class ShaftSketch(GeometricalCase):
         steps = cls.steps_no
         holes = cls.holes_no
         
-        shafts = [
-            create_random_profile(steps['max'],steps['min'], increase_values=[
-                4,
-                5,
-                6,
-            ]) + create_random_profile(steps['max'],steps['min'], increase_values=[
-                -4,
-                -5,
-                -6,
-            ]) for i in range(50)]
-        return shafts
+        shafts =  []
+        for i in range(50):
+            shaft = create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      4,
+                                      5,
+                                      6,
+                                  ],
+                                  step_modificator=step_mod_inc_threads,origin=0) 
+            
+            shaft +=create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_modificator=step_mod_dec_threads,origin = shaft[-1].end)
+            
+
+            
+            shafts.append(shaft)
 
     @classmethod
     def from_random_data(cls):
@@ -639,7 +657,7 @@ class SleeveWithThreadedHoleSketch(ShaftSketch
                                       5,
                                       6,
                                   ],
-                                  step_modificator=step_mod_inc_threads) 
+                                  step_modificator=step_mod_inc_threads,origin=0) 
             
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
@@ -647,7 +665,7 @@ class SleeveWithThreadedHoleSketch(ShaftSketch
                                       -5,
                                       -6,
                                   ],
-                                  step_modificator=step_mod_dec_threads)
+                                  step_modificator=step_mod_dec_threads,origin = shaft[-1].end)
             
             shaft += create_random_profile(4,
                                   1,
@@ -659,8 +677,8 @@ class SleeveWithThreadedHoleSketch(ShaftSketch
                                   ],
                                   step_lengths=[27, 29],
                                   step_modificator=step_mod_dec_hole_chamfer,
-                                  step_type=sol.Hole) 
-            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,1.4)]
+                                  step_type=sol.Hole,origin=0) 
+            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,1.4),origin=shaft[-1].end]
             
             shafts.append(shaft)
         
