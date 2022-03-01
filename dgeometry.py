@@ -39,58 +39,116 @@ def plots_no():
 class GeometryScene:
     plt.clf()
 
+#     plt.figure(figsize=(12,9))
+#     ax_2d = plt.subplot(121)
+#     ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
+
+#     plt.xlim(0, 16)
+#     plt.ylim(-12, 12)
+#     plt.grid(True)    
+#    
+#     ax_2d.set_yticks(  range(-12,12,2) )
+#     ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
+
+#     ax_3d = plt.subplot(122, projection='3d')
+#     ax_3d.view_init(30,10)
+#     ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
+
+#     plt.xlim(0, 16)
+#     plt.ylim(0, 16)
+
+#    
+#     ax_3d.set_zlim(0, 16)
+#     plt.tight_layout()
+
     plt.figure(figsize=(12,9))
     ax_2d = plt.subplot(121)
-    ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
+    #ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
 
-    plt.xlim(0, 16)
-    plt.ylim(-12, 12)
-    plt.grid(True)    
-    
-    ax_2d.set_yticks(  range(-12,12,2) )
-    ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
+    plt.xlim(0, 200)
+    plt.ylim(-100, 100)
+    plt.grid(False)
+    ax_2d.axis('equal')
+    ax_2d.axis('off')
+
+
+    #ax_2d.set_yticks(  range(-12,12,2) )
+    #ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
 
     ax_3d = plt.subplot(122, projection='3d')
-    ax_3d.view_init(30,10)
-    ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
+    #ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
 
-    plt.xlim(0, 16)
-    plt.ylim(0, 16)
+    #plt.xlim(0, 16)
+    #plt.ylim(0, 16)
 
-    
-    ax_3d.set_zlim(0, 16)
-    plt.tight_layout()
-    
+
+    #ax_3d.set_zlim(0, 16)
+
+    ax_3d.view_init(30,80)
+    plt.tight_layout()  
+    plt.axis("off")
+
+    ax_2d=ax_2d 
+    ax_3d=ax_3d 
+
+#    def __init__(self,height=12,width=16,figsize=(12,9)):
+
+#         plt.figure(figsize=figsize)
+#         ax_2d = plt.subplot(121)
+#         ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
+
+#         plt.xlim(0, width)
+#         plt.ylim(-height, height)
+#         plt.grid(True)      
+
+#         ax_2d.set_yticks(  range(-12,12,2) )
+#         ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
+
+#         ax_3d = plt.subplot(122, projection='3d')
+#         ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
+
+#         plt.xlim(0, 16)
+#         plt.ylim(0, 16)
+
+
+#         ax_3d.set_zlim(0, 16)
+
+#         ax_3d.view_init(30,10)
+#         plt.tight_layout()  
+
+#         self.__class__.ax_2d=ax_2d 
+#         self.__class__.ax_3d=ax_3d 
+
     def __init__(self,height=12,width=16,figsize=(12,9)):
 
         plt.figure(figsize=figsize)
         ax_2d = plt.subplot(121)
-        ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
+        #ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
 
-        plt.xlim(0, width)
-        plt.ylim(-height, height)
-        plt.grid(True)      
+        plt.xlim(-0.1*width, width)
+        plt.ylim(-height/2, height/2)
+        plt.grid(False)  
+        plt.axis('off')
       
         
-        ax_2d.set_yticks(  range(-12,12,2) )
-        ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
+        #ax_2d.set_yticks(  range(-12,12,2) )
+        #ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
 
         ax_3d = plt.subplot(122, projection='3d')
-        ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
+        #ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
 
-        plt.xlim(0, 16)
-        plt.ylim(0, 16)
+        #plt.xlim(0, 16)
+        #plt.ylim(0, 16)
 
 
-        ax_3d.set_zlim(0, 16)
+        #ax_3d.set_zlim(0, 16)
 
-        ax_3d.view_init(30,10)
+        ax_3d.view_init(30,80)
         plt.tight_layout()  
+        plt.axis("off")
 
         self.__class__.ax_2d=ax_2d 
         self.__class__.ax_3d=ax_3d 
-
-
 
 def entity_convert(entity):
     '''

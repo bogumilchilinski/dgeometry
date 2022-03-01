@@ -3,6 +3,66 @@ from ..dgeometry import GeometryScene
 import numpy as np
 from numbers import Number
 
+import numpy as np
+from matplotlib.patches import Circle
+import mpl_toolkits.mplot3d.art3d as art3d
+import matplotlib.pyplot as plt
+
+
+class ShaftPreview:
+    def __init__(self, x0, y0, z0, *args):
+        self.x0 = x0
+        self.y0 = y0
+        self.z0 = z0
+        self.data = []
+        self.total_length = 0
+
+        #self.fig = plt.figure()
+        self.ax = GeometryScene.ax_3d
+        self.Xc = None
+        self.Yc = None
+        self.Zc = None
+        self.ax.azim = 128
+        self.ax.elev = 26
+
+        for arg in args:
+            self.data.append(arg)
+
+        for i in range(len(self.data)):
+            if i == 5:
+                self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.total_length, self.data[i][3])
+                self.total_length = 0
+            self.shaft_steps_sides((self.x0, self.y0), self.data[i][0], self.total_length, self.data[i][3])
+            self.total_length += self.data[i][1]
+        self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.z0, self.data[i][3])
+        self.total_length = 0
+
+        for i in range(len(self.data)):
+            if i == 5:
+                self.total_length = 0
+            self.Xc, self.Yc, self.Zc = data_for_cylinder_along_z(self.x0, self.y0,
+                                                                  self.data[i][0], self.data[i][1], self.z0)
+
+            self.total_length += self.data[i][1]
+            self.ax.plot_surface(self.Xc, self.Yc, self.Zc, alpha=self.data[i][3], color=self.data[i][4], edgecolor="black")
+
+    def shaft_steps_sides(self, begin_cords, radius, zlength, transparency):
+
+        # Draw a circle on the x axis 'wall'
+        p = Circle(begin_cords, radius, alpha=transparency, color='#6b7aa1')
+        self.ax.add_patch(p)
+        art3d.pathpatch_2d_to_3d(p, z=zlength, zdir="x")
+        print(zlength)
+
+
+def data_for_cylinder_along_z(center_z, center_y, radius, height_x, x_begin):
+    x = np.linspace(x_begin, x_begin + height_x, 500)
+    theta = np.linspace(0, 2 * np.pi, 500)
+    theta_grid, x_grid = np.meshgrid(theta, x)
+    z_grid = radius * np.cos(theta_grid) + center_z
+    y_grid = radius * np.sin(theta_grid) + center_y
+    return x_grid, y_grid, z_grid
+
 
 class DrawingObject:
 
@@ -75,7 +135,7 @@ class Solid:
 
 
 
-        print(origin)
+#         print(origin)
         return origin
 
     @property
@@ -83,7 +143,7 @@ class Solid:
 
         end = self.origin + self.height
 
-        print('end =' + str(end))
+#         print('end =' + str(end))
         return end
 
     def _plot_2d(self):
@@ -176,8 +236,8 @@ class ComposedPart:
             print(f'++++++{no}+++++')
             print(f'++++++{elem}+++++')
 
-            if no>0:
-                elem._ref_elem = self.elements[no-1]
+#             if no>0:
+#                 elem._ref_elem = self.elements[no-1]
             
             
             elem._plot_2d()
@@ -591,7 +651,7 @@ class Cylinder(Solid):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-        print(f'plot_2d is called for {class_name}')
+#         print(f'plot_2d is called for {class_name}')
 
         r = self.diameter / 2 / 10
         l = self.height / 10
@@ -599,13 +659,20 @@ class Cylinder(Solid):
         end = self.end / 10
         
         t_l = origin + l / 4
-        t_r = (r + 1)
+        t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
             [-r, r, r, -r, -r],
-            color='k')
-        text = GeometryScene.ax_2d.text(t_l,t_r,f'{class_name}')
+            color='k') + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [0,0],'-.',
+            color='k', linewidth = 1) 
+        text = GeometryScene.ax_2d.text(t_l,t_r,self._name['pl']+f'\n {self._class_description_pl}',rotation='vertical',multialignment='center')
+        
+        
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
         print(res)
 
 
@@ -688,7 +755,7 @@ class Hole(Solid):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-        print(f'plot_2d is called for {class_name}')
+#         print(f'plot_2d is called for {class_name}')
        
         origin = self.origin / 10
         r = self.diameter / 2 / 10
@@ -696,14 +763,18 @@ class Hole(Solid):
         end = self.end / 10
         
         t_l = origin + l / 4
-        t_r = (r + 1)
+        t_r = (-r - 9)
 
         res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
                                        '--',
-                                       color='b')
-        text = GeometryScene.ax_2d.text(t_l,t_r,f'{class_name}')
+                                       color='b') + GeometryScene.ax_2d.plot(
+                                        [origin - 0.5, origin + l + 0.5],
+                                        [0,0],'-.',
+                                        color='k', linewidth = 1) 
+        text = GeometryScene.ax_2d.text(t_l,t_r,self._name['pl']+f'\n {self._class_description_pl}',rotation='vertical',multialignment='center')
         print(res)
 
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
 
 class ChamferedHole(Solid):
     """This object represents chamfered hole that can be made inside solid.
@@ -803,7 +874,7 @@ class ChamferedHole(Solid):
             pos=self.chamfer_pos)
 
     def str_pl(self):
-        return 'Otwór o L={length}mm, średnicy={d}mm i fazie {l_ch}x{angle} znajdującej się po {pos} stronie'.format(
+        return 'Otwór \n o L={length}mm, średnicy={d}mm \n i fazie {l_ch}x{angle} znajdującej się po {pos} stronie'.format(
             length=self.height,
             d=self.diameter,
             angle=self.chamfer_angle,
@@ -811,30 +882,59 @@ class ChamferedHole(Solid):
             pos=self.chamfer_pos).replace('right',
                                           'prawej').replace('left', 'lewej')
     
+#     def _plot_2d(self):
+
+#         class_name = self.__class__.__name__
+
+#         span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+       
+#         origin = self.origin / 10
+#         r = self.diameter / 2 / 10
+#         l = self.height / 10
+#         end = self.end / 10
+#         c_l = self.chamfer_length / 10
+#         c_a = self.chamfer_angle
+#         c_h = c_l * np.tan(c_a)
+        
+#         t_l = origin + l / 2
+#         t_r = (r + 1)
+
+#         res = GeometryScene.ax_2d.plot(
+#             [origin+c_l,origin+c_l,origin+l,origin+l,origin+c_l],[ -r, +r, +r, -r, -r],'--',color='c') + GeometryScene.ax_2d.plot(
+#                 [origin+c_l,origin,origin,origin+c_l],[ -r, -r-c_h, +r+c_h, +r],'--',color='c')+ GeometryScene.ax_2d.plot(
+#                     [origin,origin+l],[ -r-c_h, -r-c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
+#                         [origin,origin+l],[ +r+c_h, +r+c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
+#                             [origin+l,origin+l],[r+c_h,-r-c_h],'--',color='c')
+        
+#         text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+#         print(res)
+        
     def _plot_2d(self):
 
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-        print(f'plot_2d is called for {class_name}')
+#         print(f'plot_2d is called for {class_name}')
        
         origin = self.origin / 10
         r = self.diameter / 2 / 10
         l = self.height / 10
         end = self.end / 10
         
-        t_l = origin + l / 6
-        t_r = (r + 1)
+        t_l = origin + l / 4
+        t_r = (-r - 9)
 
-        res = GeometryScene.ax_2d.plot(
-            [origin+c_l,origin+c_l,origin+l,origin+l,origin+c_l],[ -r, +r, +r, -r, -r],'--',color='c') + GeometryScene.ax_2d.plot(
-                [origin+c_l,origin,origin,origin+c_l],[ -r, -r-c_h, +r+c_h, +r],'--',color='c')+ GeometryScene.ax_2d.plot(
-                    [origin,origin+l],[ -r-c_h, -r-c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
-                        [origin,origin+l],[ +r+c_h, +r+c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
-                            [origin+l,origin+l],[r+c_h,-r-c_h],'--',color='c')
-        
-        text = GeometryScene.ax_2d.text(t_l,t_r,f'{class_name}')
+        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
+                                       '--',
+                                       color='c') + GeometryScene.ax_2d.plot(
+                                        [origin - 0.5, origin + l + 0.5],
+                                        [0,0],'-.',
+                                        color='k', linewidth = 1) 
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
         print(res)
+
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
 
 
 class ChamferedCylinder(Solid):
@@ -937,7 +1037,7 @@ class ChamferedCylinder(Solid):
             pos=self.chamfer_pos)
 
     def str_pl(self):
-        return 'Walec o L={length}mm, średnicy={d}mm i fazie {l_ch}x{angle} znajdującej się po {pos} stronie'.format(
+        return 'Walec \n o L={length}mm, średnicy={d}mm \n i fazie {l_ch}x{angle} znajdującej się po {pos} stronie'.format(
             length=self.height,
             d=self.diameter,
             angle=self.chamfer_angle,
@@ -945,30 +1045,33 @@ class ChamferedCylinder(Solid):
             pos=self.chamfer_pos).replace('right',
                                           'prawej').replace('left', 'lewej')
 
-    def _plot_2d(self):
+#     def _plot_2d(self):
 
-        class_name = self.__class__.__name__
+#         class_name = self.__class__.__name__
 
-        span = np.linspace(0, len(class_name), 100)
-        print(f'plot_2d is called for {class_name}')
+#         span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
 
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        c_l = self.chamfer_length / 10
-        c_a = self.chamfer_angle
-        c_h = c_l * np.tan(c_a)
+#         r = self.diameter / 2 / 10
+#         l = self.height / 10
+#         origin = self.origin / 10
+#         c_l = self.chamfer_length / 10
+#         c_a = self.chamfer_angle
+#         c_h = c_l * np.tan(c_a)
         
-        t_l = origin + l / 6
-        t_r = (r + 1)
+#         t_l = origin + l / 2
+#         t_r = (r + 1)
 
-        res = GeometryScene.ax_2d.plot(
-            [origin + c_l, origin + c_l, origin + l, origin + l, origin + c_l], [-r, r, r, -r, -r],
-            color='g') + GeometryScene.ax_2d.plot(
-                [ origin + c_l, origin + 0, origin + 0, origin + c_l], [-r, -r + c_h, r - c_h, r],
-                color='g')
-        text = text = GeometryScene.ax_2d.text(t_l,t_r,f'{class_name}')
-        print(res)
+#         res = GeometryScene.ax_2d.plot(
+#             [origin + c_l, origin + c_l, origin + l, origin + l, origin + c_l], [-r, r, r, -r, -r],
+#             color='g') + GeometryScene.ax_2d.plot(
+#                 [ origin + c_l, origin + 0, origin + 0, origin + c_l], [-r, -r + c_h, r - c_h, r],
+#                 color='g')
+#         text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+#         print(res)
 
+#         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
     def _plot_2d(self):
 
         #         print(f'self.origin property is {self.origin()}')
@@ -977,17 +1080,47 @@ class ChamferedCylinder(Solid):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-        print(f'plot_2d is called for {class_name}')
+#         print(f'plot_2d is called for {class_name}')
 
         r = self.diameter / 2 / 10
         l = self.height / 10
-        origin = self.origin/10
+        origin = self.origin / 10
+        end = self.end / 10
+        
+        t_l = origin + l / 4
+        t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
             [-r, r, r, -r, -r],
-            color='k')
+            color='g') + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [0,0],'-.',
+            color='k', linewidth = 1) 
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
         print(res)
+
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
+#     def _plot_2d(self):
+
+#         #         print(f'self.origin property is {self.origin()}')
+#         #         print(f'self.end property is {self.end()}')
+
+#         class_name = self.__class__.__name__
+
+#         span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+
+#         r = self.diameter / 2 / 10
+#         l = self.height / 10
+#         origin = self.origin / 10
+
+#         res = GeometryScene.ax_2d.plot(
+#             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+#             [-r, r, r, -r, -r],
+#             color='k')
+#         print(res)
 
         
         

@@ -442,7 +442,7 @@ class ShaftSketch(GeometricalCase):
                                       5,
                                       6,
                                   ],
-                                  step_modificator=step_mod_inc_threads,origin=0) 
+                                  step_modificator=step_mod_inc_chamfer,origin=0) 
             
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
@@ -450,11 +450,12 @@ class ShaftSketch(GeometricalCase):
                                       -5,
                                       -6,
                                   ],
-                                  step_modificator=step_mod_dec_threads,origin = shaft[-1].end)
+                                  step_modificator=step_mod_dec_chamfer,origin = shaft[-1].end)
             
 
             
             shafts.append(shaft)
+        return shafts
 
     @classmethod
     def from_random_data(cls):
@@ -570,28 +571,40 @@ class SleeveSketch(ShaftSketch
         steps = cls.steps_no
         holes = cls.holes_no
         
-        shafts = [
-            create_random_profile(steps['max'],steps['min'], increase_values=[
-                4,
-                5,
-                6,
-            ]) + create_random_profile(steps['max'],steps['min'], increase_values=[
-                -4,
-                -5,
-                -6,
-            ]) + create_random_profile(holes['max'],holes['min'],
-                                       initial_diameter=[10, 15],
+
+
+        shafts =  []
+        for i in range(50):
+            shaft = create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      4,
+                                      5,
+                                      6,
+                                  ],
+                                  step_modificator=step_mod_inc_chamfer,origin=0) 
+            
+            shaft +=create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_modificator=step_mod_dec_chamfer,origin = shaft[-1].end)
+            
+            shaft +=create_random_profile(holes['max'],holes['min'],
+                                       initial_diameter=[25, 30],
                                        increase_values=[
                                            -2,
                                            -3,
                                            -4,
                                        ],
-                                       step_lengths=[27, 29],
-                                       step_type=sol.Hole) for i in range(50)
-        ]
+                                       step_lengths=[62, 65],
+                                       step_type=sol.Hole,origin=0)
 
+            
+            shafts.append(shaft)
         return shafts
-
+    
 
 class SleeveWithThreadsSketch(ShaftSketch
                               #GeometricalCase
@@ -605,7 +618,7 @@ class SleeveWithThreadsSketch(ShaftSketch
         steps = cls.steps_no
         holes = cls.holes_no
         
-        shafts = shafts = [
+        shafts  = [
             create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
                                       4,
@@ -619,7 +632,7 @@ class SleeveWithThreadsSketch(ShaftSketch
                                       -5,
                                       -6,
                                   ],
-                                  step_modificator=step_mod_dec_threads) +
+                                  step_modificator=step_mod_dec_threads,origin=0) +
             create_random_profile(2,
                                   1,
                                   initial_diameter=[25, 22],
@@ -678,7 +691,8 @@ class SleeveWithThreadedHoleSketch(ShaftSketch
                                   step_lengths=[27, 29],
                                   step_modificator=step_mod_dec_hole_chamfer,
                                   step_type=sol.Hole,origin=0) 
-            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,1.4),origin=shaft[-1].end]
+            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,1.4)]
+            shaft[-1]._ref_elem=shaft[-2].end
             
             shafts.append(shaft)
         
