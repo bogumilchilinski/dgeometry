@@ -194,6 +194,16 @@ class Solid:
 
     def __repr__(self):
         return self.__str__()
+    
+    def preview(self, example=False):
+
+        print(*list(enumerate(self.elements)))
+        
+        for no, elem in enumerate(self.elements):
+            print(f'++++++{no}+++++')
+            print(f'++++++{elem}+++++')
+            elem._plot_2d()
+
 
 
 class ComposedPart:
