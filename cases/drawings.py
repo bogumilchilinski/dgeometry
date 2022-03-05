@@ -466,20 +466,35 @@ class ShaftSketch(GeometricalCase):
         print(entities)
         return cls(*entities)
 
+
+
+        
+    def _scheme(self):
+
+        self.preview()
+
+
+        return self._path
+
+    def _real_example(self):
+
+        self.preview()
+
+
+        return self._path
+
+
+
+
+    
     def preview(self, example=False):
+        GeometryScene(30,60,figsize=(14,7))
 
-        print('preview')
-        print(self._assumptions3d)
-        if self._assumptions3d is None:
-            self._assumptions3d = self._assumptions
-            
-        print(self._solid_structure)
         self._solid_structure.preview()
-        #GeometryScene.ax_3d.plot([1,2,3],[1,4,9])
 
         
         
-        path = __file__.replace('dgeometry.py', 'images/') + self.__class__.__name__ + str(next(self.__class__._case_no)) + '.png'
+        path = __file__.replace('cases/drawings.py', 'images/') + self.__class__.__name__ + str(next(self.__class__._case_no)) + '.png'
 
         
         
@@ -493,11 +508,7 @@ class ShaftSketch(GeometricalCase):
         self._path = path
 
 
-
-
-        print('check'*100)
-        print(self._path)        
-        print('check'*100)        
+     
         plt.close()
 
 
@@ -505,7 +516,7 @@ class ShaftSketch(GeometricalCase):
             encoded_string = base64.b64encode(image_file.read())
         image_file.close()
 
-        return IP.display.Image(base64.b64decode(encoded_string)) 
+        return IP.display.Image(base64.b64decode(encoded_string))
     
     
     def __init__(self, *assumptions, **kwargs):
@@ -519,6 +530,8 @@ class ShaftSketch(GeometricalCase):
 
         self._label = None
 
+
+        
         self._solid_structure = sol.ComposedPart(*assumptions)
 
         if len(assumptions) != 0:
