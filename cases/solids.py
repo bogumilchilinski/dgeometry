@@ -28,14 +28,14 @@ class ShaftPreview:
         for arg in args:
             self.data.append(arg)
 
-        for i in range(len(self.data)):
+        '''for i in range(len(self.data)):
             if i == 5:
                 self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.total_length, self.data[i][3])
                 self.total_length = 0
             self.shaft_steps_sides((self.x0, self.y0), self.data[i][0], self.total_length, self.data[i][3])
             self.total_length += self.data[i][1]
         self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.z0, self.data[i][3])
-        self.total_length = 0
+        self.total_length = 0'''
 
         for i in range(len(self.data)):
             if i == 5:
