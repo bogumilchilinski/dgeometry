@@ -148,17 +148,16 @@ class Solid:
 
     def _plot_2d(self):
 
-        #         print(f'self.origin property is {self.origin()}')
-        #         print(f'self.end property is {self.end()}')
+
 
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-        print(f'plot_2d is called for {class_name}')
+
         res = GeometryScene.ax_2d.plot(span,
                                        np.cos(5 * len(class_name) * span),
                                        label=class_name)
-        print(res)
+
 
     @property
     def views(self):
@@ -200,8 +199,7 @@ class Solid:
         print(*list(enumerate(self.elements)))
         
         for no, elem in enumerate(self.elements):
-            print(f'++++++{no}+++++')
-            print(f'++++++{elem}+++++')
+
             elem._plot_2d()
 
 
@@ -243,26 +241,11 @@ class ComposedPart:
         
         
         for no, elem in enumerate(self.elements):
-            print(f'++++++{no}+++++')
-            print(f'++++++{elem}+++++')
 
-#             if no>0:
-#                 elem._ref_elem = self.elements[no-1]
-            
-            
+
             elem._plot_2d()
 
-#         if example:
-#             path = cls._real_example()
 
-#         else:
-#             path = cls._scheme()
-
-#         with open(f"{path}", "rb") as image_file:
-#             encoded_string = base64.b64encode(image_file.read())
-#         image_file.close()
-
-#         return IP.display.Image(base64.b64decode(encoded_string))
 
     def add(self, other):
 
@@ -653,6 +636,17 @@ class Cylinder(Solid):
         self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
             *self._parameters)
 
+    def str_en(self):
+        return 'Cylinder \n with L={length}mm \n and diameter={d}mm'.format(
+            length=self.height,
+            d=self.diameter)
+
+    def str_pl(self):
+        return 'Walec \n o L={length}mm i średnicy={d}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                          'prawej').replace('left', 'lewej')
+        
     def _plot_2d(self):
 
         #         print(f'self.origin property is {self.origin()}')
@@ -678,7 +672,7 @@ class Cylinder(Solid):
             [origin - 0.5, origin + l + 0.5],
             [0,0],'-.',
             color='k', linewidth = 1) 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self._name['pl']+f'\n {self._class_description_pl}',rotation='vertical',multialignment='center')
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
         
         
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
@@ -759,7 +753,19 @@ class Hole(Solid):
         self._name['pl'] = 'Otwór'
         self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
             *self._parameters)
-        
+ 
+    def str_en(self):
+        return 'Hole \n with L={length}mm \n and diameter={d}mm'.format(
+            length=self.height,
+            d=self.diameter
+        )
+
+    def str_pl(self):
+        return 'Otwór \n o L={length}mm i średnicy={d}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                          'prawej').replace('left', 'lewej')
+
     def _plot_2d(self):
 
         class_name = self.__class__.__name__
@@ -781,7 +787,7 @@ class Hole(Solid):
                                         [origin - 0.5, origin + l + 0.5],
                                         [0,0],'-.',
                                         color='k', linewidth = 1) 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self._name['pl']+f'\n {self._class_description_pl}',rotation='vertical',multialignment='center')
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
         print(res)
 
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
@@ -876,7 +882,7 @@ class ChamferedHole(Solid):
             *self._parameters)
 
     def str_en(self):
-        return 'Hole with L={length}mm, diameter={d}mm and {l_ch}x{angle} chamfer on the {pos} side'.format(
+        return 'Hole \n with L={length}mm, diameter={d}mm \n and {l_ch}x{angle} chamfer on the {pos} side'.format(
             length=self.height,
             d=self.diameter,
             angle=self.chamfer_angle,
@@ -941,7 +947,7 @@ class ChamferedHole(Solid):
                                         [origin - 0.5, origin + l + 0.5],
                                         [0,0],'-.',
                                         color='k', linewidth = 1) 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
         print(res)
 
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
@@ -1039,7 +1045,7 @@ class ChamferedCylinder(Solid):
             *self._parameters)
 
     def str_en(self):
-        return 'Cylinder with L={length}mm, diameter={d}mm and {l_ch}x{angle} chamfer on the {pos} side'.format(
+        return 'Cylinder \n with L={length}mm, diameter={d}mm \n and {l_ch}x{angle} chamfer on the {pos} side'.format(
             length=self.height,
             d=self.diameter,
             angle=self.chamfer_angle,
@@ -1107,7 +1113,7 @@ class ChamferedCylinder(Solid):
             [origin - 0.5, origin + l + 0.5],
             [0,0],'-.',
             color='k', linewidth = 1) 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
         print(res)
 
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
