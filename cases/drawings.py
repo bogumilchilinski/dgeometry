@@ -20,7 +20,7 @@ import sympy
 import itertools as it
 from ..dgeometry import *
 from . import solids as sol
-
+import gc
 
 
 class DrawingSheets(GeometricalCase):
@@ -471,26 +471,34 @@ class ShaftSketch(GeometricalCase):
         
     def _scheme(self):
 
-        self.preview()
+        if self._path is None:
+            self.preview()
 
 
         return self._path
 
     def _real_example(self):
 
-        self.preview()
+        if self._path is None:
+            self.preview()
 
+        return self._path
+
+
+    def _scheme_pl(self):
+
+        if self._path is None:
+            self.preview(language='pl')
 
         return self._path
 
 
 
-
     
-    def preview(self, example=False):
+    def preview(self, example=False,language='en'):
         GeometryScene(30,60,figsize=(14,7))
 
-        self._solid_structure.preview()
+        self._solid_structure.preview(language=language)
 
         
         
@@ -500,16 +508,22 @@ class ShaftSketch(GeometricalCase):
         
         plt.savefig(path)
 
-        plt.close()
 
+        # Clear the current axes.
+        plt.cla() 
+        # Clear the current figure.
+        plt.clf() 
+        # Closes all the figure windows.
+        plt.close('all')
 
+        gc.collect()
 
 
         self._path = path
 
 
      
-        plt.close()
+
 
 
         with open(f"{path}", "rb") as image_file:
@@ -543,6 +557,7 @@ class ShaftSketch(GeometricalCase):
         }
 
         self._cached_solution = None
+        self._path = None
 
     def get_default_data(self):
 

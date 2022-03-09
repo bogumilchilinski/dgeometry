@@ -146,9 +146,9 @@ class Solid:
 #         print('end =' + str(end))
         return end
 
-    def _plot_2d(self):
+    def _plot_2d(self,language='en'):
 
-
+        
 
         class_name = self.__class__.__name__
 
@@ -228,7 +228,7 @@ class ComposedPart:
 
         return path
 
-    def preview(self, example=False):
+    def preview(self, example=False,language='en'):
 
         print(*list(enumerate(self.elements)))
 
@@ -243,7 +243,7 @@ class ComposedPart:
         for no, elem in enumerate(self.elements):
 
 
-            elem._plot_2d()
+            elem._plot_2d(language=language)
 
 
 
@@ -647,7 +647,7 @@ class Cylinder(Solid):
             d=self.diameter).replace('right',
                                           'prawej').replace('left', 'lewej')
         
-    def _plot_2d(self):
+    def _plot_2d(self,language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -671,8 +671,12 @@ class Cylinder(Solid):
             color='k') + GeometryScene.ax_2d.plot(
             [origin - 0.5, origin + l + 0.5],
             [0,0],'-.',
-            color='k', linewidth = 1) 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+            color='k', linewidth = 1)
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
         
         
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
@@ -766,7 +770,7 @@ class Hole(Solid):
             d=self.diameter).replace('right',
                                           'prawej').replace('left', 'lewej')
 
-    def _plot_2d(self):
+    def _plot_2d(self,language='en'):
 
         class_name = self.__class__.__name__
 
@@ -786,9 +790,12 @@ class Hole(Solid):
                                        color='b') + GeometryScene.ax_2d.plot(
                                         [origin - 0.5, origin + l + 0.5],
                                         [0,0],'-.',
-                                        color='k', linewidth = 1) 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        print(res)
+                                        color='k', linewidth = 1)
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
 
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
 
@@ -898,7 +905,7 @@ class ChamferedHole(Solid):
             pos=self.chamfer_pos).replace('right',
                                           'prawej').replace('left', 'lewej')
     
-#     def _plot_2d(self):
+#     def _plot_2d(self,language='en'):
 
 #         class_name = self.__class__.__name__
 
@@ -926,7 +933,7 @@ class ChamferedHole(Solid):
 #         text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
 #         print(res)
         
-    def _plot_2d(self):
+    def _plot_2d(self,language='en'):
 
         class_name = self.__class__.__name__
 
@@ -946,9 +953,12 @@ class ChamferedHole(Solid):
                                        color='c') + GeometryScene.ax_2d.plot(
                                         [origin - 0.5, origin + l + 0.5],
                                         [0,0],'-.',
-                                        color='k', linewidth = 1) 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        print(res)
+                                        color='k', linewidth = 1)
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
 
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
 
@@ -1061,7 +1071,7 @@ class ChamferedCylinder(Solid):
             pos=self.chamfer_pos).replace('right',
                                           'prawej').replace('left', 'lewej')
 
-#     def _plot_2d(self):
+#     def _plot_2d(self,language='en'):
 
 #         class_name = self.__class__.__name__
 
@@ -1088,7 +1098,7 @@ class ChamferedCylinder(Solid):
 
 #         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
         
-    def _plot_2d(self):
+    def _plot_2d(self,language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -1112,13 +1122,17 @@ class ChamferedCylinder(Solid):
             color='g') + GeometryScene.ax_2d.plot(
             [origin - 0.5, origin + l + 0.5],
             [0,0],'-.',
-            color='k', linewidth = 1) 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        print(res)
+            color='k', linewidth = 1)
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+
 
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
         
-#     def _plot_2d(self):
+#     def _plot_2d(self,language='en'):
 
 #         #         print(f'self.origin property is {self.origin()}')
 #         #         print(f'self.end property is {self.end()}')
@@ -1198,7 +1212,7 @@ class Thread(Solid):
         self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(
             *self._parameters)
 
-    def _plot_2d(self):
+    def _plot_2d(self,language='en'):
 
         class_name = self.__class__.__name__
 
@@ -1320,7 +1334,7 @@ class ThreadedOpenHole(Solid):
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length)
 
-    def _plot_2d(self):
+    def _plot_2d(self,language='en'):
 
         class_name = self.__class__.__name__
 
