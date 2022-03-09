@@ -945,8 +945,8 @@ class ChamferedHole(Solid):
         l = self.height / 10
         end = self.end / 10
         
-        t_l = origin + l / 4
-        t_r = (-r - 9)
+        t_l = origin + l / 6
+        t_r = (-r - 13.5)
 
         res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
                                        '--',
@@ -1211,6 +1211,22 @@ class Thread(Solid):
         self._name['pl'] = 'Gwint'
         self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(
             *self._parameters)
+        
+    def str_en(self):
+        return 'Threaded Cylinder \n with L={length}mm, thread M{d} \n and chamfer {l_ch}x{angle}'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            )
+
+    def str_pl(self):
+        return 'Walec gwintowany \n o L={length}mm, gwincie M{d}mm \n i fazie {l_ch}x{angle}'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            )
 
     def _plot_2d(self,language='en'):
 
@@ -1221,15 +1237,23 @@ class Thread(Solid):
 
         r = self.diameter / 2 / 10
         l = self.height / 10
-        r_t = 0.8 * r
+        r_t = 0.9 * r
+        origin = self.origin / 10
+        
+        t_l = origin + l / 4
+        t_r = (r + 0.5)
 
-        res = GeometryScene.ax_2d.plot([0, 0, l, l, 0], [-r, r, r, -r, -r],
+        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
                                        color='k') + GeometryScene.ax_2d.plot(
-                                           [0, 0, l, l, 0],
+                                           [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
                                            [-r_t, r_t, r_t, -r_t, -r_t],
-                                           linewidth=1,
-                                           color='r')
+                                           linewidth=1, color='r') + GeometryScene.ax_2d.plot(
+                                           [origin - 0.5, origin + l + 0.5],
+                                           [0,0],'-.',
+                                           color='k', linewidth = 1)
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
         print(res)
+        
 
 
 class ThreadedOpenHole(Solid):
@@ -1639,13 +1663,49 @@ class FlangeWithHoles(Solid):
             *self._parameters)
 
     def str_en(self):
-        return "Flange with open holes with L={}mm, D={}, hole diameter={}, reference diameter of hole pattern={}, holes number={} and chamfers {}x{} on both sides".format(
+        return "Flange /n with open holes with L={}mm, D={}, hole diameter={}, \n reference diameter of hole pattern={}, holes number={} \n and chamfers {}x{} on both sides".format(
             *(self._parameters))
 
     def str_pl(self):
-        return "Kołnierz z przelotowymi otworami o  L={}mm, D={}, średnicy otworu={}, średnicy rozmieszczenia otworów={}, liczbie otworów={} i fazach {}x{} po obu stronach".format(
+        return "Kołnierz z przelotowymi otworami \n o  L={}mm, D={}, średnicy otworu={}, \n średnicy rozmieszczenia otworów={}, liczbie otworów={} \n i fazach {}x{} po obu stronach".format(
             *self._parameters)
 
+    def _plot_2d(self):
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        r_h = self.hole_diameter / 2 / 10
+        r_r = self.reference_diameter / 2 / 10
+        holes_no= self.holes_no
+        c_l = self.chamfer_length / 10
+        c_a = self.chamfer_angle
+        c_h=c_l * np.tan(c_a)
+        
+        origin = self.origin / 10
+        end = self.end / 10
+        
+        t_l = origin + l / 4
+        t_r = (r + 0.5)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],[0,0],'-.', color='k', linewidth = 1) + GeometryScene.ax_2d.plot(
+                [origin + 0, origin + 0, origin + l, origin + l, origin + 0],[-r,r,r,-r,-r],color='m') + GeometryScene.ax_2d.plot(
+                    [origin + 0, origin + 0, origin + l, origin + l, origin + 0],[r_r-r_h,r_r+r_h,r_r+r_h,r_r-r_h,r_r-r_h],'--',color='m',linewidth = 1) + GeometryScene.ax_2d.plot(
+                        [origin - 0.5, origin + l + 0.5],[r_r+0,r_r+0],'-.', color='k', linewidth = 1) + GeometryScene.ax_2d.plot(
+                               [origin + 0, origin + 0, origin + l, origin + l, origin + 0],[-r_r-r_h,-r_r+r_h,-r_r+r_h,-r_r-r_h,-r_r-r_h],'--',color='m',linewidth = 1) + GeometryScene.ax_2d.plot(
+                                    [origin - 0.5, origin + l + 0.5],[-r_r+0,-r_r+0],'-.', color='k', linewidth = 1)
+
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+        
+        
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
+        print(res)
 
 class BlockBearingHolder(Solid):
     """

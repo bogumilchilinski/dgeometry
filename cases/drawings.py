@@ -632,7 +632,6 @@ class SleeveSketch(ShaftSketch
             
             shafts.append(shaft)
         return shafts
-    
 
 class SleeveWithThreadsSketch(ShaftSketch
                               #GeometricalCase
@@ -646,36 +645,35 @@ class SleeveWithThreadsSketch(ShaftSketch
         steps = cls.steps_no
         holes = cls.holes_no
         
-        shafts  = [
-            create_random_profile(steps['max'],steps['min'],
+        shafts  = []
+        for i in range(50):
+            shaft = create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
                                       4,
                                       5,
                                       6,
                                   ],
-                                  step_modificator=step_mod_inc_threads) +
-            create_random_profile(steps['max'],steps['min'],
+                                  step_modificator=step_mod_inc_threads,origin=0)
+            shaft += create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
                                       -4,
                                       -5,
                                       -6,
                                   ],
-                                  step_modificator=step_mod_dec_threads,origin=0) +
-            create_random_profile(2,
+                                  step_modificator=step_mod_dec_threads,origin=shaft[-1].end)
+            shaft += create_random_profile(2,
                                   1,
                                   initial_diameter=[25, 22],
                                   increase_values=[
                                       -2,
                                       -3,
                                   ],
-                                  step_lengths=[27, 29],
+                                  step_lengths=[62, 65],
                                   step_modificator=step_mod_dec_hole_chamfer,
-                                  step_type=sol.Hole) +
-            [sol.ThreadedOpenHole(6)] for i in range(50)
-        ]
-
+                                  step_type=sol.Hole, origin=0)
+            
+            shafts.append(shaft)
         return shafts
-
 
 class SleeveWithThreadedHoleSketch(ShaftSketch
                                    #GeometricalCase
