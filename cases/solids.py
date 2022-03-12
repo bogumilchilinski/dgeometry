@@ -196,13 +196,8 @@ class Solid:
     
     def preview(self, example=False):
 
-        print(*list(enumerate(self.elements)))
-        
-        for no, elem in enumerate(self.elements):
-
-            elem._plot_2d()
-
-
+              self._plot_2d()
+            
 
 class ComposedPart:
     scheme_name = 'engine.png'
@@ -228,23 +223,17 @@ class ComposedPart:
 
         return path
 
+
     def preview(self, example=False,language='en'):
 
         print(*list(enumerate(self.elements)))
 
-        
         #self.elements[0]._origin = 0
         #self.elements[-1]._origin = -30
         
-        
-            
-        
-        
         for no, elem in enumerate(self.elements):
 
-
             elem._plot_2d(language=language)
-
 
 
     def add(self, other):
@@ -574,6 +563,39 @@ class Cone(Solid):
         self._name['pl'] = 'Stożek'
         self._class_description_pl = "o L={}mm, średnicy górnej podstawy = {}mm i średnicy dolnej podstawy={}mm".format(
             *self._parameters)
+    
+    def _plot_2d(self):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+
+        r_b = self.bottom_diameter /2 /10
+        r_t = self.top_diameter / 2 / 10
+        l = self.height / 10
+        origin = self.origin / 10
+        end = self.end / 10
+        
+        t_l = origin + l / 4
+        t_r = (r_t + 0.5)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r_b, r_b, r_t, -r_t, -r_b],
+            color='k') + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [0,0],'-.',
+            color='k', linewidth = 1) 
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+        
+        
+        ShaftPreview(5,5,origin/2 ,[2*r_t/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
+        print(res)
 
 
 class Cylinder(Solid):
