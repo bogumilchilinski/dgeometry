@@ -200,17 +200,17 @@ class CubeDrawing(DrawingSheets):
 
 
 step_mod_inc_flange = lambda step: random.choice([
-    step,
-    sol.ChamferedCylinder(
-        step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
-    sol.Thread(step.height, step.diameter),
+#     step,
+#     sol.ChamferedCylinder(
+#         step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
+#     sol.Thread(step.height, step.diameter),
     [
-        step,
+        sol.Thread(step.height, step.diameter),
         sol.FlangeWithHoles(height=step.height,
                             diameter=step.diameter * 3,
                             hole_diameter=12,
                             reference_diameter=step.diameter * 3 - 2 * 12,
-                            holes_no=4), step
+                            holes_no=4), copy.copy(step)
     ],
     [
         step,
@@ -218,7 +218,7 @@ step_mod_inc_flange = lambda step: random.choice([
                             diameter=step.diameter * 3,
                             hole_diameter=16,
                             reference_diameter=step.diameter * 3 - 2 * 16,
-                            holes_no=6), step
+                            holes_no=6), copy.copy(step)
     ],
     [
         step,
@@ -226,7 +226,7 @@ step_mod_inc_flange = lambda step: random.choice([
                             diameter=step.diameter * 3,
                             hole_diameter=14,
                             reference_diameter=step.diameter * 3 - 2 * 14,
-                            holes_no=8), step
+                            holes_no=8), copy.copy(step)
     ],
 ])
 step_mod_dec_flange = lambda step: random.choice([
@@ -242,7 +242,7 @@ step_mod_dec_flange = lambda step: random.choice([
                             diameter=step.diameter * 3,
                             hole_diameter=12,
                             reference_diameter=step.diameter * 3 - 2 * 12,
-                            holes_no=4), step
+                            holes_no=4), copy.copy(step)
     ],
     [
         step,
@@ -250,7 +250,7 @@ step_mod_dec_flange = lambda step: random.choice([
                             diameter=step.diameter * 3,
                             hole_diameter=16,
                             reference_diameter=step.diameter * 3 - 2 * 16,
-                            holes_no=6), step
+                            holes_no=6), copy.copy(step)
     ],
     [
         step,
@@ -258,7 +258,7 @@ step_mod_dec_flange = lambda step: random.choice([
                             diameter=step.diameter * 3,
                             hole_diameter=14,
                             reference_diameter=step.diameter * 3 - 2 * 14,
-                            holes_no=8), step
+                            holes_no=8), copy.copy(step)
     ],
 ])
 
@@ -675,6 +675,50 @@ class SleeveWithThreadsSketch(ShaftSketch
             shafts.append(shaft)
         return shafts
 
+class SleeveWithFlangeSketch(ShaftSketch
+                              #GeometricalCase
+                              ):
+
+    steps_no = {'max': 2, 'min': 1}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts  = []
+        for i in range(50):
+            shaft = create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      4,
+                                      5,
+                                      6,
+                                  ],
+                                  step_modificator=step_mod_inc_flange,origin=0)
+            shaft += create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_modificator=step_mod_dec_threads,
+                                           origin=shaft[-1].end)
+            shaft += create_random_profile(2,
+                                  1,
+                                  initial_diameter=[25, 22],
+                                  increase_values=[
+                                      -2,
+                                      -3,
+                                  ],
+                                  step_lengths=[62, 65],
+                                  step_modificator=step_mod_dec_hole_chamfer,
+                                  step_type=sol.Hole, origin=0)
+            
+            shafts.append(shaft)
+        return shafts
+    
+    
 class SleeveWithThreadedHoleSketch(ShaftSketch
                                    #GeometricalCase
                                    ):

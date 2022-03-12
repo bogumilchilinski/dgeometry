@@ -28,14 +28,14 @@ class ShaftPreview:
         for arg in args:
             self.data.append(arg)
 
-        '''for i in range(len(self.data)):
+        for i in range(len(self.data)):
             if i == 5:
                 self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.total_length, self.data[i][3])
                 self.total_length = 0
-            self.shaft_steps_sides((self.x0, self.y0), self.data[i][0], self.total_length, self.data[i][3])
+            self.shaft_steps_sides((self.x0, self.y0), self.data[i][0], self.z0, self.data[i][3])
             self.total_length += self.data[i][1]
-        self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.z0, self.data[i][3])
-        self.total_length = 0'''
+        self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.z0+self.total_length, self.data[i][3])
+        self.total_length = 0
 
         for i in range(len(self.data)):
             if i == 5:
@@ -52,7 +52,7 @@ class ShaftPreview:
         p = Circle(begin_cords, radius, alpha=transparency, color='#6b7aa1')
         self.ax.add_patch(p)
         art3d.pathpatch_2d_to_3d(p, z=zlength, zdir="x")
-        print(zlength)
+
 
 
 def data_for_cylinder_along_z(center_z, center_y, radius, height_x, x_begin):
@@ -1251,8 +1251,14 @@ class Thread(Solid):
                                            [origin - 0.5, origin + l + 0.5],
                                            [0,0],'-.',
                                            color='k', linewidth = 1)
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        print(res)
+        
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#56754A'])
         
 
 
@@ -1670,7 +1676,7 @@ class FlangeWithHoles(Solid):
         return "Kołnierz z przelotowymi otworami \n o  L={}mm, D={}, średnicy otworu={}, \n średnicy rozmieszczenia otworów={}, liczbie otworów={} \n i fazach {}x{} po obu stronach".format(
             *self._parameters)
 
-    def _plot_2d(self):
+    def _plot_2d(self,language='en'):
 
         class_name = self.__class__.__name__
 
@@ -1704,6 +1710,14 @@ class FlangeWithHoles(Solid):
         
         
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
+        for hole_no in range(holes_no):
+            
+            xh = r_r * np.cos(hole_no*2*np.pi/holes_no)
+            yh = r_r * np.sin(hole_no*2*np.pi/holes_no)
+            
+            ShaftPreview(5+xh,5+yh,origin/2 ,[2*r_h/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+            
         
         print(res)
 
