@@ -68,7 +68,7 @@ class GeometryScene:
     plt.xlim(0, 200)
     plt.ylim(-100, 100)
     plt.grid(False)
-    ax_2d.axis('equal')
+
     ax_2d.axis('off')
 
 
@@ -119,7 +119,7 @@ class GeometryScene:
 #         self.__class__.ax_2d=ax_2d 
 #         self.__class__.ax_3d=ax_3d 
 
-    def __init__(self,height=12,width=16,figsize=(12,9)):
+    def __init__(self,height=12,width=12,figsize=(12,9)):
 
         plt.figure(figsize=figsize)
         ax_2d = plt.subplot(121)
@@ -127,8 +127,10 @@ class GeometryScene:
 
         plt.xlim(-0.1*width, width)
         plt.ylim(-height/2, height/2)
-        plt.grid(False)  
+        plt.grid(False)
+        
         plt.axis('off')
+        
       
         
         #ax_2d.set_yticks(  range(-12,12,2) )
@@ -146,6 +148,7 @@ class GeometryScene:
         ax_3d.view_init(30,80)
         plt.tight_layout()  
         plt.axis("off")
+
 
         self.__class__.ax_2d=ax_2d 
         self.__class__.ax_3d=ax_3d 

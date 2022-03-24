@@ -213,7 +213,7 @@ step_mod_inc_flange = lambda step: random.choice([
                             holes_no=4), copy.copy(step)
     ],
     [
-        step,
+        copy.copy(step),
         sol.FlangeWithHoles(height=step.height,
                             diameter=step.diameter * 3,
                             hole_diameter=16,
@@ -221,7 +221,7 @@ step_mod_inc_flange = lambda step: random.choice([
                             holes_no=6), copy.copy(step)
     ],
     [
-        step,
+        copy.copy(step),
         sol.FlangeWithHoles(height=step.height,
                             diameter=step.diameter * 3,
                             hole_diameter=14,
@@ -230,14 +230,14 @@ step_mod_inc_flange = lambda step: random.choice([
     ],
 ])
 step_mod_dec_flange = lambda step: random.choice([
-    step,
+    copy.copy(step),
     sol.ChamferedCylinder(step.height,
                           step.diameter,
                           chamfer_angle=45,
                           chamfer_length=1,
                           chamfer_pos='right'),
     [
-        step,
+        copy.copy(step),
         sol.FlangeWithHoles(height=step.height,
                             diameter=step.diameter * 3,
                             hole_diameter=12,
@@ -245,7 +245,7 @@ step_mod_dec_flange = lambda step: random.choice([
                             holes_no=4), copy.copy(step)
     ],
     [
-        step,
+        copy.copy(step),
         sol.FlangeWithHoles(height=step.height,
                             diameter=step.diameter * 3,
                             hole_diameter=16,
@@ -253,7 +253,7 @@ step_mod_dec_flange = lambda step: random.choice([
                             holes_no=6), copy.copy(step)
     ],
     [
-        step,
+        copy.copy(step),
         sol.FlangeWithHoles(height=step.height,
                             diameter=step.diameter * 3,
                             hole_diameter=14,
@@ -268,8 +268,38 @@ step_mod_inc_threads = lambda step: random.choice([
         step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
     sol.Thread(step.height, step.diameter),
 ])
+
+step_mod_dec_screw = lambda step: random.choice([
+
+    [sol.Cylinder(4, round(step.diameter*0.85)),
+            sol.Thread(step.height, step.diameter),sol.ChamferedCylinder(round(step.height*0.3),
+                              round(step.diameter*0.85),
+                              chamfer_angle=45,
+                              chamfer_length=1,
+                              chamfer_pos='right')],
+        
+    [sol.ChamferedCylinder(10,
+                              round(step.diameter*1.3),
+                              chamfer_angle=45,
+                              chamfer_length=1,
+                              chamfer_pos='right'),
+            sol.Thread(step.height, step.diameter),sol.ChamferedCylinder(round(step.height*0.3),
+                              round(step.diameter*0.85),
+                              chamfer_angle=45,
+                              chamfer_length=1,
+                              chamfer_pos='right')],
+    sol.Thread(step.height, step.diameter),
+    [sol.Thread(step.height, step.diameter),sol.ChamferedCylinder(round(step.height*0.3),
+                              round(step.diameter*0.85),
+                              chamfer_angle=45,
+                              chamfer_length=1,
+                              chamfer_pos='right')],
+        
+])
+
+
 step_mod_dec_threads = lambda step: random.choice([
-    step,
+    copy.copy(step),
     #     sol.ChamferedCylinder(step.height,
     #                           step.diameter,
     #                           chamfer_angle=45,
@@ -279,19 +309,19 @@ step_mod_dec_threads = lambda step: random.choice([
 ])
 
 step_mod_inc_chamfer = lambda step: random.choice([
-    step,
+    copy.copy(step),
     sol.ChamferedCylinder(
         step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
 ])
 
 step_mod_dec_hole_chamfer = lambda step: random.choice([
-    step,
+    copy.copy(step),
     sol.ChamferedHole(
         step.height, step.diameter, chamfer_angle=45, chamfer_length=1.2),
 ])
 
 step_mod_dec_chamfer = lambda step: random.choice([
-    step,
+    copy.copy(step),
     sol.ChamferedCylinder(step.height,
                           step.diameter,
                           chamfer_angle=45,
@@ -299,8 +329,17 @@ step_mod_dec_chamfer = lambda step: random.choice([
                           chamfer_pos='right'),
 ])
 
+step_mod_chamfer_hex_prism = lambda step: random.choice([
+    copy.copy(step),
+    sol.ChamferedHexagonalPrism(step.height,
+                          step.diameter,
+                          chamfer_angle=45,
+                          chamfer_length=1,
+                          chamfer_pos='left'),
+])
+
 step_mod_inc_gear = lambda step: random.choice([
-    step,
+    copy.copy(step),
     *[[
         step,
         sol.Gear(step.height,
@@ -312,7 +351,7 @@ step_mod_inc_gear = lambda step: random.choice([
 ])
 
 step_mod_dec_gear = lambda step: random.choice([
-    step,
+    copy.copy(step),
     *[[
         sol.Gear(step.height,
                  round(2 * step.diameter / module),
@@ -908,5 +947,135 @@ class ThreadedSleeveWithGrearsSketch(ShaftSketch
             shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,1.4)]
             shafts.append(shaft)
         
+
+        return shafts
+    
+    
+class ComplexBoltWithHole(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 1, 'min': 0}
+    holes_no = {'max': 2, 'min': 0}    
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+
+        shafts =  []
+        for i in range(50):
+            indiameter = random.randint( 60,70)
+            height=round(1.2*0.5*indiameter)
+            
+            shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+            shaft[-1]._origin=0
+            #shaft += [sol.ThreadedOpenHole(shaft[-1].height,shaft[-1].diameter-5)]
+            shaft[-1]._origin = 0
+
+#             shaft =  create_random_profile(steps['max'],steps['min'],
+#                                   increase_values=[
+#                                       4,
+#                                       5,
+#                                       6,
+#                                   ],
+#                                   step_modificator= step_mod_chamfer_hex_prism, origin = 0) 
+            
+            shaft +=create_random_profile(steps['max'],steps['min'],
+                                  initial_diameter=[40,35,30],
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_lengths=[60, 70],
+                                  step_modificator=step_mod_dec_screw,origin = shaft[-1].end)
+            
+            shaft += create_random_profile(2,
+                                  1,
+                                  initial_diameter=[23,20],
+                                  increase_values=[
+                                      -5,
+                                      -7,
+                    
+                                  ],
+                                  step_lengths=[31, 33,37],
+                                  step_modificator=step_mod_dec_hole_chamfer,
+                                  step_type=sol.Hole,origin=0) 
+            
+            
+            shafts.append(shaft)
+        
+
+        return shafts
+    
+class HexNutSketch(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 2, 'min': 1}
+    holes_no = {'max': 2, 'min': 0}    
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+
+        shafts =  []
+        for i in range(50):
+            indiameter = random.randint( 70,80)
+            height=round(0.8*0.5*indiameter)
+            
+            shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+            shaft[0]._origin = 0
+            shaft += [sol.Cylinder(round(shaft[-1].height*0.2),round(shaft[-1].indiameter*0.9))]
+            shaft[-1]._origin= shaft[-2].end
+            shaft += [sol.ThreadedOpenHole(shaft[-2].height+shaft[-1].height,shaft[-2].diameter-5)]
+            shaft[-1]._origin = 0
+            
+            shafts.append(shaft)
+            
+        for i in range(50):
+            
+            
+            indiameter = random.randint( 70,80)
+            height=round(1.2*0.5*indiameter)
+            
+            shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+            shaft[0]._origin = 0
+            shaft += [sol.Cylinder(round(shaft[-1].height*0.3),round(shaft[-1].indiameter*0.9))]
+            shaft[-1]._origin= shaft[-2].end
+            shaft  += [sol.ChamferedHexagonalPrism(shaft[-2].height, shaft[-2].indiameter, shaft[-2].chamfer_length)]
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [sol.ThreadedOpenHole(shaft[-3].height+shaft[-2].height+shaft[-1].height,shaft[-3].diameter-5)]
+            shaft[-1]._origin = 0
+            
+            shafts.append(shaft)
+            
+        for i in range(50):
+            indiameter = random.randint( 70,80)
+            height=round(1.2*0.5*indiameter)
+            
+            shaft = [sol.DoubleChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+            shaft[0]._origin = 0
+            shaft += [sol.ThreadedOpenHole(shaft[-1].height,shaft[-1].diameter-5)]
+            shaft[-1]._origin = 0
+            
+            shafts.append(shaft)
+
+        for i in range(50):
+            indiameter = random.randint( 70,80)
+            height=round(1.2*0.5*indiameter)
+            
+            shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+            shaft[0]._origin = 0
+            shaft += [sol.Cylinder(round(shaft[-1].height*0.2),round(shaft[-1].indiameter*1.2))]
+            shaft[-1]._origin= shaft[-2].end
+            shaft += [sol.ThreadedOpenHole(shaft[-2].height+shaft[-1].height,shaft[-2].diameter-5)]
+            shaft[-1]._origin = 0
+            
+            shafts.append(shaft)
 
         return shafts
