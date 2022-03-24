@@ -102,6 +102,7 @@ class HexPreview:
 
             self.total_length += self.data[i][1]
             self.ax.plot_surface(self.Xc, self.Yc, self.Zc, alpha=self.data[i][3], color=self.data[i][4], edgecolor="black")
+        self.ax.scatter(10,0 ,0)
 
     def shaft_steps_sides(self, begin_cords, radius, zlength, transparency):
 
