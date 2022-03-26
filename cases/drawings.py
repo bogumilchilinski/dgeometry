@@ -823,13 +823,16 @@ class SleeveWithGrearsSketch(ShaftSketch
         
         shafts =  []
         for i in range(50):
-            shaft = [sol.Gear(25, 40, 2)] + create_random_profile(steps['max'],steps['min'],
+            shaft = [sol.Cylinder(25, 40)]
+            shaft[0]._origin = 0
+            
+            shaft += create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
                                       4,
                                       5,
                                       6,
                                   ],
-                                  step_modificator=step_mod_inc_gear) 
+                                  step_modificator=step_mod_inc_gear,origin=shaft[-1].end) 
             
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
@@ -837,7 +840,7 @@ class SleeveWithGrearsSketch(ShaftSketch
                                       -5,
                                       -6,
                                   ],
-                                  step_modificator=step_mod_inc_gear)
+                                  step_modificator=step_mod_inc_gear,origin = shaft[-1].end)
             
             shaft += create_random_profile(4,
                                   2,
@@ -849,12 +852,110 @@ class SleeveWithGrearsSketch(ShaftSketch
                                   ],
                                   step_lengths=[27, 29],
                                   step_modificator=step_mod_dec_hole_chamfer,
-                                  step_type=sol.Hole) 
+                                  step_type=sol.Hole,origin=0) 
+            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,14)]
+            shaft[-1]._origin=shaft[-2].end
+            
             shafts.append(shaft)
         
 
         return shafts
 
+    
+class SimpleGearSketch(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 1, 'min': 0}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+        for i in range(50):
+            
+            shaft = [sol.Cylinder(25, 55)]
+            shaft[0]._origin = 0
+    
+            shaft += [sol.Gear(25, 40, 2)]
+            shaft[-1]._origin = shaft[-2].end
+            
+            shaft += create_random_profile(1,
+                                  0,
+                                  initial_diameter=[25,15,10],
+                                  increase_values=[
+                                      -2,
+                                      -3,
+                                      -4,
+                                  ],
+                                  step_lengths=[27, 29],
+                                  step_modificator=step_mod_dec_hole_chamfer,
+                                  step_type=sol.Hole,origin=0) 
+            
+            shafts.append(shaft)
+        
+
+        return shafts
+
+class ChoinkaGearSketch(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 1, 'min': 0}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+        for i in range(50):
+            shaft = [sol.Cylinder(60, 40)]
+            shaft[0]._origin = 0
+            
+            shaft += [sol.Gear(25, 40, 2)]
+            shaft[-1]._origin = shaft[-2].end
+            
+            shaft += create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      4,
+                                      5,
+                                      6,
+                                  ],
+                                  step_modificator=step_mod_inc_gear,origin=shaft[-1].end) 
+            
+            shaft +=create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_modificator=step_mod_inc_gear,origin = shaft[-1].end)
+            
+            shaft += create_random_profile(3,
+                                  0,
+                                  initial_diameter=[30,25,20],
+                                  increase_values=[
+                                      -2,
+                                      -3,
+                                      -4,
+                                  ],
+                                  step_lengths=[27, 29],
+                                  step_modificator=step_mod_dec_hole_chamfer,
+                                  step_type=sol.Hole,origin=0) 
+            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,14)]
+            shaft[-1]._origin=shaft[-2].end
+            
+            shafts.append(shaft)
+        
+
+        return shafts
+
+    
     
 class HollowSleeveWithGrearsSketch(ShaftSketch
                              #GeometricalCase
@@ -870,13 +971,16 @@ class HollowSleeveWithGrearsSketch(ShaftSketch
         
         shafts =  []
         for i in range(50):
-            shaft = [sol.Gear(25, 40, 2)] + create_random_profile(steps['max'],steps['min'],
+            shaft = [sol.Gear(25, 40, 2)]
+            shaft[0]._origin = 0
+            
+            shaft += create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
                                       4,
                                       5,
                                       6,
                                   ],
-                                  step_modificator=step_mod_inc_gear) 
+                                  step_modificator=step_mod_inc_gear,origin=shaft[-1].end) 
             
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
@@ -884,7 +988,7 @@ class HollowSleeveWithGrearsSketch(ShaftSketch
                                       -5,
                                       -6,
                                   ],
-                                  step_modificator=step_mod_inc_gear)
+                                  step_modificator=step_mod_inc_gear,origin=shaft[-1].end)
             
             shaft += create_random_profile(4,
                                   2,
@@ -896,9 +1000,10 @@ class HollowSleeveWithGrearsSketch(ShaftSketch
                                   ],
                                   step_lengths=[27, 29],
                                   step_modificator=step_mod_dec_hole_chamfer,
-                                  step_type=sol.Hole) 
-            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,1.4)]
+                                  step_type=sol.Hole,origin=0) 
+            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,14)]
             shafts.append(shaft)
+            shaft[-1]._origin=shaft[-2].end
         
 
         return shafts
@@ -923,7 +1028,10 @@ class ThreadedSleeveWithGrearsSketch(ShaftSketch
                                       5,
                                       6,
                                   ],
-                                  step_modificator= step_mod_inc_threads) + [sol.Gear(25, 40, 3)] 
+                                  step_modificator= step_mod_inc_threads,origin = 0)
+            
+            shaft +=  [sol.Gear(25, 40, 3)]
+            shaft[-1]._origin = shaft[-2].end
             
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
@@ -931,7 +1039,7 @@ class ThreadedSleeveWithGrearsSketch(ShaftSketch
                                       -5,
                                       -6,
                                   ],
-                                  step_modificator=step_mod_inc_gear)
+                                  step_modificator=step_mod_inc_gear,origin = shaft[-1].end)
             
             shaft += create_random_profile(4,
                                   2,
@@ -943,8 +1051,10 @@ class ThreadedSleeveWithGrearsSketch(ShaftSketch
                                   ],
                                   step_lengths=[27, 29],
                                   step_modificator=step_mod_dec_hole_chamfer,
-                                  step_type=sol.Hole) 
-            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,1.4)]
+                                  step_type=sol.Hole,origin=0)
+            shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,14)]
+            shaft[-1]._origin=shaft[-2].end
+            
             shafts.append(shaft)
         
 

@@ -864,8 +864,8 @@ class Hole(Solid):
         l = self.height / 10
         end = self.end / 10
         
-        t_l = origin + l / 4
-        t_r = (-r - 9)
+        t_l = origin + l / 8
+        t_r = (-r - 13)
 
         res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
                                        '--',
@@ -1027,8 +1027,8 @@ class ChamferedHole(Solid):
         l = self.height / 10
         end = self.end / 10
         
-        t_l = origin + l / 6
-        t_r = (-r - 13.5)
+        t_l = origin + l / 7
+        t_r = (-r - 14.5)
 
         res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
                                        '--',
@@ -1478,8 +1478,8 @@ class ThreadedOpenHole(Solid):
                         color='y') + GeometryScene.ax_2d.plot(
                             [origin + l,origin +  l], [t, -t], '--', color='y')
         
-        t_l = origin + l / 8
-        t_r = (-r - 10.5)
+        t_l = origin + l / 7
+        t_r = (-r - 13.5)
         
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
@@ -1572,7 +1572,7 @@ class Gear(Solid):
         self.height = height
         self.teeth_no = teeth_no
         self.module = module
-        self.diameter = round(module * (teeth_no + 2) / 2)
+#         self.diameter = round(module * (teeth_no + 2)) # Grzegorz - usuwam z inita i daję do plot 2d
         self.chamfer_length = chamfer_length
         self.chamfer_angle = chamfer_angle
         self._parameters = height, teeth_no, module, chamfer_length, chamfer_angle,
@@ -1584,14 +1584,57 @@ class Gear(Solid):
             *self._parameters)
 
     def str_en(self):
-        return f'Gear with teeth number {self.teeth_no}, module {self.module}, width {self.height} and {self.chamfer_length}x{self.chamfer_angle} chamfers on both sides'
+        return f'Gear with teeth number {self.teeth_no}, \n  module {self.module}, width {self.height} \n and {self.chamfer_length}x{self.chamfer_angle} chamfers on both sides'
 
 
 #         super().__init__(View(horizontal_lines,vertical_lines,diagonal_lines,horizontal_dimensions,vertical_dimensions,diagonal_dimensions))
 
     def str_pl(self):
-        return f'Koło zębate o liczbie zębów {self.teeth_no}, module {self.module} oraz szerokości {self.height} z fazą {self.chamfer_length}x{self.chamfer_angle} po obu stronach'
+        return f'Koło zębate o liczbie zębów {self.teeth_no}, \n module {self.module} oraz szerokości {self.height} \n z fazą {self.chamfer_length}x{self.chamfer_angle} po obu stronach'
 
+    def _plot_2d(self,language='en'):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+
+        r = round(self.module * (self.teeth_no + 2)) / 10 /2
+        rp =round(self.module * (self.teeth_no)) / 10 / 2
+        l = self.height / 10
+        origin = self.origin / 10
+        end = self.end / 10
+        
+        t_l = origin + l / 4
+        t_r = (r + 2.5)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            color='tab:pink') + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [0,0],'-.',
+            color='k', linewidth = 1) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [-rp,-rp],'-.',
+            color='k', linewidth = 1) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [rp,rp],'-.',
+            color='k', linewidth = 1) #Jaś Fasola
+        
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+        
+        
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
+        print(res)
 
 class HexagonalPrism(Solid):
 
