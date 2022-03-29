@@ -200,7 +200,7 @@ class SquareOnPlane(ShapeOnPlane):
 
     point_A = [Point(x,y,z) for x in [8,8.5,9,7.5,7] for y in [5,5.5,6,6.5] for z in   [8,8.5,7.5,7]  ]
 
-    point_O=[Point(x,y,z) for x in [5,5.5,6,6.5] for y in [8,8.5,9,9.5,10] for z in   [4,4.5,5,5.5] ]
+    point_O = [Point(x,y,z) for x in [5,5.5,6,6.5] for y in [8,8.5,9,9.5,10] for z in   [4,4.5,5,5.5] ]
 
     point_P = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5]  for z in [1,1.5,2,2.5] ]
 
@@ -232,10 +232,11 @@ class SquareOnPlane(ShapeOnPlane):
 
         #self.add_solution_step('Creating a point $\\C_0$ based on triangle geometry ', [A^B,B^C]) #<- to źle źle niedobrze połowa kroków się w ogóle nie wyświetla
 
-
         self.A = A
         self.B = B
         self.D = D
+        
+        
         
         return A,B, D
 

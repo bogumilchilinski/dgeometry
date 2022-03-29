@@ -182,7 +182,7 @@ class Solid:
         self._name['pl'] = 'Bryła'
 
         self._ref_elem=None
-        self._origin = 25
+        self._origin = 0
 
 
     @property
@@ -691,6 +691,10 @@ class Cylinder(Solid):
     
     """
 
+    line_type = '-'
+    color='k'
+    
+    
     def __init__(self, height, diameter):
         num_of_lines = {
             'horizontal_lines': 3,
@@ -744,13 +748,16 @@ class Cylinder(Solid):
         origin = self.origin / 10
         end = self.end / 10
         
-        t_l = origin + l / 4
+        t_l = origin # + l / 8
         t_r = (r + 0.5)
 
+        line_type = self.line_type
+        color = self.color
+        
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],
-            color='k') + GeometryScene.ax_2d.plot(
+            [-r, r, r, -r, -r],line_type,
+            color=color) + GeometryScene.ax_2d.plot(
             [origin - 0.5, origin + l + 0.5],
             [0,0],'-.',
             color='k', linewidth = 1)
@@ -765,7 +772,123 @@ class Cylinder(Solid):
         
         print(res)
 
+ 
 
+
+        
+class ScrewCore(Cylinder):
+    """This object represents core of the screw.
+    
+    The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
+    
+    Parameters
+    ==========
+    
+    height : int
+        The value of height of cylinder
+        
+    diameter : int
+        The value of diameter of cylinder
+    
+    Examples
+    ========
+    
+    >>> from solids import Cylinder
+    >>> cyl = ScrewCore(5,2)
+    >>> cyl._parameters
+    (5, 2)
+    
+    >>> cyl._class_description
+    'with L=5mm and diameter =2mm'
+    
+    >>> cyl._class_description_pl
+    'o L=5mm i średnicy =2mm'
+    
+    >>> cyl._name
+    {'pl': 'Walec'}
+    
+    """
+    
+    line_type = '--'
+    color='r'
+    
+    def str_en(self):
+        return 'Cylinder of the screw \n with L={length}mm \n and diameter={d}mm'.format(
+            length=self.height,
+            d=self.diameter)
+
+    def str_pl(self):
+        return 'Trzpień śruby \n o L={length}mm i średnicy={d}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                          'prawej').replace('left', 'lewej')
+    
+
+class PlateWithHole(Cylinder):
+    """This object represents core of the screw.
+    
+    The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
+    
+    Parameters
+    ==========
+    
+    height : int
+        The value of height of cylinder
+        
+    diameter : int
+        The value of diameter of cylinder
+    
+    Examples
+    ========
+    
+    >>> from solids import Cylinder
+    >>> cyl = ScrewCore(5,2)
+    >>> cyl._parameters
+    (5, 2)
+    
+    >>> cyl._class_description
+    'with L=5mm and diameter =2mm'
+    
+    >>> cyl._class_description_pl
+    'o L=5mm i średnicy =2mm'
+    
+    >>> cyl._name
+    {'pl': 'Walec'}
+    
+    """
+    
+    line_type = '--'
+    color='b'
+    
+    def _plot_2d(self,language='en'):
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+       
+        origin = self.origin / 10
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        end = self.end / 10
+        
+        t_l = origin + l / 8
+        t_r = (-r - 13)
+
+        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
+                                       '--',
+                                       color='b') + GeometryScene.ax_2d.plot(
+                                        [origin - 0.5, origin + l + 0.5],
+                                        [0,0],'-.',
+                                        color='k', linewidth = 1)
+    
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l],
+            [-r, r, r, -r, -r],'-',
+            color=color) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [0,0],'-.',
+            color='color', linewidth = 1)
 class Hole(Solid):
     """This object represents hole that can be made inside solid.
     
@@ -1323,8 +1446,8 @@ class Thread(Solid):
         origin = self.origin / 10
         end = self.end / 10
         
-        t_l = origin + l / 4
-        t_r = (r + 0.5)
+        t_l = origin + l /2
+        t_r = (- r - 8.5)
 
         res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
                                        color='k') + GeometryScene.ax_2d.plot(
@@ -1826,7 +1949,7 @@ class ChamferedHexagonalPrism(HexagonalPrism):
         origin = self.origin / 10
         end = self.end / 10
         
-        t_l = origin + l / 9
+        t_l = origin # + l / 9
         t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(
@@ -2242,7 +2365,7 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
         origin = self.origin / 10
         end = self.end / 10
         
-        t_l = origin + l / 9
+        t_l = origin + l 
         t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(

@@ -1189,3 +1189,98 @@ class HexNutSketch(ShaftSketch
             shafts.append(shaft)
 
         return shafts
+    
+class BasicGearSketch(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 4, 'min': 2}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+        for i in range(50): # Git
+
+            shaft = [sol.Cylinder(random.randint(20,40),random.randint(50,60))] + [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))]
+            shaft[-1]._origin=0
+            shaft[-2]._origin=shaft[-1].end
+            
+            shaft +=[sol.ChamferedHole(shaft[-2].end,random.randint(20,40))]
+            shaft[-1]._origin=shaft[-2].origin
+            shaft[-1]._end=shaft[-3].end
+            
+            shafts.append(shaft)
+            
+              
+        for i in range(50): # Git
+            shaft =[sol.Cylinder(random.randint(20,40),random.randint(50,60))] + [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))] + [sol.Cylinder(random.randint(20,40),random.randint(50,60))]
+            shaft[-3]._origin = 0
+            shaft[-2]._origin=shaft[-3].end
+            shaft[-1]._origin = shaft[-2].end
+            
+            shaft +=[sol.ChamferedHole(shaft[-1].end,random.randint(20,40))]
+            shaft[-1]._origin=shaft[-4].origin
+            shaft[-1]._end=shaft[-2].end
+              
+            shafts.append(shaft)
+            
+        for i in range(50): # Git
+
+            shaft = [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))] + [sol.Cylinder(random.randint(20,40),random.randint(50,60))]
+            shaft[-1]._origin =0
+            shaft[-2]._origin = shaft[-1].end
+            shaft +=[sol.ChamferedHole(shaft[-2].end,random.randint(20,40))]
+            shaft[-1]._origin=shaft[-2].origin
+            shaft[-1]._end=shaft[-3].end
+            
+            
+            shafts.append(shaft)
+        
+            
+  
+            
+        return shafts
+    
+class ScrewConnectionSketch(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 4, 'min': 2}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+        for i in range(50): # Git
+            
+            shaft =[sol.ChamferedHexagonalPrism(40,48)]
+            shaft += [sol.ScrewCore(140,28)] 
+            shaft += [sol.Cylinder(7,60)] 
+            shaft += [sol.DoubleChamferedHexagonalPrism(40,48)] 
+            shaft += [sol.Thread(15,28)]
+            
+            shaft += [sol.Cylinder(random.randint(40,60),100)] 
+            shaft += [sol.Cylinder((shaft[-5].end-shaft[-1].end),100)]  
+           
+            
+            shaft[-7]._origin = 0
+            shaft[-6]._origin = shaft[-7].end
+            shaft[-5]._origin = shaft[-6].end
+            shaft[-4]._origin = shaft[-5].end
+            shaft[-3]._origin = shaft[-4].end
+            
+            shaft[-2]._origin = shaft[-7].end
+            shaft[-1]._origin = shaft[-2].end
+            shafts.append(shaft)
+
+  
+            
+        return shafts
+    
