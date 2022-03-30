@@ -362,6 +362,11 @@ step_mod_dec_gear = lambda step: random.choice([
     ] for module in [2, 3, 4]],
 ])
 
+step_mod_dec_plate = lambda step: random.choice([
+    copy.copy(step),
+    sol.Plate(step.height,
+              step.diameter*3),
+])
 
 def create_random_profile(max_steps_no,
                           min_steps_no=4,
@@ -1256,22 +1261,20 @@ class ScrewConnectionSketch(ShaftSketch
         
         steps = cls.steps_no
         holes = cls.holes_no
-        
         shafts = []
-        for i in range(50): # Git
+        for i in range(50): # 2 płytki
             
             screw_diameter = random.randint(40,60)
             
-            shaft = [sol.ChamferedHexagonalPrism(0.7 * screw_diameter, 2 * screw_diameter)]
-            shaft += [sol.Cylinder(140, screw_diameter)] 
-            shaft += [sol.Cylinder(0.15 * screw_diameter, 2.2 * screw_diameter)]
-            shaft += [sol.DoubleChamferedHexagonalPrism(0.8 * screw_diameter, 2 * screw_diameter)]
-            shaft += [sol.Thread(0.3 * screw_diameter, screw_diameter)]
+            shaft =  [sol.ChamferedHexagonalPrism(round(0.7 * screw_diameter), 2 * screw_diameter)]
+            shaft += [sol.ScrewCore(round(screw_diameter*3), screw_diameter)] 
+            shaft += [sol.Cylinder(round(0.15 * screw_diameter), round(2.2 * screw_diameter))]
+            shaft += [sol.DoubleChamferedHexagonalPrism(round(0.8 * screw_diameter), 2 * screw_diameter)]
+            shaft += [sol.Thread(round(0.3 * screw_diameter), screw_diameter)]
             
-            shaft += [sol.PlateWithHole(random.randint(40,60),28)] 
-            shaft += [sol.PlateWithHole((shaft[-5].end-shaft[-1].end),28)]  
-           
-            
+            shaft += [sol.Plate(random.randint(70,90),60)]
+            shaft += [sol.Plate((shaft[-5].end-shaft[-1].end),random.randint(70,90))]
+
             shaft[-7]._origin = 0
             shaft[-6]._origin = shaft[-7].end
             shaft[-5]._origin = shaft[-6].end
@@ -1280,9 +1283,92 @@ class ScrewConnectionSketch(ShaftSketch
             
             shaft[-2]._origin = shaft[-7].end
             shaft[-1]._origin = shaft[-2].end
+            
+            shaft += [sol.OpenHole(shaft[-2].end-shaft[-7].end,round(screw_diameter*1.2))]
+            shaft += [sol.OpenHole(shaft[-2].end-shaft[-8].end-shaft[-1].end,round(screw_diameter*1.2))]
+            
+            shaft[-2]._origin = shaft[-9].end
+            shaft[-1]._origin = shaft[-2].end
+            
+            shafts.append(shaft)
+            
+        for i in range(50): # 3 płytki
+            
+            screw_diameter = random.randint(40,60)
+            
+            shaft =  [sol.ChamferedHexagonalPrism(round(0.7 * screw_diameter), 2 * screw_diameter)]
+            shaft += [sol.ScrewCore(round(screw_diameter*3), screw_diameter)] 
+            shaft += [sol.Cylinder(round(0.15 * screw_diameter), round(2.2 * screw_diameter))]
+            shaft += [sol.DoubleChamferedHexagonalPrism(round(0.8 * screw_diameter), 2 * screw_diameter)]
+            shaft += [sol.Thread(round(0.3 * screw_diameter), screw_diameter)]
+            
+            shaft += [sol.Plate(random.randint(40,60),60)]
+            shaft += [sol.Plate((round(0.7*shaft[-5].end)-shaft[-1].end),random.randint(70,90))]
+
+            shaft[-7]._origin = 0
+            shaft[-6]._origin = shaft[-7].end
+            shaft[-5]._origin = shaft[-6].end
+            shaft[-4]._origin = shaft[-5].end
+            shaft[-3]._origin = shaft[-4].end
+            
+            shaft[-2]._origin = shaft[-7].end
+            shaft[-1]._origin = shaft[-2].end
+            
+            shaft += [sol.Plate((shaft[-6].end-shaft[-1].end),random.randint(70,90))]
+            
+            shaft[-1]._origin = shaft[-2].end
+            
+            shaft += [sol.OpenHole(shaft[-3].end-shaft[-8].end,round(screw_diameter*1.2))]
+            shaft += [sol.OpenHole(shaft[-3].end-shaft[-9].end-shaft[-1].end,round(screw_diameter*1.2))]
+            shaft += [sol.OpenHole(shaft[-3].end-shaft[-10].end-shaft[-2].end-shaft[-1].end,round(screw_diameter*1.2))]
+            
+            shaft[-3]._origin = shaft[-11].end
+            shaft[-2]._origin = shaft[-3].end
+            shaft[-1]._origin = shaft[-2].end
+            
             shafts.append(shaft)
 
-  
+        for i in range(50): # 4 płytki
+            
+            screw_diameter = random.randint(40,60)
+            
+            shaft =  [sol.ChamferedHexagonalPrism(round(0.7 * screw_diameter), 2 * screw_diameter)]
+            shaft += [sol.ScrewCore(round(screw_diameter*3), screw_diameter)] 
+            shaft += [sol.Cylinder(round(0.15 * screw_diameter), round(2.2 * screw_diameter))]
+            shaft += [sol.DoubleChamferedHexagonalPrism(round(0.8 * screw_diameter), 2 * screw_diameter)]
+            shaft += [sol.Thread(round(0.3 * screw_diameter), screw_diameter)]
+            
+            shaft += [sol.Plate(random.randint(40,60),60)]
+            shaft += [sol.Plate((round(0.6*shaft[-5].end)-shaft[-1].end),random.randint(70,90))]
+
+            shaft[-7]._origin = 0
+            shaft[-6]._origin = shaft[-7].end
+            shaft[-5]._origin = shaft[-6].end
+            shaft[-4]._origin = shaft[-5].end
+            shaft[-3]._origin = shaft[-4].end
+            
+            shaft[-2]._origin = shaft[-7].end
+            shaft[-1]._origin = shaft[-2].end
+            
+            shaft += [sol.Plate((round(0.9*shaft[-6].end)-shaft[-1].end),random.randint(70,90))]
+            
+            shaft[-1]._origin = shaft[-2].end
+            
+            shaft += [sol.Plate((shaft[-7].end-shaft[-1].end),random.randint(70,90))]
+            
+            shaft[-1]._origin = shaft[-2].end
+            
+            shaft += [sol.OpenHole(shaft[-4].end-shaft[-9].end,round(screw_diameter*1.2))]
+            shaft += [sol.OpenHole(shaft[-4].end-shaft[-10].end-shaft[-1].end,round(screw_diameter*1.2))]
+            shaft += [sol.OpenHole(shaft[-4].end-shaft[-11].end-shaft[-2].end-shaft[-1].end,round(screw_diameter*1.2))]
+            shaft += [sol.OpenHole(shaft[-4].end-shaft[-12].end-shaft[-3].end-shaft[-2].end-shaft[-1].end,round(screw_diameter*1.2))]
+            
+            shaft[-4]._origin = shaft[-13].end
+            shaft[-3]._origin = shaft[-4].end
+            shaft[-2]._origin = shaft[-3].end
+            shaft[-1]._origin = shaft[-2].end
+            
+            shafts.append(shaft)
             
         return shafts
     

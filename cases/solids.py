@@ -748,8 +748,8 @@ class Cylinder(Solid):
         origin = self.origin / 10
         end = self.end / 10
         
-        t_l = origin # + l / 8
-        t_r = (r + 0.5)
+        t_l = origin - 3
+        t_r = (r + 5.5)
 
         line_type = self.line_type
         color = self.color
@@ -810,7 +810,7 @@ class ScrewCore(Cylinder):
     """
     
     line_type = '--'
-    color='r'
+    color='k'
     
     def str_en(self):
         return 'Cylinder of the screw \n with L={length}mm \n and diameter={d}mm'.format(
@@ -822,10 +822,48 @@ class ScrewCore(Cylinder):
             length=self.height,
             d=self.diameter).replace('right',
                                           'prawej').replace('left', 'lewej')
-    
 
-class PlateWithHole(Cylinder):
-    """This object represents a plate with a hole.
+    def _plot_2d(self,language='en'):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        origin = self.origin / 10
+        end = self.end / 10
+        
+        t_l = origin  + l / 3
+        t_r = (r + 10.5)
+
+        line_type = self.line_type
+        color = self.color
+        
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],line_type,
+            color=color) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [0,0],'-.',
+            color='k', linewidth = 1)
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+        
+        
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
+        print(res)
+
+class Plate(Cylinder):
+    """This object represents a plate.
     
     The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
     
@@ -873,17 +911,23 @@ class PlateWithHole(Cylinder):
         
         t_l = origin + l / 8
         t_r = (-r - 13)
-
+        
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin +l],
-            [r+2/10, r+2/10],'--',
-            color='b') + GeometryScene.ax_2d.plot(
-            [origin + 0, origin + l],
-            [-r-2/10,-r-2/10],'--',
-            color='b')+ GeometryScene.ax_2d.plot(
             [origin + 0, origin + l,origin + l, origin + 0, origin + 0,],
             [r*3,r*3,-r*3,-r*3,r*3,],'-',
             color='b')
+        
+#         res = GeometryScene.ax_2d.plot(
+#             [origin + 0, origin +l],
+#             [r+2/10, r+2/10],'--',
+#             color='b') + GeometryScene.ax_2d.plot(
+#             [origin + 0, origin + l],
+#             [-r-2/10,-r-2/10],'--',
+#             color='b')+ GeometryScene.ax_2d.plot(
+#             [origin + 0, origin + l,origin + l, origin + 0, origin + 0,],
+#             [r*3,r*3,-r*3,-r*3,r*3,],'-',
+#             color='b')
+        
 #         res = GeometryScene.ax_2d.plot(
 #             [origin + 0, origin + l],
 #             [r, r],'--',
@@ -996,8 +1040,8 @@ class Hole(Solid):
         l = self.height / 10
         end = self.end / 10
         
-        t_l = origin + l / 8
-        t_r = (-r - 13)
+        t_l = origin + l / 4
+        t_r = (-r - 20)
 
         res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
                                        '--',
@@ -1013,6 +1057,125 @@ class Hole(Solid):
 
         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
 
+        
+        
+class OpenHole(Solid):
+    """This object represents hole that can be made inside solid.
+    
+    The hole object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height and diameter.
+    
+    Parameters
+    ==========
+    
+    height : int
+        The value of height of hole
+        
+    diameter : int
+        The value of diameter of hole
+    
+    Examples
+    ========
+    
+    >>> from solids import Hole
+    >>> hole = Hole(5,2)
+    >>> hole._parameters
+    (5, 2)
+    
+    >>> hole._class_description
+    'with L=5mm and diameter =2mm'
+    
+    >>> hole._class_description_pl
+    'o L=5mm i średnicy =2mm'
+    
+    >>> hole._name
+    {'pl': 'Otwór'}
+    
+    """
+
+    def __init__(self, height, diameter):
+        num_of_lines_view = {
+            'horizontal_lines': 1,
+            'vertical_lines': 1,
+            'horizontal_dimensions': 0,
+            'vertical_dimensions': 0,
+            'inclined_lines': 0,
+        }
+        num_of_lines_sec = {
+            'horizontal_lines': 3,
+            'vertical_lines': 0,
+            'horizontal_dimensions': 0,
+            'vertical_dimensions': 1,
+            'inclined_lines': 0,
+        }
+
+        num_of_lines_half_sec = {
+            'horizontal_lines': 2,
+            'vertical_lines': 0,
+            'horizontal_dimensions': 0,
+            'vertical_dimensions': 1,
+            'inclined_lines': 0,
+        }
+
+        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+
+        super().__init__(View(**num_of_lines_view),
+                         Section(**num_of_lines_sec),
+                         HalfSection(**num_of_lines_half_sec),
+                         FrontView(**num_of_lines_front))
+        self.height = height
+        self.diameter = diameter
+
+        self._parameters = height, diameter
+        self._class_description = "with L={}mm and diameter={}mm".format(
+            *self._parameters)
+
+        self._name['pl'] = 'Otwór'
+        self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
+            *self._parameters)
+ 
+    def str_en(self):
+        return 'Open hole \n with diameter={d}mm'.format(
+            length=self.height,
+            d=self.diameter
+        )
+
+    def str_pl(self):
+        return 'Przelotowy otwór \n o średnicy={d}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                          'prawej').replace('left', 'lewej')
+
+    def _plot_2d(self,language='en'):
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+       
+        origin = self.origin / 10
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        end = self.end / 10
+        
+        t_l = origin + l / 2
+        t_r = (-r - 23)
+
+        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
+                                       '--',
+                                       color='b') + GeometryScene.ax_2d.plot(
+                                        [origin - 0.5, origin + l + 0.5],
+                                        [0,0],'-.',
+                                        color='k', linewidth = 1)
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
+        
+        
+        
 class ChamferedHole(Solid):
     """This object represents chamfered hole that can be made inside solid.
     
@@ -1455,8 +1618,8 @@ class Thread(Solid):
         origin = self.origin / 10
         end = self.end / 10
         
-        t_l = origin + l /2
-        t_r = (- r - 8.5)
+        t_l = origin + l* 5/4
+        t_r = (- r - 14.5)
 
         res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
                                        color='k') + GeometryScene.ax_2d.plot(
@@ -2374,7 +2537,7 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
         origin = self.origin / 10
         end = self.end / 10
         
-        t_l = origin + l 
+        t_l = origin + l/2 
         t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(

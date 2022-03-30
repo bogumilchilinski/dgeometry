@@ -126,7 +126,7 @@ class GeometryScene:
         #ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
 
         plt.xlim(-0.1*width, width)
-        plt.ylim(-height/2, height/2)
+        plt.ylim(-height, height)
         plt.grid(False)
         
         plt.axis('off')
