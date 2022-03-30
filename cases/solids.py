@@ -916,31 +916,25 @@ class Plate(Cylinder):
             [origin + 0, origin + l,origin + l, origin + 0, origin + 0,],
             [r*3,r*3,-r*3,-r*3,r*3,],'-',
             color='b')
+
+    def str_en(self):
+        return 'Plate \n with thickness t={length}mm \n and width b={d}mm'.format(
+            length=self.height,
+            d=self.diameter)
+
+    def str_pl(self):
+        return 'Płyta \n o grubości g={length}mm i szerokości b={d}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                          'prawej').replace('left', 'lewej')
         
-#         res = GeometryScene.ax_2d.plot(
-#             [origin + 0, origin +l],
-#             [r+2/10, r+2/10],'--',
-#             color='b') + GeometryScene.ax_2d.plot(
-#             [origin + 0, origin + l],
-#             [-r-2/10,-r-2/10],'--',
-#             color='b')+ GeometryScene.ax_2d.plot(
-#             [origin + 0, origin + l,origin + l, origin + 0, origin + 0,],
-#             [r*3,r*3,-r*3,-r*3,r*3,],'-',
-#             color='b')
-        
-#         res = GeometryScene.ax_2d.plot(
-#             [origin + 0, origin + l],
-#             [r, r],'--',
-#             color='b') + GeometryScene.ax_2d.plot(
-#             [origin + 0, origin + l],
-#             [-r, -r],'--',
-#             color='b') + GeometryScene.ax_2d.plot(
-#             [origin + 0, origin + 0, origin + l, origin + l],
-#             [r, r*3, r*3, r],'-',
-#             color='b') + GeometryScene.ax_2d.plot(
-#             [origin + 0, origin + 0, origin + l, origin + l],
-#             [-r, -r*3, -r*3, -r],'-',
-#             color='b')
+    if language == 'pl':
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+    else:
+        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+
+
+    ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
         
 class Hole(Solid):
     """This object represents hole that can be made inside solid.
@@ -1095,7 +1089,7 @@ class OpenHole(Solid):
     def __init__(self, height, diameter):
         num_of_lines_view = {
             'horizontal_lines': 1,
-            'vertical_lines': 1,
+            'vertical_lines': 0,
             'horizontal_dimensions': 0,
             'vertical_dimensions': 0,
             'inclined_lines': 0,
