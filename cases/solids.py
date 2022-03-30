@@ -2562,3 +2562,148 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
         HexPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
         
         print(res)
+        
+class Washer(Cylinder):
+    """This object represents washer solid.
+    
+    The washer object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
+    
+    Parameters
+    ==========
+    
+    height : int
+        The value of height of washer
+        
+    diameter : int
+        The value of diameter of washer
+    
+    Examples
+    ========
+    
+    >>> from solids import washer
+    >>> wsh = washer(5,2)
+    >>> wsh._parameters
+    (5, 2)
+    
+    >>> wsh._class_description
+    'with L=5mm and diameter =2mm'
+    
+    >>> wsh._class_description_pl
+    'o L=5mm i średnicy =2mm'
+    
+    >>> wsh._name
+    {'pl': 'Podkładka'}
+    
+    """
+    def _plot_2d(self,language='en'):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        origin = self.origin / 10
+        end = self.end / 10
+        
+        t_l = origin + l*1/2
+        t_r = (r + 5.5)
+
+        line_type = self.line_type
+        color = self.color
+        
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],line_type,
+            color=color) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [0,0],'-.',
+            color='k', linewidth = 1)
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+        
+        
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
+        print(res)
+
+    
+
+    def str_en(self):
+        return 'Washer \n with L={length}mm \n and diameter={d}mm'.format(
+            length=self.height,
+            d=self.diameter)
+
+    def str_pl(self):
+        return 'Podkładka \n o  grubości g={length}mm \n i średnicy d={d}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                          'prawej').replace('left', 'lewej')
+        
+
+class StandarizedNut(DoubleChamferedHexagonalPrism):
+    
+    def _plot_2d(self,language='en'):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+#         print(f'plot_2d is called for {class_name}')
+
+        r = self.indiameter / 2 / 10
+        l = self.height / 10
+        origin = self.origin / 10
+        end = self.end / 10
+        
+        t_l = origin - l*1/3 
+        t_r = (r + 0.5)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            color='tab:purple') + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5],
+            [0,0],'-.',
+            color='k', linewidth = 1) +  GeometryScene.ax_2d.plot(
+            [origin + 0, origin + l],
+            [r*0.6,r*0.6], color='tab:purple') + GeometryScene.ax_2d.plot(
+            [origin + 0, origin + l],
+            [-r*0.6,-r*0.6], color='tab:purple')
+        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+        
+        
+        #ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        HexPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
+        print(res)
+    
+    def str_en(self):
+        return 'Standarized nut \n with L={length}mm, wrench size S={d} \n and chamfer {l_ch}x{angle} \n on the both sides'.format(
+            length=self.height,
+            d=self.indiameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            )
+
+    def str_pl(self):
+        return 'Znormalizowana nakrętka \n o L={length}mm, wymiarze pod klucz S={d}mm \n i fazie {l_ch}x{angle} \n po oby stronach'.format(
+            length=self.height,
+            d=self.indiameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            )
+        
