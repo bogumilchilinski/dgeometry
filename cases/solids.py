@@ -825,7 +825,7 @@ class ScrewCore(Cylinder):
     
 
 class PlateWithHole(Cylinder):
-    """This object represents core of the screw.
+    """This object represents a plate with a hole.
     
     The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
     
@@ -857,8 +857,7 @@ class PlateWithHole(Cylinder):
     
     """
     
-    line_type = '--'
-    color='b'
+
     
     def _plot_2d(self,language='en'):
 
@@ -875,20 +874,30 @@ class PlateWithHole(Cylinder):
         t_l = origin + l / 8
         t_r = (-r - 13)
 
-        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
-                                       '--',
-                                       color='b') + GeometryScene.ax_2d.plot(
-                                        [origin - 0.5, origin + l + 0.5],
-                                        [0,0],'-.',
-                                        color='k', linewidth = 1)
-    
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l],
-            [-r, r, r, -r, -r],'-',
-            color=color) + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='color', linewidth = 1)
+            [origin + 0, origin +l],
+            [r+2/10, r+2/10],'--',
+            color='b') + GeometryScene.ax_2d.plot(
+            [origin + 0, origin + l],
+            [-r-2/10,-r-2/10],'--',
+            color='b')+ GeometryScene.ax_2d.plot(
+            [origin + 0, origin + l,origin + l, origin + 0, origin + 0,],
+            [r*3,r*3,-r*3,-r*3,r*3,],'-',
+            color='b')
+#         res = GeometryScene.ax_2d.plot(
+#             [origin + 0, origin + l],
+#             [r, r],'--',
+#             color='b') + GeometryScene.ax_2d.plot(
+#             [origin + 0, origin + l],
+#             [-r, -r],'--',
+#             color='b') + GeometryScene.ax_2d.plot(
+#             [origin + 0, origin + 0, origin + l, origin + l],
+#             [r, r*3, r*3, r],'-',
+#             color='b') + GeometryScene.ax_2d.plot(
+#             [origin + 0, origin + 0, origin + l, origin + l],
+#             [-r, -r*3, -r*3, -r],'-',
+#             color='b')
+        
 class Hole(Solid):
     """This object represents hole that can be made inside solid.
     

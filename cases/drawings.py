@@ -1257,17 +1257,19 @@ class ScrewConnectionSketch(ShaftSketch
         steps = cls.steps_no
         holes = cls.holes_no
         
-        shafts =  []
+        shafts = []
         for i in range(50): # Git
             
-            shaft =[sol.ChamferedHexagonalPrism(40,48)]
-            shaft += [sol.ScrewCore(140,28)] 
-            shaft += [sol.Cylinder(7,60)] 
-            shaft += [sol.DoubleChamferedHexagonalPrism(40,48)] 
-            shaft += [sol.Thread(15,28)]
+            screw_diameter = random.randint(40,60)
             
-            shaft += [sol.Cylinder(random.randint(40,60),100)] 
-            shaft += [sol.Cylinder((shaft[-5].end-shaft[-1].end),100)]  
+            shaft = [sol.ChamferedHexagonalPrism(0.7 * screw_diameter, 2 * screw_diameter)]
+            shaft += [sol.Cylinder(140, screw_diameter)] 
+            shaft += [sol.Cylinder(0.15 * screw_diameter, 2.2 * screw_diameter)]
+            shaft += [sol.DoubleChamferedHexagonalPrism(0.8 * screw_diameter, 2 * screw_diameter)]
+            shaft += [sol.Thread(0.3 * screw_diameter, screw_diameter)]
+            
+            shaft += [sol.PlateWithHole(random.randint(40,60),28)] 
+            shaft += [sol.PlateWithHole((shaft[-5].end-shaft[-1].end),28)]  
            
             
             shaft[-7]._origin = 0
