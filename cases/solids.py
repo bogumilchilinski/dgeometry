@@ -694,23 +694,47 @@ class Cylinder(Solid):
     line_type = '-'
     color='k'
     
+
+    num_of_lines_view = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+    
     
     def __init__(self, height, diameter):
-        num_of_lines = {
-            'horizontal_lines': 3,
-            'vertical_lines': 2,
-            'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
-            'inclined_lines': 0,
-        }
 
-        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+        
+        num_of_lines_view = self.__class__.num_of_lines_view        
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
 
-        num_of_lines_front = {'circles': 1, 'phi_dimensions': 1}
-
-        super().__init__(View(**num_of_lines), Section(**num_of_lines),
-                         HalfSection(**num_of_lines),
+        super().__init__(View(**num_of_lines_view),
+                         Section(**num_of_lines_sec),
+                         HalfSection(**num_of_lines_half_sec),
                          FrontView(**num_of_lines_front))
+        
+
         self.height = height
         self.diameter = diameter
 
@@ -812,8 +836,33 @@ class ScrewCore(Cylinder):
     line_type = '--'
     color='k'
     
+    num_of_lines_view = {
+        'horizontal_lines': 1,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 0,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 2,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+    
     def str_en(self):
-        return 'Cylinder of the screw \n with L={length}mm \n and diameter={d}mm'.format(
+        return 'Shank of the screw \n with L={length}mm \n and diameter={d}mm'.format(
             length=self.height,
             d=self.diameter)
 
@@ -917,6 +966,14 @@ class Plate(Cylinder):
             [r*3,r*3,-r*3,-r*3,r*3,],'-',
             color='b')
 
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+
+
+        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
+        
     def str_en(self):
         return 'Plate \n with thickness t={length}mm \n and width b={d}mm'.format(
             length=self.height,
@@ -928,13 +985,7 @@ class Plate(Cylinder):
             d=self.diameter).replace('right',
                                           'prawej').replace('left', 'lewej')
         
-    if language == 'pl':
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
-    else:
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
 
-
-    ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
         
 class Hole(Solid):
     """This object represents hole that can be made inside solid.
@@ -1089,14 +1140,14 @@ class OpenHole(Solid):
     def __init__(self, height, diameter):
         num_of_lines_view = {
             'horizontal_lines': 1,
-            'vertical_lines': 0,
+            'vertical_lines': 1,
             'horizontal_dimensions': 0,
             'vertical_dimensions': 0,
             'inclined_lines': 0,
         }
         num_of_lines_sec = {
             'horizontal_lines': 3,
-            'vertical_lines': 0,
+            'vertical_lines': 1,
             'horizontal_dimensions': 0,
             'vertical_dimensions': 1,
             'inclined_lines': 0,
@@ -1104,7 +1155,7 @@ class OpenHole(Solid):
 
         num_of_lines_half_sec = {
             'horizontal_lines': 2,
-            'vertical_lines': 0,
+            'vertical_lines': 1,
             'horizontal_dimensions': 0,
             'vertical_dimensions': 1,
             'inclined_lines': 0,
@@ -1925,38 +1976,49 @@ class Gear(Solid):
         
         print(res)
 
+        
+        
+        
 class HexagonalPrism(Solid):
 
+    num_of_lines_view = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 0,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 0,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'inclined_lines': 0,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 4,
+        'vertical_lines': 2,
+        'inclined_lines': 0,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
+    
+    
     def __init__(self, height, indiameter):
 
-        num_of_lines_view = {
-            'horizontal_lines': 5,
-            'vertical_lines': 2,
-            'inclined_lines': 0,
-            'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 0,
-        }
 
-        num_of_lines_sec = {
-            'horizontal_lines': 3,
-            'vertical_lines': 2,
-            'inclined_lines': 0,
-            'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 0,
-        }
 
-        num_of_lines_half_sec = {
-            'horizontal_lines': 4,
-            'vertical_lines': 2,
-            'inclined_lines': 0,
-            'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 0,
-        }
-
-        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
+        num_of_lines_view = self.__class__.num_of_lines_view        
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
@@ -2024,6 +2086,38 @@ class HexagonalPrism(Solid):
 
 class ChamferedHexagonalPrism(HexagonalPrism):
 
+    num_of_lines_view = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'arcs': 3,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'arcs': 0,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 4,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'arcs': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+    
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
+    
     def __init__(self,
                  height,
                  indiameter,
@@ -2031,40 +2125,21 @@ class ChamferedHexagonalPrism(HexagonalPrism):
                  chamfer_angle=45,
                  chamfer_pos='left'):
 
-        num_of_lines_view = {
-            'horizontal_lines': 5,
-            'vertical_lines': 2,
-            'inclined_lines': 2,
-            'arcs': 3,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 1,
-        }
 
-        num_of_lines_sec = {
-            'horizontal_lines': 3,
-            'vertical_lines': 2,
-            'inclined_lines': 2,
-            'arcs': 0,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 1,
-        }
 
-        num_of_lines_half_sec = {
-            'horizontal_lines': 4,
-            'vertical_lines': 2,
-            'inclined_lines': 2,
-            'arcs': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 1,
-        }
 
-        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
 
         super().__init__(height=height, indiameter=indiameter)
 
+        
+        num_of_lines_view = self.__class__.num_of_lines_view
+        
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+
+        num_of_lines_front = self.__class__.num_of_lines_front
+
+        
         self._views = {
             'view': View(**num_of_lines_view),
             'section': Section(**num_of_lines_sec),
@@ -2440,6 +2515,38 @@ class BlockInverseTShape(Solid):
 
 class DoubleChamferedHexagonalPrism(HexagonalPrism):
 
+    num_of_lines_view = {
+        'horizontal_lines': 5,  #axis included
+        'vertical_lines': 2,
+        'inclined_lines': 4,
+        'arcs': 6,
+        'horizontal_dimensions': 3,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 2,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 3,  #axis included
+        'vertical_lines': 2,
+        'inclined_lines': 4,
+        'arcs': 0,
+        'horizontal_dimensions': 3,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 2,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 4,  # axis included
+        'vertical_lines': 2,
+        'inclined_lines': 4,
+        'arcs': 4,
+        'horizontal_dimensions': 3,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 2,
+    }
+    
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
+    
     def __init__(self,
                  height,
                  indiameter,
@@ -2447,40 +2554,20 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
                  chamfer_angle=45,
                  chamfer_pos='left'):
 
-        num_of_lines_view = {
-            'horizontal_lines': 5,  #axis included
-            'vertical_lines': 2,
-            'inclined_lines': 4,
-            'arcs': 6,
-            'horizontal_dimensions': 3,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 2,
-        }
 
-        num_of_lines_sec = {
-            'horizontal_lines': 3,  #axis included
-            'vertical_lines': 2,
-            'inclined_lines': 4,
-            'arcs': 0,
-            'horizontal_dimensions': 3,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 2,
-        }
-
-        num_of_lines_half_sec = {
-            'horizontal_lines': 4,  # axis included
-            'vertical_lines': 2,
-            'inclined_lines': 4,
-            'arcs': 4,
-            'horizontal_dimensions': 3,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 2,
-        }
 
         num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
 
         super().__init__(height=height, indiameter=indiameter)
 
+        
+        num_of_lines_view = self.__class__.num_of_lines_view
+        
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+
+        num_of_lines_front = self.__class__.num_of_lines_front
+        
         self._views = {
             'view': View(**num_of_lines_view),
             'section': Section(**num_of_lines_sec),
@@ -2604,8 +2691,8 @@ class Washer(Cylinder):
         origin = self.origin / 10
         end = self.end / 10
         
-        t_l = origin + l*1/2
-        t_r = (r + 5.5)
+        t_l = origin - l*1/2
+        t_r = (r + 7)
 
         line_type = self.line_type
         color = self.color
@@ -2644,6 +2731,38 @@ class Washer(Cylinder):
 
 class StandarizedNut(DoubleChamferedHexagonalPrism):
     
+    num_of_lines_view = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'arcs': 6,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'arcs': 6,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'arcs': 6,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+    
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
+    
     def _plot_2d(self,language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
@@ -2659,7 +2778,7 @@ class StandarizedNut(DoubleChamferedHexagonalPrism):
         origin = self.origin / 10
         end = self.end / 10
         
-        t_l = origin - l*1/3 
+        t_l = origin + l 
         t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(
@@ -2701,3 +2820,124 @@ class StandarizedNut(DoubleChamferedHexagonalPrism):
             l_ch=self.chamfer_length,
             )
         
+class HexagonalHeadOfScrew(ChamferedHexagonalPrism):
+    
+    
+    num_of_lines_view = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'arcs': 3,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'arcs': 3,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'arcs': 3,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+    
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
+    
+    def str_en(self):
+        return 'Hexagonal head of screw \n with L={length}mm \n and internal diameter {d}mm '.format(
+            length=self.height,
+            d=self.indiameter,
+            )
+
+    def str_pl(self):
+        return 'Łeb sześciokątny śruby \n o L={length}mm  \n i wymiarze pod klucz {d}mm'.format(
+            length=self.height,
+            d=self.indiameter,
+            )
+    
+class ThreadOfScrew(Thread):
+    
+    def __init__(self,
+                 height,
+                 diameter,
+                 chamfer_length=1,
+                 chamfer_angle=45,
+                 thread='M'):
+
+        num_of_lines_view = {
+            'horizontal_lines': 5,
+            'vertical_lines': 3,
+            'inclined_lines': 2,
+            'horizontal_dimensions': 2,
+            'vertical_dimensions': 1,
+            'angular_dimensions': 1,
+        }
+
+        num_of_lines_sec = {
+            'horizontal_lines': 5,
+            'vertical_lines': 3,
+            'inclined_lines': 2,
+            'horizontal_dimensions': 2,
+            'vertical_dimensions': 1,
+            'angular_dimensions': 1,
+        }
+
+
+        num_of_lines_half_sec = {
+            'horizontal_lines': 5,
+            'vertical_lines': 3,
+            'inclined_lines': 2,
+            'horizontal_dimensions': 2,
+            'vertical_dimensions': 1,
+            'angular_dimensions': 1,
+        }
+
+
+        num_of_lines_front = {'circles': 1, 'arcs': 1}
+
+        super().__init__(View(**num_of_lines_view),
+                         Section(**num_of_lines_sec),
+                         HalfSection(**num_of_lines_half_sec),
+                         FrontView(**num_of_lines_front))
+
+        self.height = height
+        self.diameter = diameter
+        self.thread = thread
+        self.chamfer_length = chamfer_length
+        self.chamfer_angle = chamfer_angle
+        self._parameters = thread + str(
+            diameter), height, chamfer_length, chamfer_angle,
+        self._class_description = "{} with L={}mm and chamfer {}x{}".format(*(self._parameters))
+
+        self._name['pl'] = 'Gwint'
+        self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(*self._parameters)
+        
+        
+    def str_en(self):
+        return 'Thread of screw \n with L={length}mm, thread M{d} \n and chamfer {l_ch}x{angle}'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            )
+
+    def str_pl(self):
+        return 'Gwint śruby \n o L={length}mm, gwincie M{d}mm \n i fazie {l_ch}x{angle}'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            )
+    
