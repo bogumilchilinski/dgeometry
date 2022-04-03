@@ -2194,8 +2194,8 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
             line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+            point_P1 = plane_beta.intersection(A ^ O)[0]('P1')
+            point_P2 = plane_eta.intersection(A ^ O)[0]('P2')
             current_obj.P1 = point_P1
             line_kk = (P ^ point_P1)('a')
             line_f = (P ^ point_P2)('f')
