@@ -1214,7 +1214,7 @@ class BasicGearSketch(ShaftSketch
             shaft[-1]._origin=0
             shaft[-2]._origin=shaft[-1].end
             
-            shaft +=[sol.ChamferedHole(shaft[-2].end,random.randint(20,40))]
+            shaft +=[sol.OpenHole(shaft[-2].end,random.randint(20,40))]
             shaft[-1]._origin=shaft[-2].origin
             shaft[-1]._end=shaft[-3].end
             
@@ -1227,7 +1227,7 @@ class BasicGearSketch(ShaftSketch
             shaft[-2]._origin=shaft[-3].end
             shaft[-1]._origin = shaft[-2].end
             
-            shaft +=[sol.ChamferedHole(shaft[-1].end,random.randint(20,40))]
+            shaft +=[sol.OpenHole(shaft[-1].end,random.randint(20,40))]
             shaft[-1]._origin=shaft[-4].origin
             shaft[-1]._end=shaft[-2].end
               
@@ -1238,7 +1238,7 @@ class BasicGearSketch(ShaftSketch
             shaft = [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))] + [sol.Cylinder(random.randint(20,40),random.randint(50,60))]
             shaft[-1]._origin =0
             shaft[-2]._origin = shaft[-1].end
-            shaft +=[sol.ChamferedHole(shaft[-2].end,random.randint(20,40))]
+            shaft +=[sol.OpenHole(shaft[-2].end,random.randint(20,40))]
             shaft[-1]._origin=shaft[-2].origin
             shaft[-1]._end=shaft[-3].end
             
