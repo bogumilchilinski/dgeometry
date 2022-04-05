@@ -862,12 +862,12 @@ class ScrewCore(Cylinder):
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
     
     def str_en(self):
-        return 'Shank of the screw \n with L={length}mm \n and diameter={d}mm'.format(
+        return 'Shank of the screw \n with diameter={d}mm'.format(
             length=self.height,
             d=self.diameter)
 
     def str_pl(self):
-        return 'Trzpień śruby \n o L={length}mm i średnicy={d}mm'.format(
+        return 'Trzpień śruby \n o średnicy={d}mm'.format(
             length=self.height,
             d=self.diameter).replace('right',
                                           'prawej').replace('left', 'lewej')
@@ -2926,7 +2926,7 @@ class ThreadOfScrew(Thread):
         
         
     def str_en(self):
-        return 'Thread of screw \n with L={length}mm, thread M{d} \n and chamfer {l_ch}x{angle}'.format(
+        return 'Part (free) of screw thread  M{d} \n with chamfer {l_ch}x{angle} \n being L={length}mm outside the nut'.format(
             length=self.height,
             d=self.diameter,
             angle=self.chamfer_angle,
@@ -2934,7 +2934,7 @@ class ThreadOfScrew(Thread):
             )
 
     def str_pl(self):
-        return 'Gwint śruby \n o L={length}mm, gwincie M{d}mm \n i fazie {l_ch}x{angle}'.format(
+        return 'Część gwintu (swobodna) M{d} \n o fazie {l_ch}x{angle} \n wysunięta poza nakrętkę na L={length}mm'.format(
             length=self.height,
             d=self.diameter,
             angle=self.chamfer_angle,
