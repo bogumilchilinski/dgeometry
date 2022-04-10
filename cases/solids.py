@@ -850,11 +850,17 @@ class ScrewCore(Cylinder):
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
 
     def str_en(self):
+<<<<<<< HEAD
         return 'Shank of the screw \n with L={length}mm \n and diameter={d}mm'.format(
             length=self.height, d=self.diameter)
+=======
+        return 'Shank of the screw \n with diameter={d}mm'.format(
+            length=self.height,
+            d=self.diameter)
+>>>>>>> 5d427993582574accddc9eeffcc5c643cfb417be
 
     def str_pl(self):
-        return 'Trzpień śruby \n o L={length}mm i średnicy={d}mm'.format(
+        return 'Trzpień śruby \n o średnicy={d}mm'.format(
             length=self.height,
             d=self.diameter).replace('right',
                                      'prawej').replace('left', 'lewej')
@@ -3218,4 +3224,83 @@ class HexagonalHeadOfScrew(ChamferedHexagonalPrism):
         return 'Łeb sześciokątny śruby \n o L={length}mm  \n i wymiarze pod klucz {d}mm'.format(
             length=self.height,
             d=self.indiameter,
+<<<<<<< HEAD
         )
+=======
+            )
+    
+class ThreadOfScrew(Thread):
+    
+    def __init__(self,
+                 height,
+                 diameter,
+                 chamfer_length=1,
+                 chamfer_angle=45,
+                 thread='M'):
+
+        num_of_lines_view = {
+            'horizontal_lines': 5,
+            'vertical_lines': 3,
+            'inclined_lines': 2,
+            'horizontal_dimensions': 2,
+            'vertical_dimensions': 1,
+            'angular_dimensions': 1,
+        }
+
+        num_of_lines_sec = {
+            'horizontal_lines': 5,
+            'vertical_lines': 3,
+            'inclined_lines': 2,
+            'horizontal_dimensions': 2,
+            'vertical_dimensions': 1,
+            'angular_dimensions': 1,
+        }
+
+
+        num_of_lines_half_sec = {
+            'horizontal_lines': 5,
+            'vertical_lines': 3,
+            'inclined_lines': 2,
+            'horizontal_dimensions': 2,
+            'vertical_dimensions': 1,
+            'angular_dimensions': 1,
+        }
+
+
+        num_of_lines_front = {'circles': 1, 'arcs': 1}
+
+        super().__init__(View(**num_of_lines_view),
+                         Section(**num_of_lines_sec),
+                         HalfSection(**num_of_lines_half_sec),
+                         FrontView(**num_of_lines_front))
+
+        self.height = height
+        self.diameter = diameter
+        self.thread = thread
+        self.chamfer_length = chamfer_length
+        self.chamfer_angle = chamfer_angle
+        self._parameters = thread + str(
+            diameter), height, chamfer_length, chamfer_angle,
+        self._class_description = "{} with L={}mm and chamfer {}x{}".format(*(self._parameters))
+
+        self._name['pl'] = 'Gwint'
+        self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(*self._parameters)
+        
+        
+    def str_en(self):
+        return 'Part (free) of screw thread  M{d} \n with chamfer {l_ch}x{angle} \n being L={length}mm outside the nut'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            )
+
+    def str_pl(self):
+        return 'Część gwintu (swobodna) M{d} \n o fazie {l_ch}x{angle} \n wysunięta poza nakrętkę na L={length}mm'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            )
+    
+>>>>>>> 5d427993582574accddc9eeffcc5c643cfb417be
