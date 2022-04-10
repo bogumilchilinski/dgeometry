@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 
 
 class ShaftPreview:
+
     def __init__(self, x0, y0, z0, *args):
         self.x0 = x0
         self.y0 = y0
@@ -31,21 +32,29 @@ class ShaftPreview:
 
         for i in range(len(self.data)):
             if i == 5:
-                self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.total_length, self.data[i][3])
+                self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0],
+                                       self.total_length, self.data[i][3])
                 self.total_length = 0
-            self.shaft_steps_sides((self.x0, self.y0), self.data[i][0], self.z0, self.data[i][3])
+            self.shaft_steps_sides((self.x0, self.y0), self.data[i][0],
+                                   self.z0, self.data[i][3])
             self.total_length += self.data[i][1]
-        self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.z0+self.total_length, self.data[i][3])
+        self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0],
+                               self.z0 + self.total_length, self.data[i][3])
         self.total_length = 0
 
         for i in range(len(self.data)):
             if i == 5:
                 self.total_length = 0
-            self.Xc, self.Yc, self.Zc = data_for_cylinder_along_z(self.x0, self.y0,
-                                                                  self.data[i][0], self.data[i][1], self.z0)
+            self.Xc, self.Yc, self.Zc = data_for_cylinder_along_z(
+                self.x0, self.y0, self.data[i][0], self.data[i][1], self.z0)
 
             self.total_length += self.data[i][1]
-            self.ax.plot_surface(self.Xc, self.Yc, self.Zc, alpha=self.data[i][3], color=self.data[i][4], edgecolor="black")
+            self.ax.plot_surface(self.Xc,
+                                 self.Yc,
+                                 self.Zc,
+                                 alpha=self.data[i][3],
+                                 color=self.data[i][4],
+                                 edgecolor="black")
 
     def shaft_steps_sides(self, begin_cords, radius, zlength, transparency):
 
@@ -53,7 +62,6 @@ class ShaftPreview:
         p = Circle(begin_cords, radius, alpha=transparency, color='#6b7aa1')
         self.ax.add_patch(p)
         art3d.pathpatch_2d_to_3d(p, z=zlength, zdir="x")
-
 
 
 def data_for_cylinder_along_z(center_z, center_y, radius, height_x, x_begin):
@@ -65,8 +73,8 @@ def data_for_cylinder_along_z(center_z, center_y, radius, height_x, x_begin):
     return x_grid, y_grid, z_grid
 
 
-
 class HexPreview:
+
     def __init__(self, x0, y0, z0, *args):
         self.x0 = x0
         self.y0 = y0
@@ -87,32 +95,42 @@ class HexPreview:
 
         for i in range(len(self.data)):
             if i == 5:
-                self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.total_length, self.data[i][3])
+                self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0],
+                                       self.total_length, self.data[i][3])
                 self.total_length = 0
-            self.shaft_steps_sides((self.x0, self.y0), self.data[i][0], self.z0, self.data[i][3])
+            self.shaft_steps_sides((self.x0, self.y0), self.data[i][0],
+                                   self.z0, self.data[i][3])
             self.total_length += self.data[i][1]
-        self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0], self.z0+self.total_length, self.data[i][3])
+        self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0],
+                               self.z0 + self.total_length, self.data[i][3])
         self.total_length = 0
 
         for i in range(len(self.data)):
             if i == 5:
                 self.total_length = 0
-            self.Xc, self.Yc, self.Zc = data_for_cylinder_along_z(self.x0, self.y0,
-                                                                  self.data[i][0], self.data[i][1], self.z0)
+            self.Xc, self.Yc, self.Zc = data_for_cylinder_along_z(
+                self.x0, self.y0, self.data[i][0], self.data[i][1], self.z0)
 
             self.total_length += self.data[i][1]
-            self.ax.plot_surface(self.Xc, self.Yc, self.Zc, alpha=self.data[i][3], color=self.data[i][4], edgecolor="black")
-        self.ax.scatter(10,0 ,0)
+            self.ax.plot_surface(self.Xc,
+                                 self.Yc,
+                                 self.Zc,
+                                 alpha=self.data[i][3],
+                                 color=self.data[i][4],
+                                 edgecolor="black")
+        self.ax.scatter(10, 0, 0)
 
     def shaft_steps_sides(self, begin_cords, radius, zlength, transparency):
 
         # Draw a circle on the x axis 'wall'
-        p = RegularPolygon(begin_cords,6, 1.2*radius, alpha=0.6, color='#6b7aa1')
+        p = RegularPolygon(begin_cords,
+                           6,
+                           1.2 * radius,
+                           alpha=0.6,
+                           color='#6b7aa1')
         self.ax.add_patch(p)
-        
 
         art3d.pathpatch_2d_to_3d(p, z=zlength, zdir="x")
-
 
 
 def data_for_cylinder_along_z(center_z, center_y, radius, height_x, x_begin):
@@ -181,18 +199,16 @@ class Solid:
         self._name = {}
         self._name['pl'] = 'Bryła'
 
-        self._ref_elem=None
+        self._ref_elem = None
         self._origin = 0
-
 
     @property
     def origin(self):
 
         if self._ref_elem is not None:
-            origin=self._ref_elem.end
+            origin = self._ref_elem.end
         else:
             origin = self._origin
-
 
 
 #         print(origin)
@@ -203,12 +219,10 @@ class Solid:
 
         end = self.origin + self.height
 
-#         print('end =' + str(end))
+        #         print('end =' + str(end))
         return end
 
-    def _plot_2d(self,language='en'):
-
-        
+    def _plot_2d(self, language='en'):
 
         class_name = self.__class__.__name__
 
@@ -217,7 +231,6 @@ class Solid:
         res = GeometryScene.ax_2d.plot(span,
                                        np.cos(5 * len(class_name) * span),
                                        label=class_name)
-
 
     @property
     def views(self):
@@ -253,11 +266,11 @@ class Solid:
 
     def __repr__(self):
         return self.__str__()
-    
+
     def preview(self, example=False):
 
-              self._plot_2d()
-            
+        self._plot_2d()
+
 
 class ComposedPart:
     scheme_name = 'engine.png'
@@ -283,18 +296,16 @@ class ComposedPart:
 
         return path
 
-
-    def preview(self, example=False,language='en'):
+    def preview(self, example=False, language='en'):
 
         print(*list(enumerate(self.elements)))
 
         #self.elements[0]._origin = 0
         #self.elements[-1]._origin = -30
-        
+
         for no, elem in enumerate(self.elements):
 
             elem._plot_2d(language=language)
-
 
     def add(self, other):
 
@@ -530,34 +541,6 @@ class ComposedPart:
             'front_view': self.front_view,
         }
 
-
-#     @propery
-#     def side_view(self):
-
-#         num_of_lines={
-#             'horizontal_lines':
-#            sum([2 for solid in self.element
-#                 if solid.__class__.__name__ == 'HexagonalPrism'])
-#             'vertical_lines':
-#             None,
-#             'horizontal_dimensions':
-#             None,
-#             'vertical_dimensions':
-#             None,
-#             'inclined_lines':
-#             sum([4 for solid in self.element
-#                 if solid.__class__.__name__ == 'HexagonalPrism'])
-#             'circle':
-#             None
-# #             sum([for solid in self.element:
-# #                      if solid.__class__.__name__ != 'Gear' | 'HexagonalPrism' | 'Thread':
-# #                          if solid == self.element[0]:
-
-# #                          else:
-# #                              solid
-# #                 ])
-#         }
-
     def view_horizontal_lines(self):
         return sum([solid.view.horizontal_lines() for solid in self.elements])
 
@@ -623,7 +606,7 @@ class Cone(Solid):
         self._name['pl'] = 'Stożek'
         self._class_description_pl = "o L={}mm, średnicy górnej podstawy = {}mm i średnicy dolnej podstawy={}mm".format(
             *self._parameters)
-    
+
     def _plot_2d(self):
 
         #         print(f'self.origin property is {self.origin()}')
@@ -632,14 +615,14 @@ class Cone(Solid):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
-        r_b = self.bottom_diameter /2 /10
+        r_b = self.bottom_diameter / 2 / 10
         r_t = self.top_diameter / 2 / 10
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
+
         t_l = origin + l / 4
         t_r = (r_t + 0.5)
 
@@ -647,15 +630,18 @@ class Cone(Solid):
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
             [-r_b, r_b, r_t, -r_t, -r_b],
             color='k') + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='k', linewidth = 1) 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
-        ShaftPreview(5,5,origin/2 ,[2*r_t/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
-        print(res)
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1)
+        text = GeometryScene.ax_2d.text(t_l,
+                                        t_r,
+                                        self.str_en(),
+                                        rotation='vertical',
+                                        multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r_t / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
 
 class Cylinder(Solid):
@@ -692,8 +678,7 @@ class Cylinder(Solid):
     """
 
     line_type = '-'
-    color='k'
-    
+    color = 'k'
 
     num_of_lines_view = {
         'horizontal_lines': 3,
@@ -719,12 +704,10 @@ class Cylinder(Solid):
     }
 
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
-    
-    
+
     def __init__(self, height, diameter):
 
-        
-        num_of_lines_view = self.__class__.num_of_lines_view        
+        num_of_lines_view = self.__class__.num_of_lines_view
         num_of_lines_sec = self.__class__.num_of_lines_sec
         num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
         num_of_lines_front = self.__class__.num_of_lines_front
@@ -733,7 +716,6 @@ class Cylinder(Solid):
                          Section(**num_of_lines_sec),
                          HalfSection(**num_of_lines_half_sec),
                          FrontView(**num_of_lines_front))
-        
 
         self.height = height
         self.diameter = diameter
@@ -748,16 +730,15 @@ class Cylinder(Solid):
 
     def str_en(self):
         return 'Cylinder \n with L={length}mm \n and diameter={d}mm'.format(
-            length=self.height,
-            d=self.diameter)
+            length=self.height, d=self.diameter)
 
     def str_pl(self):
         return 'Walec \n o L={length}mm i średnicy={d}mm'.format(
             length=self.height,
             d=self.diameter).replace('right',
-                                          'prawej').replace('left', 'lewej')
-        
-    def _plot_2d(self,language='en'):
+                                     'prawej').replace('left', 'lewej')
+
+    def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -765,41 +746,48 @@ class Cylinder(Solid):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
         r = self.diameter / 2 / 10
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
+
         t_l = origin - 3
         t_r = (r + 5.5)
 
         line_type = self.line_type
         color = self.color
-        
+
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],line_type,
+            [-r, r, r, -r, -r],
+            line_type,
             color=color) + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='k', linewidth = 1)
-        
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1)
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
         print(res)
 
- 
 
-
-        
 class ScrewCore(Cylinder):
     """This object represents core of the screw.
     
@@ -832,10 +820,10 @@ class ScrewCore(Cylinder):
     {'pl': 'Walec'}
     
     """
-    
+
     line_type = '--'
-    color='k'
-    
+    color = 'k'
+
     num_of_lines_view = {
         'horizontal_lines': 1,
         'vertical_lines': 1,
@@ -860,19 +848,18 @@ class ScrewCore(Cylinder):
     }
 
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
-    
+
     def str_en(self):
         return 'Shank of the screw \n with L={length}mm \n and diameter={d}mm'.format(
-            length=self.height,
-            d=self.diameter)
+            length=self.height, d=self.diameter)
 
     def str_pl(self):
         return 'Trzpień śruby \n o L={length}mm i średnicy={d}mm'.format(
             length=self.height,
             d=self.diameter).replace('right',
-                                          'prawej').replace('left', 'lewej')
+                                     'prawej').replace('left', 'lewej')
 
-    def _plot_2d(self,language='en'):
+    def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -880,113 +867,138 @@ class ScrewCore(Cylinder):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
         r = self.diameter / 2 / 10
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
-        t_l = origin  + l / 3
+
+        t_l = origin + l / 3
         t_r = (r + 10.5)
 
         line_type = self.line_type
         color = self.color
-        
+
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],line_type,
+            [-r, r, r, -r, -r],
+            line_type,
             color=color) + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='k', linewidth = 1)
-        
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1)
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
         print(res)
+
 
 class Plate(Cylinder):
     """This object represents a plate.
-    
+
     The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
-    
+
     Parameters
     ==========
-    
+
     height : int
         The value of height of cylinder
-        
+
     diameter : int
         The value of diameter of cylinder
-    
+
     Examples
     ========
-    
+
     >>> from solids import Cylinder
     >>> cyl = ScrewCore(5,2)
     >>> cyl._parameters
     (5, 2)
-    
+
     >>> cyl._class_description
     'with L=5mm and diameter =2mm'
-    
+
     >>> cyl._class_description_pl
     'o L=5mm i średnicy =2mm'
-    
+
     >>> cyl._name
     {'pl': 'Walec'}
-    
-    """
-    
 
-    
-    def _plot_2d(self,language='en'):
+    """
+
+    def _plot_2d(self, language='en'):
 
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
-       
+
         origin = self.origin / 10
         r = self.diameter / 2 / 10
         l = self.height / 10
         end = self.end / 10
-        
+
         t_l = origin + l / 8
         t_r = (-r - 13)
-        
-        res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + l,origin + l, origin + 0, origin + 0,],
-            [r*3,r*3,-r*3,-r*3,r*3,],'-',
-            color='b')
+
+        res = GeometryScene.ax_2d.plot([
+            origin + 0,
+            origin + l,
+            origin + l,
+            origin + 0,
+            origin + 0,
+        ], [
+            r * 3,
+            r * 3,
+            -r * 3,
+            -r * 3,
+            r * 3,
+        ],
+                                       '-',
+                                       color='b')
 
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
 
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
     def str_en(self):
         return 'Plate \n with thickness t={length}mm \n and width b={d}mm'.format(
-            length=self.height,
-            d=self.diameter)
+            length=self.height, d=self.diameter)
 
     def str_pl(self):
         return 'Płyta \n o grubości g={length}mm i szerokości b={d}mm'.format(
             length=self.height,
             d=self.diameter).replace('right',
-                                          'prawej').replace('left', 'lewej')
-        
+                                     'prawej').replace('left', 'lewej')
 
-        
+
 class Hole(Solid):
     """This object represents hole that can be made inside solid.
     
@@ -1020,31 +1032,37 @@ class Hole(Solid):
     
     """
 
+    num_of_lines_view = {
+        'horizontal_lines': 1,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 0,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 2,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+
     def __init__(self, height, diameter):
-        num_of_lines_view = {
-            'horizontal_lines': 1,
-            'vertical_lines': 1,
-            'horizontal_dimensions': 0,
-            'vertical_dimensions': 0,
-            'inclined_lines': 0,
-        }
-        num_of_lines_sec = {
-            'horizontal_lines': 3,
-            'vertical_lines': 1,
-            'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
-            'inclined_lines': 0,
-        }
 
-        num_of_lines_half_sec = {
-            'horizontal_lines': 2,
-            'vertical_lines': 1,
-            'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
-            'inclined_lines': 0,
-        }
-
-        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+        num_of_lines_view = self.__class__.num_of_lines_view
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
@@ -1060,51 +1078,60 @@ class Hole(Solid):
         self._name['pl'] = 'Otwór'
         self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
             *self._parameters)
- 
+
     def str_en(self):
         return 'Hole \n with L={length}mm \n and diameter={d}mm'.format(
-            length=self.height,
-            d=self.diameter
-        )
+            length=self.height, d=self.diameter)
 
     def str_pl(self):
         return 'Otwór \n o L={length}mm i średnicy={d}mm'.format(
             length=self.height,
             d=self.diameter).replace('right',
-                                          'prawej').replace('left', 'lewej')
+                                     'prawej').replace('left', 'lewej')
 
-    def _plot_2d(self,language='en'):
+    def _plot_2d(self, language='en'):
 
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
-       
+        #         print(f'plot_2d is called for {class_name}')
+
         origin = self.origin / 10
         r = self.diameter / 2 / 10
         l = self.height / 10
         end = self.end / 10
-        
+
         t_l = origin + l / 4
         t_r = (-r - 20)
 
-        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
-                                       '--',
-                                       color='b') + GeometryScene.ax_2d.plot(
-                                        [origin - 0.5, origin + l + 0.5],
-                                        [0,0],'-.',
-                                        color='k', linewidth = 1)
-        
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            '--',
+            color='b') + GeometryScene.ax_2d.plot(
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1)
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
 
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
 
-        
-        
-class OpenHole(Solid):
+
+class OpenHole(Hole):
     """This object represents hole that can be made inside solid.
     
     The hole object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height and diameter.
@@ -1136,91 +1163,76 @@ class OpenHole(Solid):
     {'pl': 'Otwór'}
     
     """
+    num_of_lines_view = {
+        'horizontal_lines': 1,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 0,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
 
-    def __init__(self, height, diameter):
-        num_of_lines_view = {
-            'horizontal_lines': 1,
-            'vertical_lines': 1,
-            'horizontal_dimensions': 0,
-            'vertical_dimensions': 0,
-            'inclined_lines': 0,
-        }
-        num_of_lines_sec = {
-            'horizontal_lines': 3,
-            'vertical_lines': 1,
-            'horizontal_dimensions': 0,
-            'vertical_dimensions': 1,
-            'inclined_lines': 0,
-        }
+    num_of_lines_half_sec = {
+        'horizontal_lines': 2,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
 
-        num_of_lines_half_sec = {
-            'horizontal_lines': 2,
-            'vertical_lines': 1,
-            'horizontal_dimensions': 0,
-            'vertical_dimensions': 1,
-            'inclined_lines': 0,
-        }
-
-        num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
-
-        super().__init__(View(**num_of_lines_view),
-                         Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front))
-        self.height = height
-        self.diameter = diameter
-
-        self._parameters = height, diameter
-        self._class_description = "with L={}mm and diameter={}mm".format(
-            *self._parameters)
-
-        self._name['pl'] = 'Otwór'
-        self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
-            *self._parameters)
- 
     def str_en(self):
-        return 'Open hole \n with diameter={d}mm'.format(
-            length=self.height,
-            d=self.diameter
-        )
+        return 'Open hole \n with diameter={d}mm'.format(length=self.height,
+                                                         d=self.diameter)
 
     def str_pl(self):
         return 'Przelotowy otwór \n o średnicy={d}mm'.format(
             length=self.height,
             d=self.diameter).replace('right',
-                                          'prawej').replace('left', 'lewej')
+                                     'prawej').replace('left', 'lewej')
 
-    def _plot_2d(self,language='en'):
+    def _plot_2d(self, language='en'):
 
-        class_name = self.__class__.__name__
-
-        span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
-       
         origin = self.origin / 10
         r = self.diameter / 2 / 10
         l = self.height / 10
         end = self.end / 10
-        
+
         t_l = origin + l / 2
         t_r = (-r - 23)
 
-        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
-                                       '--',
-                                       color='b') + GeometryScene.ax_2d.plot(
-                                        [origin - 0.5, origin + l + 0.5],
-                                        [0,0],'-.',
-                                        color='k', linewidth = 1)
-        
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            '--',
+            color='b')
+        GeometryScene.ax_2d.plot([origin - 0.5, origin + l + 0.5], [0, 0],
+                                 '-.',
+                                 color='k',
+                                 linewidth=1)
 
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
-        
-        
-        
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
+
+
 class ChamferedHole(Solid):
     """This object represents chamfered hole that can be made inside solid.
     
@@ -1263,6 +1275,33 @@ class ChamferedHole(Solid):
     
     """
 
+    num_of_lines_view = {
+        'horizontal_lines': 1,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 0,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'inclined_lines': 2,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 2,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'inclined_lines': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_front = {'circles': 2, 'phi_dimensions': 0}
+
     def __init__(self,
                  height,
                  diameter,
@@ -1270,37 +1309,16 @@ class ChamferedHole(Solid):
                  chamfer_angle=45,
                  chamfer_pos='left'):
 
-        num_of_lines_view = {
-            'horizontal_lines': 1,
-            'vertical_lines': 1,
-            'horizontal_dimensions': 0,
-            'vertical_dimensions': 0,
-            'inclined_lines': 0,
-        }
-        num_of_lines_sec = {
-            'horizontal_lines': 3,
-            'vertical_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'inclined_lines': 2,
-            'angular_dimensions': 1,
-        }
-
-        num_of_lines_half_sec = {
-            'horizontal_lines': 2,
-            'vertical_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'inclined_lines': 1,
-            'angular_dimensions': 1,
-        }
-
-        num_of_lines_front = {'circles': 2, 'phi_dimensions': 0}
+        num_of_lines_view = self.__class__.num_of_lines_view
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
                          HalfSection(**num_of_lines_half_sec),
                          FrontView(**num_of_lines_front))
+
         self.height = height
         self.diameter = diameter
         self.chamfer_length = chamfer_length
@@ -1326,14 +1344,15 @@ class ChamferedHole(Solid):
             l_ch=self.chamfer_length,
             pos=self.chamfer_pos).replace('right',
                                           'prawej').replace('left', 'lewej')
-    
+
+
 #     def _plot_2d(self,language='en'):
 
 #         class_name = self.__class__.__name__
 
 #         span = np.linspace(0, len(class_name), 100)
 #         print(f'plot_2d is called for {class_name}')
-       
+
 #         origin = self.origin / 10
 #         r = self.diameter / 2 / 10
 #         l = self.height / 10
@@ -1341,7 +1360,7 @@ class ChamferedHole(Solid):
 #         c_l = self.chamfer_length / 10
 #         c_a = self.chamfer_angle
 #         c_h = c_l * np.tan(c_a)
-        
+
 #         t_l = origin + l / 2
 #         t_r = (r + 1)
 
@@ -1351,38 +1370,194 @@ class ChamferedHole(Solid):
 #                     [origin,origin+l],[ -r-c_h, -r-c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
 #                         [origin,origin+l],[ +r+c_h, +r+c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
 #                             [origin+l,origin+l],[r+c_h,-r-c_h],'--',color='c')
-        
+
 #         text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
 #         print(res)
-        
-    def _plot_2d(self,language='en'):
+
+    def _plot_2d(self, language='en'):
 
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
-       
+        #         print(f'plot_2d is called for {class_name}')
+
         origin = self.origin / 10
         r = self.diameter / 2 / 10
         l = self.height / 10
         end = self.end / 10
-        
+
         t_l = origin + l / 7
         t_r = (-r - 14.5)
 
-        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
-                                       '--',
-                                       color='c') + GeometryScene.ax_2d.plot(
-                                        [origin - 0.5, origin + l + 0.5],
-                                        [0,0],'-.',
-                                        color='k', linewidth = 1)
-        
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            '--',
+            color='c') + GeometryScene.ax_2d.plot(
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1)
 
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
+
+
+class ChamferedOpenHoleWithKeyway(ChamferedHole):
+    """This object represents chamfered hole that can be made inside solid.
+    
+    The chamfered hole object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height, diameter, chamfer length, angle and position.
+    
+    Parameters
+    ==========
+    
+    height : int
+        The value of height of hole
+        
+    diameter : int
+        The value of diameter of hole
+    
+    chamfer_length=1 : int
+        The value of chamfer length
+    
+    chamfer_angle=45 : int
+        The value of chamfer angle
+    
+    chamfer_pos='left' : str
+        The position of chamfer
+    
+    Examples
+    ========
+    
+    >>> from solids import ChamferedHole
+    >>> chamf_hole = ChamferedHole(5,2)
+    >>> chamf_hole._parameters
+    (5, 2)
+    
+    >>> chamf_hole.str_en()
+    'Hole with L=5mm, diameter=2mm and 1x45 chamfer on the left side'
+    
+    >>> chamf_hole.str_pl()
+    'Otwór o L=5mm, średnicy=2mm i fazie 1x45 znajdującej się po lewej stronie'
+    
+    >>> chamf_hole._class_description
+    'with L=5mm and diameter=2mm'
+    
+    """
+    num_of_lines_view = {
+        'horizontal_lines': 1,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 0,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'inclined_lines': 4,
+        'angular_dimensions': 2,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'inclined_lines': 2,
+        'angular_dimensions': 2,
+    }
+    def str_en(self):
+        return 'Hole with keyway \n with L={length}mm, diameter={d}mm \n and {l_ch}x{angle} chamfers on the both sides'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            pos=self.chamfer_pos)
+
+    def str_pl(self):
+        return 'Otwór z wypust czółenkowy \n o L={length}mm, średnicy={d}mm \n i fazach {l_ch}x{angle} znajdującej się po obu stronach'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+            pos=self.chamfer_pos).replace('right',
+                                          'prawej').replace('left', 'lewej')
+
+    def _plot_2d(self, language='en'):
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        #         print(f'plot_2d is called for {class_name}')
+
+        origin = self.origin / 10
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        end = self.end / 10
+
+        t_l = origin + l / 7
+        t_r = (-r - 14.5)
+
+        res = GeometryScene.ax_2d.plot(
+            [
+                origin + 0,
+                origin + 0,
+                origin + l,
+                origin + l,
+                origin + 0,
+            ], [-r, r, r, -r, -r],
+            '--',
+            color='c') + GeometryScene.ax_2d.plot(
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1),
+        GeometryScene.ax_2d.plot([origin,(origin+1)], [0.5,0.5],
+                                        '-.',
+                                        color='k',
+                                        linewidth=1),
+        GeometryScene.ax_2d.plot([origin,(origin+1)], [-0.5,-0.5],
+                                        '-.',
+                                        color='k',
+                                        linewidth=1)
+#         GeometryScene.ax_2d.plot([origin,origin+1], [1,1],
+#                                         '-.',
+#                                         color='k',
+#                                         linewidth=1)
+#         GeometryScene.ax_2d.plot([origin,origin+1], [-1,-1],
+#                                         '-.',
+#                                         color='k',
+#                                         linewidth=1)
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
 
 
 class ChamferedCylinder(Solid):
@@ -1426,6 +1601,34 @@ class ChamferedCylinder(Solid):
     'with L=5mm and diameter=2mm'
     
     """
+    num_of_lines_view = {
+        'horizontal_lines': 3,
+        'vertical_lines': 3,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'inclined_lines': 2,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'inclined_lines': 2,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 3,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'inclined_lines': 2,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_front = {'circles': 2, 'phi_dimensions': 0}
 
     def __init__(self,
                  height,
@@ -1434,39 +1637,16 @@ class ChamferedCylinder(Solid):
                  chamfer_angle=45,
                  chamfer_pos='left'):
 
-        num_of_lines_view = {
-            'horizontal_lines': 3,
-            'vertical_lines': 3,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'inclined_lines': 2,
-            'angular_dimensions': 1,
-        }
-
-        num_of_lines_sec = {
-            'horizontal_lines': 3,
-            'vertical_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'inclined_lines': 2,
-            'angular_dimensions': 1,
-        }
-
-        num_of_lines_half_sec = {
-            'horizontal_lines': 3,
-            'vertical_lines': 3,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'inclined_lines': 2,
-            'angular_dimensions': 1,
-        }
-
-        num_of_lines_front = {'circles': 2, 'phi_dimensions': 0}
+        num_of_lines_view = self.__class__.num_of_lines_view
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
                          HalfSection(**num_of_lines_half_sec),
                          FrontView(**num_of_lines_front))
+
         self.height = height
         self.diameter = diameter
         self.chamfer_length = chamfer_length
@@ -1506,7 +1686,7 @@ class ChamferedCylinder(Solid):
 #         c_l = self.chamfer_length / 10
 #         c_a = self.chamfer_angle
 #         c_h = c_l * np.tan(c_a)
-        
+
 #         t_l = origin + l / 2
 #         t_r = (r + 1)
 
@@ -1519,8 +1699,8 @@ class ChamferedCylinder(Solid):
 #         print(res)
 
 #         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
-    def _plot_2d(self,language='en'):
+
+    def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -1528,13 +1708,13 @@ class ChamferedCylinder(Solid):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
         r = self.diameter / 2 / 10
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
+
         t_l = origin + l / 4
         t_r = (r + 0.5)
 
@@ -1542,18 +1722,28 @@ class ChamferedCylinder(Solid):
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
             [-r, r, r, -r, -r],
             color='g') + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='k', linewidth = 1)
-        
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1)
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
 
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
 #     def _plot_2d(self,language='en'):
 
 #         #         print(f'self.origin property is {self.origin()}')
@@ -1574,10 +1764,37 @@ class ChamferedCylinder(Solid):
 #             color='k')
 #         print(res)
 
-        
-        
 
 class Thread(Solid):
+
+    num_of_lines_view = {
+        'horizontal_lines': 5,
+        'vertical_lines': 3,
+        'inclined_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 3,
+        'inclined_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_front = {'circles': 1, 'arcs': 1}
 
     def __init__(self,
                  height,
@@ -1586,34 +1803,10 @@ class Thread(Solid):
                  chamfer_angle=45,
                  thread='M'):
 
-        num_of_lines_view = {
-            'horizontal_lines': 5,
-            'vertical_lines': 3,
-            'inclined_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 1,
-        }
-
-        num_of_lines_sec = {
-            'horizontal_lines': 5,
-            'vertical_lines': 2,
-            'inclined_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 1,
-        }
-
-        num_of_lines_half_sec = {
-            'horizontal_lines': 5,
-            'vertical_lines': 3,
-            'inclined_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 1,
-        }
-
-        num_of_lines_front = {'circles': 1, 'arcs': 1}
+        num_of_lines_view = self.__class__.num_of_lines_view
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
@@ -1625,22 +1818,22 @@ class Thread(Solid):
         self.thread = thread
         self.chamfer_length = chamfer_length
         self.chamfer_angle = chamfer_angle
-        self._parameters = thread + str(
-            diameter), height, chamfer_length, chamfer_angle,
-        self._class_description = "{} with L={}mm and chamfer {}x{}".format(
-            *(self._parameters))
+        # self._parameters = thread + str(
+        #     diameter), height, chamfer_length, chamfer_angle,
+        # self._class_description = "{} with L={}mm and chamfer {}x{}".format(
+        #     *(self._parameters))
 
-        self._name['pl'] = 'Gwint'
-        self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(
-            *self._parameters)
-        
+        # self._name['pl'] = 'Gwint'
+        # self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(
+        #     *self._parameters)
+
     def str_en(self):
         return 'Threaded Cylinder \n with L={length}mm, thread M{d} \n and chamfer {l_ch}x{angle}'.format(
             length=self.height,
             d=self.diameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length,
-            )
+        )
 
     def str_pl(self):
         return 'Walec gwintowany \n o L={length}mm, gwincie M{d}mm \n i fazie {l_ch}x{angle}'.format(
@@ -1648,9 +1841,9 @@ class Thread(Solid):
             d=self.diameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length,
-            )
+        )
 
-    def _plot_2d(self,language='en'):
+    def _plot_2d(self, language='en'):
 
         class_name = self.__class__.__name__
 
@@ -1662,27 +1855,86 @@ class Thread(Solid):
         r_t = 0.9 * r
         origin = self.origin / 10
         end = self.end / 10
-        
-        t_l = origin + l* 5/4
-        t_r = (- r - 14.5)
 
-        res = GeometryScene.ax_2d.plot([origin + 0, origin + 0, origin + l, origin + l, origin + 0], [-r, r, r, -r, -r],
-                                       color='k') + GeometryScene.ax_2d.plot(
-                                           [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-                                           [-r_t, r_t, r_t, -r_t, -r_t],
-                                           linewidth=1, color='r') + GeometryScene.ax_2d.plot(
-                                           [origin - 0.5, origin + l + 0.5],
-                                           [0,0],'-.',
-                                           color='k', linewidth = 1)
-        
-        
+        t_l = origin + l * 5 / 4
+        t_r = (-r - 14.5)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            color='k') + GeometryScene.ax_2d.plot(
+                [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+                [-r_t, r_t, r_t, -r_t, -r_t],
+                linewidth=1,
+                color='r') + GeometryScene.ax_2d.plot(
+                    [origin - 0.5, origin + l + 0.5], [0, 0],
+                    '-.',
+                    color='k',
+                    linewidth=1)
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
 
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#56754A'])
-        
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#56754A'])
+
+
+class ThreadOfScrew(Thread):
+
+    num_of_lines_view = {
+        'horizontal_lines': 5,
+        'vertical_lines': 3,
+        'inclined_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 3,
+        'inclined_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 3,
+        'inclined_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_front = {'circles': 1, 'arcs': 1}
+
+    def str_en(self):
+        return 'Thread of screw \n with L={length}mm, thread M{d} \n and chamfer {l_ch}x{angle}'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+        )
+
+    def str_pl(self):
+        return 'Gwint śruby \n o L={length}mm, gwincie M{d}mm \n i fazie {l_ch}x{angle}'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+        )
 
 
 class ThreadedOpenHole(Solid):
@@ -1726,6 +1978,32 @@ class ThreadedOpenHole(Solid):
     'with L=5mm and diameter=2mm'
     
     """
+    num_of_lines_view = {
+        'horizontal_lines': 1,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 0,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'inclined_lines': 4,
+        'angular_dimensions': 2,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'inclined_lines': 2,
+        'angular_dimensions': 2,
+    }
+
+    num_of_lines_front = {'circles': 3, 'phi_dimensions': 0}
 
     def __init__(self,
                  height,
@@ -1734,32 +2012,10 @@ class ThreadedOpenHole(Solid):
                  chamfer_angle=45,
                  thread='M'):
 
-        num_of_lines_view = {
-            'horizontal_lines': 1,
-            'vertical_lines': 1,
-            'horizontal_dimensions': 0,
-            'vertical_dimensions': 0,
-            'inclined_lines': 0,
-        }
-        num_of_lines_sec = {
-            'horizontal_lines': 5,
-            'vertical_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'inclined_lines': 4,
-            'angular_dimensions': 2,
-        }
-
-        num_of_lines_half_sec = {
-            'horizontal_lines': 3,
-            'vertical_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'inclined_lines': 2,
-            'angular_dimensions': 2,
-        }
-
-        num_of_lines_front = {'circles': 3, 'phi_dimensions': 0}
+        num_of_lines_view = self.__class__.num_of_lines_view
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
@@ -1789,7 +2045,7 @@ class ThreadedOpenHole(Solid):
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length)
 
-    def _plot_2d(self,language='en'):
+    def _plot_2d(self, language='en'):
 
         class_name = self.__class__.__name__
 
@@ -1801,32 +2057,48 @@ class ThreadedOpenHole(Solid):
         c_l = self.chamfer_length / 10
         c_a = self.chamfer_angle
         c_h = c_l * np.tan(c_a)
-        t = 1.1*r
-        
+        t = 1.1 * r
+
         origin = self.origin / 10
         end = self.end / 10
 
         res = GeometryScene.ax_2d.plot(
-            [origin + 0,origin +  0,origin +  l,origin +  l,origin +  0], [-r, r, r, -r, -r], '--',
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            '--',
             color='y') + GeometryScene.ax_2d.plot(
-                [origin + 0,origin +  0 - c_l,origin +  0 - c_l,origin +  0], [-r, -r - c_h, r + c_h, r],
+                [origin + 0, origin + 0 - c_l, origin + 0 - c_l, origin + 0],
+                [-r, -r - c_h, r + c_h, r],
                 '--',
                 color='y') + GeometryScene.ax_2d.plot(
-                    [origin - c_l,origin + l], [-t, -t], '--', linewidth=1,
+                    [origin - c_l, origin + l], [-t, -t],
+                    '--',
+                    linewidth=1,
                     color='y') + GeometryScene.ax_2d.plot(
-                        [origin - c_l,origin + l], [t, t], '--', linewidth=1,
+                        [origin - c_l, origin + l], [t, t],
+                        '--',
+                        linewidth=1,
                         color='y') + GeometryScene.ax_2d.plot(
-                            [origin + l,origin +  l], [t, -t], '--', color='y')
-        
+                            [origin + l, origin + l], [t, -t], '--', color='y')
+
         t_l = origin + l / 7
         t_r = (-r - 13.5)
-        
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
 
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.7, '#6b7aa1'])
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
 
 
 class Gear(Solid):
@@ -1868,6 +2140,34 @@ class Gear(Solid):
 
     
     """
+    num_of_lines_view = {
+        'horizontal_lines': 5,
+        'vertical_lines': 4,
+        'inclined_lines': 4,
+        'horizontal_dimensions': 3,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 2,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 7,
+        'vertical_lines': 2,
+        'inclined_lines': 4,
+        'horizontal_dimensions': 3,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 2,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 6,
+        'vertical_lines': 4,
+        'inclined_lines': 4,
+        'horizontal_dimensions': 3,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 2,
+    }
+
+    num_of_lines_front = {'circles': 3, 'phi_dimensions': 0}
 
     def __init__(self,
                  height,
@@ -1875,35 +2175,10 @@ class Gear(Solid):
                  module,
                  chamfer_length=1,
                  chamfer_angle=45):
-
-        num_of_lines_view = {
-            'horizontal_lines': 5,
-            'vertical_lines': 4,
-            'inclined_lines': 4,
-            'horizontal_dimensions': 3,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 2,
-        }
-
-        num_of_lines_sec = {
-            'horizontal_lines': 7,
-            'vertical_lines': 2,
-            'inclined_lines': 4,
-            'horizontal_dimensions': 3,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 2,
-        }
-
-        num_of_lines_half_sec = {
-            'horizontal_lines': 6,
-            'vertical_lines': 4,
-            'inclined_lines': 4,
-            'horizontal_dimensions': 3,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 2,
-        }
-
-        num_of_lines_front = {'circles': 3, 'phi_dimensions': 0}
+        num_of_lines_view = self.__class__.num_of_lines_view
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
@@ -1912,7 +2187,7 @@ class Gear(Solid):
         self.height = height
         self.teeth_no = teeth_no
         self.module = module
-#         self.diameter = round(module * (teeth_no + 2)) # Grzegorz - usuwam z inita i daję do plot 2d
+        #         self.diameter = round(module * (teeth_no + 2)) # Grzegorz - usuwam z inita i daję do plot 2d
         self.chamfer_length = chamfer_length
         self.chamfer_angle = chamfer_angle
         self._parameters = height, teeth_no, module, chamfer_length, chamfer_angle,
@@ -1932,7 +2207,7 @@ class Gear(Solid):
     def str_pl(self):
         return f'Koło zębate o liczbie zębów {self.teeth_no}, \n module {self.module} oraz szerokości {self.height} \n z fazą {self.chamfer_length}x{self.chamfer_angle} po obu stronach'
 
-    def _plot_2d(self,language='en'):
+    def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -1940,14 +2215,14 @@ class Gear(Solid):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
-        r = round(self.module * (self.teeth_no + 2)) / 10 /2
-        rp =round(self.module * (self.teeth_no)) / 10 / 2
+        r = round(self.module * (self.teeth_no + 2)) / 10 / 2
+        rp = round(self.module * (self.teeth_no)) / 10 / 2
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
+
         t_l = origin + l / 4
         t_r = (r + 2.5)
 
@@ -1955,30 +2230,38 @@ class Gear(Solid):
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
             [-r, r, r, -r, -r],
             color='tab:pink') + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='k', linewidth = 1) + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [-rp,-rp],'-.',
-            color='k', linewidth = 1) + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [rp,rp],'-.',
-            color='k', linewidth = 1) #Jaś Fasola
-        
-        
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1) + GeometryScene.ax_2d.plot(
+                    [origin - 0.5, origin + l + 0.5], [-rp, -rp],
+                    '-.',
+                    color='k',
+                    linewidth=1) + GeometryScene.ax_2d.plot(
+                        [origin - 0.5, origin + l + 0.5], [rp, rp],
+                        '-.',
+                        color='k',
+                        linewidth=1)  #Jaś Fasola
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
         print(res)
 
-        
-        
-        
+
 class HexagonalPrism(Solid):
 
     num_of_lines_view = {
@@ -2009,13 +2292,10 @@ class HexagonalPrism(Solid):
     }
 
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
-    
-    
+
     def __init__(self, height, indiameter):
 
-
-
-        num_of_lines_view = self.__class__.num_of_lines_view        
+        num_of_lines_view = self.__class__.num_of_lines_view
         num_of_lines_sec = self.__class__.num_of_lines_sec
         num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
         num_of_lines_front = self.__class__.num_of_lines_front
@@ -2040,15 +2320,15 @@ class HexagonalPrism(Solid):
         return 'Hexagonal prism \n with L={length}mm and internal diameter {d}mm '.format(
             length=self.height,
             d=self.indiameter,
-            )
+        )
 
     def str_pl(self):
         return 'Łeb sześciokątny \n o L={length}mm i wymiarze pod klucz {d}mm'.format(
             length=self.height,
             d=self.indiameter,
-            )
-        
-    def _plot_2d(self,language='en'):
+        )
+
+    def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -2056,13 +2336,13 @@ class HexagonalPrism(Solid):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
         r = self.indiameter / 2 / 10
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
+
         t_l = origin + l / 4
         t_r = (r + 0.5)
 
@@ -2070,19 +2350,29 @@ class HexagonalPrism(Solid):
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
             [-r, r, r, -r, -r],
             color='g') + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='g', linewidth = 1)
-        
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='g',
+                linewidth=1)
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
-        HexPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.6, '#6b7aa1'])
-        
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        HexPreview(5, 5, origin / 2,
+                   [2 * r / 2, l / 2, "bez fazy", 0.6, '#6b7aa1'])
+
         print(res)
+
 
 class ChamferedHexagonalPrism(HexagonalPrism):
 
@@ -2115,9 +2405,9 @@ class ChamferedHexagonalPrism(HexagonalPrism):
         'vertical_dimensions': 1,
         'angular_dimensions': 1,
     }
-    
+
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
-    
+
     def __init__(self,
                  height,
                  indiameter,
@@ -2125,21 +2415,15 @@ class ChamferedHexagonalPrism(HexagonalPrism):
                  chamfer_angle=45,
                  chamfer_pos='left'):
 
-
-
-
-
         super().__init__(height=height, indiameter=indiameter)
 
-        
         num_of_lines_view = self.__class__.num_of_lines_view
-        
+
         num_of_lines_sec = self.__class__.num_of_lines_sec
         num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
 
         num_of_lines_front = self.__class__.num_of_lines_front
 
-        
         self._views = {
             'view': View(**num_of_lines_view),
             'section': Section(**num_of_lines_sec),
@@ -2165,7 +2449,7 @@ class ChamferedHexagonalPrism(HexagonalPrism):
             d=self.indiameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length,
-            )
+        )
 
     def str_pl(self):
         return 'Łeb sześciokątny \n o L={length}mm, wymiarze pod klucz S={d}mm \n i fazie {l_ch}x{angle}'.format(
@@ -2173,9 +2457,9 @@ class ChamferedHexagonalPrism(HexagonalPrism):
             d=self.indiameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length,
-            )
-        
-    def _plot_2d(self,language='en'):
+        )
+
+    def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -2183,38 +2467,48 @@ class ChamferedHexagonalPrism(HexagonalPrism):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
         r = self.indiameter / 2 / 10
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
-        t_l = origin # + l / 9
+
+        t_l = origin  # + l / 9
         t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
             [-r, r, r, -r, -r],
             color='g') + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='g', linewidth = 1) +  GeometryScene.ax_2d.plot(
-            [origin + 0, origin + l],
-            [r*0.6,r*0.6], color='g') + GeometryScene.ax_2d.plot(
-            [origin + 0, origin + l],
-            [-r*0.6,-r*0.6], color='g')
-        
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='g',
+                linewidth=1) + GeometryScene.ax_2d.plot(
+                    [origin + 0, origin + l], [r * 0.6, r * 0.6],
+                    color='g') + GeometryScene.ax_2d.plot(
+                        [origin + 0, origin + l], [-r * 0.6, -r * 0.6],
+                        color='g')
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
         #ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        HexPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
+        HexPreview(5, 5, origin / 2,
+                   [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
         print(res)
+
 
 class FlangeWithHoles(Solid):
 
@@ -2283,55 +2577,122 @@ class FlangeWithHoles(Solid):
         return "Kołnierz z przelotowymi otworami \n o  L={}mm, D={}, średnicy otworu={}, \n średnicy rozmieszczenia otworów={}, liczbie otworów={} \n i fazach {}x{} po obu stronach".format(
             *self._parameters)
 
-    def _plot_2d(self,language='en'):
+    def _plot_2d(self, language='en'):
 
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
         r = self.diameter / 2 / 10
         l = self.height / 10
         r_h = self.hole_diameter / 2 / 10
         r_r = self.reference_diameter / 2 / 10
-        holes_no= self.holes_no
+        holes_no = self.holes_no
         c_l = self.chamfer_length / 10
         c_a = self.chamfer_angle
-        c_h=c_l * np.tan(c_a)
-        
+        c_h = c_l * np.tan(c_a)
+
         origin = self.origin / 10
         end = self.end / 10
-        
+
         t_l = origin + l / 4
         t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],[0,0],'-.', color='k', linewidth = 1) + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + 0, origin + l, origin + l, origin + 0],[-r,r,r,-r,-r],color='m') + GeometryScene.ax_2d.plot(
-                    [origin + 0, origin + 0, origin + l, origin + l, origin + 0],[r_r-r_h,r_r+r_h,r_r+r_h,r_r-r_h,r_r-r_h],'--',color='m',linewidth = 1) + GeometryScene.ax_2d.plot(
-                        [origin - 0.5, origin + l + 0.5],[r_r+0,r_r+0],'-.', color='k', linewidth = 1) + GeometryScene.ax_2d.plot(
-                               [origin + 0, origin + 0, origin + l, origin + l, origin + 0],[-r_r-r_h,-r_r+r_h,-r_r+r_h,-r_r-r_h,-r_r-r_h],'--',color='m',linewidth = 1) + GeometryScene.ax_2d.plot(
-                                    [origin - 0.5, origin + l + 0.5],[-r_r+0,-r_r+0],'-.', color='k', linewidth = 1)
+            [origin - 0.5, origin + l + 0.5], [0, 0],
+            '-.',
+            color='k',
+            linewidth=1) + GeometryScene.ax_2d.plot(
+                [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+                [-r, r, r, -r, -r],
+                color='m') + GeometryScene.ax_2d.plot(
+                    [
+                        origin + 0, origin + 0, origin + l, origin + l,
+                        origin + 0
+                    ], [r_r - r_h, r_r + r_h, r_r + r_h, r_r - r_h, r_r - r_h],
+                    '--',
+                    color='m',
+                    linewidth=1) + GeometryScene.ax_2d.plot(
+                        [origin - 0.5, origin + l + 0.5], [r_r + 0, r_r + 0],
+                        '-.',
+                        color='k',
+                        linewidth=1) + GeometryScene.ax_2d.plot(
+                            [
+                                origin + 0, origin + 0, origin + l, origin + l,
+                                origin + 0
+                            ], [
+                                -r_r - r_h, -r_r + r_h, -r_r + r_h, -r_r - r_h,
+                                -r_r - r_h
+                            ],
+                            '--',
+                            color='m',
+                            linewidth=1) + GeometryScene.ax_2d.plot(
+                                [origin - 0.5, origin + l + 0.5],
+                                [-r_r + 0, -r_r + 0],
+                                '-.',
+                                color='k',
+                                linewidth=1)
 
-        text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
+        text = GeometryScene.ax_2d.text(t_l,
+                                        t_r,
+                                        self.str_en(),
+                                        rotation='vertical',
+                                        multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
         for hole_no in range(holes_no):
-            
-            xh = r_r * np.cos(hole_no*2*np.pi/holes_no)
-            yh = r_r * np.sin(hole_no*2*np.pi/holes_no)
-            
-            ShaftPreview(5+xh,5+yh,origin/2 ,[2*r_h/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-            
-        
+
+            xh = r_r * np.cos(hole_no * 2 * np.pi / holes_no)
+            yh = r_r * np.sin(hole_no * 2 * np.pi / holes_no)
+
+            ShaftPreview(5 + xh, 5 + yh, origin / 2,
+                         [2 * r_h / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
         print(res)
+
 
 class BlockBearingHolder(Solid):
     """
     Block with hole in every corner and bearing place on the top. It's drawn in the horizontal position (symmetry axis is horizontal line).
     """
+    num_of_lines_view = {
+        'horizontal_lines': 2 + 1,  #axis included
+        'vertical_lines': 2,  #axis excluded
+        'inclined_lines': 0,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 0,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 2 + 1,  #axis included
+        'vertical_lines': 2,  #axis excluded
+        'inclined_lines': 0,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 2 + 1,  #axis included
+        'vertical_lines': 2,  #axis excluded
+        'inclined_lines': 0,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 0,
+    }
+
+    num_of_lines_front = {
+        'horizontal_lines': 2,  #axis excluded
+        'vertical_lines': 2,  #axis exclueded
+        'inclined_lines': 0,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 0,
+    }
 
     def __init__(self, height, width, length):
 
@@ -2340,41 +2701,10 @@ class BlockBearingHolder(Solid):
         self.length = length
         self._parameters = height, width, length
 
-        num_of_lines_view = {
-            'horizontal_lines': 2 + 1,  #axis included
-            'vertical_lines': 2,  #axis excluded
-            'inclined_lines': 0,
-            'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 0,
-        }
-
-        num_of_lines_sec = {
-            'horizontal_lines': 2 + 1,  #axis included
-            'vertical_lines': 2,  #axis excluded
-            'inclined_lines': 0,
-            'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 0,
-        }
-
-        num_of_lines_half_sec = {
-            'horizontal_lines': 2 + 1,  #axis included
-            'vertical_lines': 2,  #axis excluded
-            'inclined_lines': 0,
-            'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 0,
-        }
-
-        num_of_lines_front = {
-            'horizontal_lines': 2,  #axis excluded
-            'vertical_lines': 2,  #axis exclueded
-            'inclined_lines': 0,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 0,
-        }
+        num_of_lines_view = self.__class__.num_of_lines_view
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
 
         super().__init__(View(**num_of_lines_view),
                          Section(**num_of_lines_sec),
@@ -2544,9 +2874,9 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
         'vertical_dimensions': 1,
         'angular_dimensions': 2,
     }
-    
+
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
-    
+
     def __init__(self,
                  height,
                  indiameter,
@@ -2554,20 +2884,16 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
                  chamfer_angle=45,
                  chamfer_pos='left'):
 
-
-
         num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
 
         super().__init__(height=height, indiameter=indiameter)
 
-        
         num_of_lines_view = self.__class__.num_of_lines_view
-        
         num_of_lines_sec = self.__class__.num_of_lines_sec
         num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
 
         num_of_lines_front = self.__class__.num_of_lines_front
-        
+
         self._views = {
             'view': View(**num_of_lines_view),
             'section': Section(**num_of_lines_sec),
@@ -2593,7 +2919,7 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
             d=self.indiameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length,
-            )
+        )
 
     def str_pl(self):
         return 'Łeb sześciokątny \n o L={length}mm, wymiarze pod klucz S={d}mm \n i fazie {l_ch}x{angle} \n po oby stronach'.format(
@@ -2601,9 +2927,9 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
             d=self.indiameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length,
-            )
-        
-    def _plot_2d(self,language='en'):
+        )
+
+    def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -2611,39 +2937,49 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
         r = self.indiameter / 2 / 10
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
-        t_l = origin + l/2 
+
+        t_l = origin + l / 2
         t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
             [-r, r, r, -r, -r],
             color='tab:purple') + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='k', linewidth = 1) +  GeometryScene.ax_2d.plot(
-            [origin + 0, origin + l],
-            [r*0.6,r*0.6], color='tab:purple') + GeometryScene.ax_2d.plot(
-            [origin + 0, origin + l],
-            [-r*0.6,-r*0.6], color='tab:purple')
-        
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1) + GeometryScene.ax_2d.plot(
+                    [origin + 0, origin + l], [r * 0.6, r * 0.6],
+                    color='tab:purple') + GeometryScene.ax_2d.plot(
+                        [origin + 0, origin + l], [-r * 0.6, -r * 0.6],
+                        color='tab:purple')
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
         #ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        HexPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
+        HexPreview(5, 5, origin / 2,
+                   [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
         print(res)
-        
+
+
 class Washer(Cylinder):
     """This object represents washer solid.
     
@@ -2676,7 +3012,8 @@ class Washer(Cylinder):
     {'pl': 'Podkładka'}
     
     """
-    def _plot_2d(self,language='en'):
+
+    def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -2684,53 +3021,60 @@ class Washer(Cylinder):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
         r = self.diameter / 2 / 10
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
-        t_l = origin - l*1/2
+
+        t_l = origin - l * 1 / 2
         t_r = (r + 7)
 
         line_type = self.line_type
         color = self.color
-        
+
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],line_type,
+            [-r, r, r, -r, -r],
+            line_type,
             color=color) + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='k', linewidth = 1)
-        
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
-        ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
-        print(res)
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1)
 
-    
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
+        print(res)
 
     def str_en(self):
         return 'Washer \n with L={length}mm \n and diameter={d}mm'.format(
-            length=self.height,
-            d=self.diameter)
+            length=self.height, d=self.diameter)
 
     def str_pl(self):
         return 'Podkładka \n o  grubości g={length}mm \n i średnicy d={d}mm'.format(
             length=self.height,
             d=self.diameter).replace('right',
-                                          'prawej').replace('left', 'lewej')
-        
+                                     'prawej').replace('left', 'lewej')
+
 
 class StandarizedNut(DoubleChamferedHexagonalPrism):
-    
+
     num_of_lines_view = {
         'horizontal_lines': 5,
         'vertical_lines': 2,
@@ -2760,10 +3104,10 @@ class StandarizedNut(DoubleChamferedHexagonalPrism):
         'vertical_dimensions': 1,
         'angular_dimensions': 1,
     }
-    
+
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
-    
-    def _plot_2d(self,language='en'):
+
+    def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
@@ -2771,46 +3115,55 @@ class StandarizedNut(DoubleChamferedHexagonalPrism):
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
+        #         print(f'plot_2d is called for {class_name}')
 
         r = self.indiameter / 2 / 10
         l = self.height / 10
         origin = self.origin / 10
         end = self.end / 10
-        
-        t_l = origin + l 
+
+        t_l = origin + l
         t_r = (r + 0.5)
 
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
             [-r, r, r, -r, -r],
             color='tab:purple') + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5],
-            [0,0],'-.',
-            color='k', linewidth = 1) +  GeometryScene.ax_2d.plot(
-            [origin + 0, origin + l],
-            [r*0.6,r*0.6], color='tab:purple') + GeometryScene.ax_2d.plot(
-            [origin + 0, origin + l],
-            [-r*0.6,-r*0.6], color='tab:purple')
-        
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1) + GeometryScene.ax_2d.plot(
+                    [origin + 0, origin + l], [r * 0.6, r * 0.6],
+                    color='tab:purple') + GeometryScene.ax_2d.plot(
+                        [origin + 0, origin + l], [-r * 0.6, -r * 0.6],
+                        color='tab:purple')
+
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,t_r,self.str_en(),rotation='vertical',multialignment='center')
-        
-        
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
         #ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        HexPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        
+        HexPreview(5, 5, origin / 2,
+                   [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
         print(res)
-    
+
     def str_en(self):
         return 'Standarized nut \n with L={length}mm, wrench size S={d} \n and chamfer {l_ch}x{angle} \n on the both sides'.format(
             length=self.height,
             d=self.indiameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length,
-            )
+        )
 
     def str_pl(self):
         return 'Znormalizowana nakrętka \n o L={length}mm, wymiarze pod klucz S={d}mm \n i fazie {l_ch}x{angle} \n po oby stronach'.format(
@@ -2818,11 +3171,11 @@ class StandarizedNut(DoubleChamferedHexagonalPrism):
             d=self.indiameter,
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length,
-            )
-        
+        )
+
+
 class HexagonalHeadOfScrew(ChamferedHexagonalPrism):
-    
-    
+
     num_of_lines_view = {
         'horizontal_lines': 5,
         'vertical_lines': 2,
@@ -2852,92 +3205,17 @@ class HexagonalHeadOfScrew(ChamferedHexagonalPrism):
         'vertical_dimensions': 1,
         'angular_dimensions': 1,
     }
-    
+
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
-    
+
     def str_en(self):
         return 'Hexagonal head of screw \n with L={length}mm \n and internal diameter {d}mm '.format(
             length=self.height,
             d=self.indiameter,
-            )
+        )
 
     def str_pl(self):
         return 'Łeb sześciokątny śruby \n o L={length}mm  \n i wymiarze pod klucz {d}mm'.format(
             length=self.height,
             d=self.indiameter,
-            )
-    
-class ThreadOfScrew(Thread):
-    
-    def __init__(self,
-                 height,
-                 diameter,
-                 chamfer_length=1,
-                 chamfer_angle=45,
-                 thread='M'):
-
-        num_of_lines_view = {
-            'horizontal_lines': 5,
-            'vertical_lines': 3,
-            'inclined_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 1,
-        }
-
-        num_of_lines_sec = {
-            'horizontal_lines': 5,
-            'vertical_lines': 3,
-            'inclined_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 1,
-        }
-
-
-        num_of_lines_half_sec = {
-            'horizontal_lines': 5,
-            'vertical_lines': 3,
-            'inclined_lines': 2,
-            'horizontal_dimensions': 2,
-            'vertical_dimensions': 1,
-            'angular_dimensions': 1,
-        }
-
-
-        num_of_lines_front = {'circles': 1, 'arcs': 1}
-
-        super().__init__(View(**num_of_lines_view),
-                         Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front))
-
-        self.height = height
-        self.diameter = diameter
-        self.thread = thread
-        self.chamfer_length = chamfer_length
-        self.chamfer_angle = chamfer_angle
-        self._parameters = thread + str(
-            diameter), height, chamfer_length, chamfer_angle,
-        self._class_description = "{} with L={}mm and chamfer {}x{}".format(*(self._parameters))
-
-        self._name['pl'] = 'Gwint'
-        self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(*self._parameters)
-        
-        
-    def str_en(self):
-        return 'Thread of screw \n with L={length}mm, thread M{d} \n and chamfer {l_ch}x{angle}'.format(
-            length=self.height,
-            d=self.diameter,
-            angle=self.chamfer_angle,
-            l_ch=self.chamfer_length,
-            )
-
-    def str_pl(self):
-        return 'Gwint śruby \n o L={length}mm, gwincie M{d}mm \n i fazie {l_ch}x{angle}'.format(
-            length=self.height,
-            d=self.diameter,
-            angle=self.chamfer_angle,
-            l_ch=self.chamfer_length,
-            )
-    
+        )

@@ -2185,29 +2185,35 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
             current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            line_a = Line(A, B)('a')
-            line_b = Line(C, A)('b')
+            line_a = Line(A, B)('AB')
+            line_b = Line(C, A)('BC')
             plane_alpha = Plane(A, O, P)
 
             plane_beta = HorizontalPlane(P)
             plane_eta = VerticalPlane(P)
 
-            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+            line_a = plane_alpha.intersection(plane_beta)[0]('a')
 
             point_P1 = plane_beta.intersection(A ^ O)[0]('P1')
             point_P2 = plane_eta.intersection(A ^ O)[0]('P2')
             current_obj.P1 = point_P1
-            line_kk = (P ^ point_P1)('a')
-            line_f = (P ^ point_P2)('f')
+            line_p = (P ^ point_P1)('p')
+            line_l = (P ^ point_P2)('l')
+            line_k = (A ^ point_P1)('k')
 
+           
+
+            current_obj.add_solution_step('Base ABC', [A, B, C])
+            
             # it creates next step of solution - lines are presented
             #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
             #it sets the step elements
             current_obj.add_solution_step(
-                'Axis of rotation', [(A ^ point_P1)('AO'), point_P1,
-                                     (P ^ point_P1)('a'), point_P2, line_f])
+                'Axis of rotation', [point_P2, point_P1,
+                                     line_k, line_p, line_l, line_a])
 
+            
             elems = self._assumptions
             projections = []
             point_0_dict = {}
@@ -2216,10 +2222,10 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             point_B = B
             point_C = C
             point_O = O
-
+            
             ##################   plane rotation
 
-            line_kk = Line(P, (O @ line_k))('k')
+            #line_kk = Line(P, (O @ line_k))('k')
 
             A0 = A.rotate_about(axis=line_k)('A_0')
             current_obj.A0 = A0
@@ -2240,9 +2246,9 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             #### Step 4 ####
             ### postion of B0 (based on triangle geometry) #####
 
-            current_obj.add_solution_step(
-                'Point B rotation -plane of rotation',
-                [(B0 ^ (B0 @ line_kk))('eps_B')])
+            #current_obj.add_solution_step(
+                #'Point B rotation - plane of rotation',
+                #[(B0 ^ (B0 @ line_k))('eps_B')])
 
             C0 = C.rotate_about(axis=line_k)('C_0')
             current_obj.C0 = C0
@@ -2254,7 +2260,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
             current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
 
-            current_obj.add_solution_step('Base ABC', [A, B, C])
+        
 
             G = (H @ plane_alpha)('G')
 
@@ -2316,7 +2322,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
                 self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
 
             self._solution3d_step[no].plot(color='r')
-            self._solution_step[no].plot_vp(color='r').plot_hp(color='r')
+            self._solution_step[no].plot_vp(color='r').plot_hp(color='g')
 
             with doc_model.create(Figure(position='H')) as fig:
                 #path=f'./images/image{no}.png'
@@ -3110,7 +3116,7 @@ class GivenHeightEquilateralTrianglePrism(GeometricalCase):
             dirHG = H - G
             distance_HG = (H.distance(G)).n(5)
 
-            #D = (A + dirHG/distance_HG*triangle_height)('D')
+            #D = (A + dirHG/distance_HG*triangle_height)('D')S
             #E = (B + dirHG/distance_HG*triangle_height)('E')
             #F = (C + dirHG/distance_HG*triangle_height)('F')
 
@@ -3230,7 +3236,7 @@ class GivenHeightSquarePrism(GeometricalCase):
         for z in [4, 5, 6]
     ]
 
-    point_R = [
+    point_H = [
         Point(x, y, z) for x in [9, 9.5, 10] for y in [2, 2.5, 3]
         for z in range(0, 2)
     ]
@@ -3244,40 +3250,40 @@ class GivenHeightSquarePrism(GeometricalCase):
                  point_A=None,
                  point_P=None,
                  point_O=None,
-                 point_R=None,
+                 point_H=None,
                  **kwargs):
 
         super().__init__()
 
-        if point_A and point_O and point_P and point_R:
+        if point_A and point_O and point_P and point_H:
             projections = (point_A @ HPP, point_O @ HPP, point_O @ VPP,
                            point_P @ VPP, point_P @ HPP, point_A @ VPP,
-                           point_R @ VPP, point_R @ HPP)
+                           point_H @ VPP, point_H @ HPP)
 
         else:
             projections = []
 
         # it creates first step of solution
         self.add_solution_step('Assumptions',
-                               [point_A, point_O, point_P, point_R])
+                               [point_A, point_O, point_P, point_H])
 
         self._assumptions3d = DrawingSet(point_A, point_O, point_P,
-                                         point_R)('Assumptions')
+                                         point_H)('Assumptions')
         self._assumptions = DrawingSet(*projections)
-        #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_R)('Assumptions')
+        #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
 
-        #self += [point_A,point_O,point_P,point_R]
+        #self += [point_A,point_O,point_P,point_H]
 
         self._point_A = point_A
         self._point_P = point_P
         self._point_O = point_O
-        self._point_R = point_R
+        self._point_H = point_H
 
         self._given_data = {
             'A': point_A,
             'P': point_P,
             'O': point_O,
-            'R': point_R
+            'H': point_H
         }
 
     def solution(self):
@@ -3288,7 +3294,7 @@ class GivenHeightSquarePrism(GeometricalCase):
             O = current_obj._point_O
             P = current_obj._point_P
 
-            R = current_obj._point_R
+            H = current_obj._point_H
 
             S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
@@ -3375,19 +3381,19 @@ class GivenHeightSquarePrism(GeometricalCase):
 
             current_obj.add_solution_step('Base ABCD', [A, B, C, D])
 
-            T = (R @ plane_alpha)('T')
+            T = (H @ plane_alpha)('T')
 
             ############  upper  base
 
-            dirRT = R - T
-            distance_RT = (T.distance(R)).n(5)
+            dirHT = H - T
+            distance_HT = (T.distance(H)).n(5)
 
             #D = (A + dirHG/distance_HG*triangle_height)('D')
             #E = (B + dirHG/distance_HG*triangle_height)('E')
             #F = (C + dirHG/distance_HG*triangle_height)('F')
 
             A, B, C, E, F, G = Prism(triangle_plane,
-                                     dirRT / distance_RT * B.distance(C))
+                                     dirHT / distance_HT * B.distance(C))
 
             E = E('E')
             F = F('F')
@@ -3459,7 +3465,7 @@ class GivenHeightSquarePrism(GeometricalCase):
         point_A = self.__class__.point_A
         point_O = self.__class__.point_O
         point_P = self.__class__.point_P
-        point_R = self.__class__.point_R
+        point_H = self.__class__.point_H
 
         shift = self.shift
 
@@ -3467,7 +3473,7 @@ class GivenHeightSquarePrism(GeometricalCase):
             Symbol('A'): point_A,
             Symbol('P'): point_P,
             Symbol('O'): point_O,
-            Symbol('R'): point_R,
+            Symbol('H'): point_H,
             'shift': shift
         }
         return default_data_dict
@@ -3476,7 +3482,7 @@ class GivenHeightSquarePrism(GeometricalCase):
 
         parameters_dict = super().get_random_parameters()
 
-        point_R = parameters_dict[Symbol('R')]
+        point_H = parameters_dict[Symbol('H')]
         point_O = parameters_dict[Symbol('O')]
         point_A = parameters_dict[Symbol('A')]
         point_P = parameters_dict[Symbol('P')]
@@ -3484,7 +3490,7 @@ class GivenHeightSquarePrism(GeometricalCase):
         shift = parameters_dict['shift']
         parameters_dict.pop('shift')
 
-        for point in symbols('A P O R'):
+        for point in symbols('A P O H'):
             parameters_dict[point] = parameters_dict[point] + shift
 
         return parameters_dict

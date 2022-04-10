@@ -1269,6 +1269,7 @@ class HFLinesIsoscelesRightTrianglePyramid(GeometricalCase):
             plane_beta=Plane(H,H+(A-P),H-(O-P))
             
             D=(A@plane_beta)('D')
+            point_D = D
             current_obj.D=point_D
             current_obj.add_solution_step('Point O rotation',[point_O])
 
@@ -1384,7 +1385,7 @@ class RectangleLongSideAtPOPyramid(GeometricalCase):
 
     point_A = [Point(x,y,z) for x in [3,3.5] for y in [8,8.5,9] for z in   [6,7]  ]
 
-    point_O=[Point(x,y,z) for x in  [6,7] for y in [11,11.5,12] for z in   [2.5,3,3.5] ]
+    point_O = [Point(x,y,z) for x in  [6,7] for y in [11,11.5,12] for z in   [2.5,3,3.5] ]
 
     point_P = [Point(x,y,z) for x in [1,1.5,2] for y in [3,3.5]  for z in [1,1.5,2] ]
 
