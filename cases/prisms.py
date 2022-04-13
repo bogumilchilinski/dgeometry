@@ -2211,7 +2211,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             #it sets the step elements
             current_obj.add_solution_step(
                 'Axis of rotation', [point_P2, point_P1,
-                                     line_k, line_p, line_l, line_a])
+                                     line_k, line_p, line_l])
 
             
             elems = self._assumptions
@@ -2278,6 +2278,18 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
             current_obj.add_solution_step('Vertices D,E,F', [D, E, F])
 
+            line_ab=Line(A,B)('|AB|')
+            line_bc=Line(B,C)('|BC|')
+            line_ca=Line(C,A)('|CA|')
+            line_eb=Line(E,B)('|EB|')
+            line_da=Line(D,A)('|DA|')
+            line_fc=Line(F,C)('|FC|')
+            line_de=Line(D,E)('|DE|')
+            line_ef=Line(E,F)('|EF|')
+            #line_fd=Line(F,D)('|FD|')
+            line_fd = (F ^ D)('FD')
+            current_obj.add_solution_step('Lines implementation', [line_ab, line_bc, line_ca, line_eb, line_da, line_fc, line_de, line_ef, line_fd])
+            
             elems += [D, E, F, G]
 
             projections += [
@@ -3132,6 +3144,18 @@ class GivenHeightEquilateralTrianglePrism(GeometricalCase):
                 F @ VPP
             ]
 
+            line_ab=Line(A,B)('|AB|')
+            line_bc=Line(B,C)('|BC|')
+            line_ca=Line(C,A)('|CA|')
+            line_eb=Line(E,B)('|EB|')
+            line_da=Line(D,A)('|DA|')
+            line_fc=Line(F,C)('|FC|')
+            line_de=Line(D,E)('|DE|')
+            line_ef=Line(E,F)('|EF|')
+            line_fd=Line(F,D)('|FD|')
+            current_obj.add_solution_step('Lines implementation', [line_ab, line_bc, line_ca, like_eb, line_da, line_fc])
+            
+            
             current_obj._assumptions = DrawingSet(
                 *current_obj.get_projections())('Solution')
             current_obj._assumptions3d = DrawingSet(*current_obj)
@@ -3398,9 +3422,9 @@ class GivenHeightSquarePrism(GeometricalCase):
             E = E('E')
             F = F('F')
             G = G('G')
-            H = (D + (E - A))('H')
+            I = (D + (E - A))('I')
 
-            current_obj.add_solution_step('Vertices E,F,G,H', [E, F, G, H])
+            current_obj.add_solution_step('Vertices E,F,G,H', [E, F, G, I])
 
             elems += [D, E, F, G]
 
@@ -3419,7 +3443,7 @@ class GivenHeightSquarePrism(GeometricalCase):
             current_obj.point_E = E
             current_obj.point_F = F
             current_obj.point_G = G
-            current_obj.point_H = H
+            current_obj.point_I = I
             self._cached_solution = current_obj
         else:
             current_obj = copy.deepcopy(self._cached_solution)

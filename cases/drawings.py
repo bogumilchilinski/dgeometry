@@ -1372,3 +1372,27 @@ class ScrewConnectionSketch(ShaftSketch
             
         return shafts
     
+class KorpusTest(ShaftSketch
+                              #GeometricalCase
+                              ):
+
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts  = []
+        for i in range(50):
+            
+            shaft = [sol.Korpus(20,40,60,50)]
+            shaft += [sol.OpenHole(40,20)]
+            
+            shaft[-2]._origin = 0
+            shaft[-1]._origin = shaft[-2].end
+            
+            shafts.append(shaft)
+  
+            
+        return shafts

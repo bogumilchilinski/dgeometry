@@ -850,14 +850,14 @@ class ScrewCore(Cylinder):
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
 
     def str_en(self):
-<<<<<<< HEAD
+# <<<<<<< HEAD
         return 'Shank of the screw \n with L={length}mm \n and diameter={d}mm'.format(
             length=self.height, d=self.diameter)
-=======
-        return 'Shank of the screw \n with diameter={d}mm'.format(
-            length=self.height,
-            d=self.diameter)
->>>>>>> 5d427993582574accddc9eeffcc5c643cfb417be
+# =======
+#         return 'Shank of the screw \n with diameter={d}mm'.format(
+#             length=self.height,
+#             d=self.diameter)
+# >>>>>>> 5d427993582574accddc9eeffcc5c643cfb417be
 
     def str_pl(self):
         return 'Trzpień śruby \n o średnicy={d}mm'.format(
@@ -3223,11 +3223,11 @@ class HexagonalHeadOfScrew(ChamferedHexagonalPrism):
     def str_pl(self):
         return 'Łeb sześciokątny śruby \n o L={length}mm  \n i wymiarze pod klucz {d}mm'.format(
             length=self.height,
-            d=self.indiameter,
-<<<<<<< HEAD
-        )
-=======
-            )
+            d=self.indiameter,)
+# <<<<<<< HEAD
+#         )
+# =======
+#             )
     
 class ThreadOfScrew(Thread):
     
@@ -3303,4 +3303,176 @@ class ThreadOfScrew(Thread):
             l_ch=self.chamfer_length,
             )
     
->>>>>>> 5d427993582574accddc9eeffcc5c643cfb417be
+# >>>>>>> 5d427993582574accddc9eeffcc5c643cfb417be
+        
+class Korpus(Solid):
+    """This object represents cylinder solid.
+    
+    The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
+    
+    Parameters
+    ==========
+    
+    height : int
+        The value of height of cylinder
+        
+    diameter : int
+        The value of diameter of cylinder
+    
+    Examples
+    ========
+    
+    >>> from solids import Cylinder
+    >>> cyl = Cylinder(5,2)
+    >>> cyl._parameters
+    (5, 2)
+    
+    >>> cyl._class_description
+    'with L=5mm and diameter =2mm'
+    
+    >>> cyl._class_description_pl
+    'o L=5mm i średnicy =2mm'
+    
+    >>> cyl._name
+    {'pl': 'Walec'}
+    
+    """
+
+    line_type = '-'
+    color = 'k'
+
+    num_of_lines_view = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+
+    @classmethod
+    def num_of_lines(cls,type_of_view):
+        
+        if type_of_view == 'view':
+            return cls.num_of_lines_view
+        elif type_of_view == 'section':
+            return cls.num_of_lines_sec
+        elif type_of_view == 'halfsection':
+            return cls.num_of_lines_half_sec
+        else:
+            return {}
+
+    def __init__(self,
+             height,
+             length,
+             width,
+             axis_height):
+
+        num_of_lines_view = self.num_of_lines('view')
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
+
+        super().__init__(View(**num_of_lines_view),
+                         Section(**num_of_lines_sec),
+                         HalfSection(**num_of_lines_half_sec),
+                         FrontView(**num_of_lines_front))
+
+        self.length = length
+        self.height = height
+ 
+        self.width = width
+        self.axis_height=axis_height
+#         #self._parameters = lenght, height_upper, height_lower, width
+#         self._class_description = "with L={}mm and diameter ={}mm".format(
+#             *self._parameters)
+
+#         self._name['pl'] = 'Walec'
+#         self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
+#             *self._parameters)
+
+    def str_en(self):
+        return 'Cylinder \n with L={length}mm \n and diameter={d}mm'.format(
+            length=self.height, d=self.diameter)
+
+    def str_pl(self):
+        return 'Walec \n o L={length}mm i średnicy={d}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                     'prawej').replace('left', 'lewej')
+    @property
+    def height_upper(self):
+        return self.height -self.axis_height
+
+    @property
+    def height_lower(self):
+        return -self.axis_height
+    
+    
+    def _plot_2d(self, language='en'):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        #         print(f'plot_2d is called for {class_name}')
+
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+
+        t_l = origin + l / 4
+        t_r = (-r - 20)
+
+        line_type = self.line_type
+        color = self.color
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-h_lw, h_up, h_up, -h_lw, -h_lw],
+            line_type,
+            color=color) + GeometryScene.ax_2d.plot(
+                [origin + 5, origin + 5, origin + 5 + w, origin + 5+ w, origin + 5], 
+                [-h_lw, h_up, h_up, -h_lw, -h_lw],
+                '-',
+                color='k',
+                linewidth=1)
+
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
+        print(res)
+
