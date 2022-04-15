@@ -1372,7 +1372,8 @@ class ScrewConnectionSketch(ShaftSketch
             
         return shafts
     
-class KorpusTest(ShaftSketch
+
+class BodyBlockView(ShaftSketch
                               #GeometricalCase
                               ):
 
@@ -1386,13 +1387,75 @@ class KorpusTest(ShaftSketch
         shafts  = []
         for i in range(50):
             
-            shaft = [sol.Korpus(20,40,60,50)]
-            shaft += [sol.OpenHole(40,20)]
+            shaft = [sol.BodyBlock(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
+            shaft[-1]._origin = 0
+            shaft += [sol.OpenHole(0,0)]
+            shaft[-1]._origin = 0
+            shaft[-1]._end = shaft[-2].end
             
-            shaft[-2]._origin = 0
-            shaft[-1]._origin = shaft[-2].end
             
             shafts.append(shaft)
-  
+#         for i in range(50):
             
+#             shaft = [sol.BodyBlockShapeT(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
+#             shaft[-1]._origin = 0
+#             shaft += [sol.OpenHole(50,random.randint(20,40))]
+#             shaft[-1]._origin = 0
+#             shaft[-1]._end = shaft[-2].end
+            
+            
+#             shafts.append(shaft)
+#         for i in range(50):
+            
+#             shaft = [sol.BodyBlockShapeC(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
+#             shaft[-1]._origin = 0
+#             shaft += [sol.OpenHole(50,random.randint(20,40))]
+#             shaft[-1]._origin = 0
+#             shaft[-1]._end = shaft[-2].end
+            
+            
+#             shafts.append(shaft)
+#         for i in range(50):
+            
+#             shaft = [sol.BodyBlockCutType(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
+#             shaft[-1]._origin = 0
+#             shaft += [sol.OpenHole(50,random.randint(20,40))]
+#             shaft[-1]._origin = 0
+#             shaft[-1]._end = shaft[-2].end
+            
+            
+#             shafts.append(shaft)
+#         for i in range(50):
+            
+#             shaft = [sol.BodyBlockRounded(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
+#             shaft[-1]._origin = 0
+#             shaft += [sol.OpenHole(50,random.randint(20,40))]
+#             shaft[-1]._origin = 0
+#             shaft[-1]._end = shaft[-2].end
+            
+            
+#             shafts.append(shaft)
+            
+        return shafts
+class BodyBlockView1(ShaftSketch
+                              #GeometricalCase
+                              ):
+
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts  = []
+        for i in range(50):
+            
+            shaft = [sol.BodyBlockRounded(100,50,130,45)]
+            shaft += [sol.OpenHole(50,30)]
+            
+            shaft[-2]._origin = 0
+            shaft[-1]._origin = shaft[-2].origin
+            
+            shafts.append(shaft)
         return shafts
