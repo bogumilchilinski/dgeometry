@@ -1386,58 +1386,52 @@ class BodyBlockView(ShaftSketch
         
         shafts  = []
         for i in range(50):
+            body_length=random.randint(30,90)
             
-            shaft = [sol.BodyBlock(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
+            shaft = [sol.BodyBlock(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
             shaft[-1]._origin = 0
-            shaft += [sol.OpenHole(0,0)]
+            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
             shaft[-1]._origin = 0
             shaft[-1]._end = shaft[-2].end
             
             
             shafts.append(shaft)
-#         for i in range(50):
+        for i in range(50):
+            body_length=random.randint(30,90)
             
-#             shaft = [sol.BodyBlockShapeT(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
-#             shaft[-1]._origin = 0
-#             shaft += [sol.OpenHole(50,random.randint(20,40))]
-#             shaft[-1]._origin = 0
-#             shaft[-1]._end = shaft[-2].end
-            
-            
-#             shafts.append(shaft)
-#         for i in range(50):
-            
-#             shaft = [sol.BodyBlockShapeC(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
-#             shaft[-1]._origin = 0
-#             shaft += [sol.OpenHole(50,random.randint(20,40))]
-#             shaft[-1]._origin = 0
-#             shaft[-1]._end = shaft[-2].end
+            shaft = [sol.BodyBlockShapeT(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft[-1]._end = shaft[-2].end
             
             
-#             shafts.append(shaft)
-#         for i in range(50):
+            shafts.append(shaft)
+        for i in range(50):
+            body_length=random.randint(30,90)
             
-#             shaft = [sol.BodyBlockCutType(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
-#             shaft[-1]._origin = 0
-#             shaft += [sol.OpenHole(50,random.randint(20,40))]
-#             shaft[-1]._origin = 0
-#             shaft[-1]._end = shaft[-2].end
-            
-            
-#             shafts.append(shaft)
-#         for i in range(50):
-            
-#             shaft = [sol.BodyBlockRounded(random.randint(100,130),50,random.randint(100,150),random.randint(30,70))]
-#             shaft[-1]._origin = 0
-#             shaft += [sol.OpenHole(50,random.randint(20,40))]
-#             shaft[-1]._origin = 0
-#             shaft[-1]._end = shaft[-2].end
+            shaft = [sol.BodyBlockShapeC(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft[-1]._end = shaft[-2].end
             
             
-#             shafts.append(shaft)
+            shafts.append(shaft)
+        for i in range(50):
+            body_length=random.randint(30,90)
+            
+            shaft = [sol.BodyBlockCutType(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft[-1]._end = shaft[-2].end
+            
+            
+            shafts.append(shaft)
             
         return shafts
-class BodyBlockView1(ShaftSketch
+class BodyBlockRoundedView(ShaftSketch
                               #GeometricalCase
                               ):
 
@@ -1450,12 +1444,48 @@ class BodyBlockView1(ShaftSketch
         
         shafts  = []
         for i in range(50):
+            body_length=random.randint(30,90)
             
-            shaft = [sol.BodyBlockRounded(100,50,130,45)]
-            shaft += [sol.OpenHole(50,30)]
+            shaft = [sol.BodyBlockRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft[-1]._end = shaft[-2].end
             
-            shaft[-2]._origin = 0
-            shaft[-1]._origin = shaft[-2].origin
             
             shafts.append(shaft)
+        for i in range(50):
+            body_length=random.randint(30,90)
+            
+            shaft = [sol.BodyBlockShapeTRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft[-1]._end = shaft[-2].end
+            
+            
+            shafts.append(shaft)
+        for i in range(50):
+            body_length=random.randint(30,90)
+            
+            shaft = [sol. BodyBlockShapeCRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft[-1]._end = shaft[-2].end
+            
+            
+            shafts.append(shaft)
+        for i in range(50):
+            body_length=random.randint(30,90)
+            
+            shaft = [sol.BodyBlockCutTypeRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
+            shaft[-1]._origin = 0
+            shaft[-1]._end = shaft[-2].end
+            
+            
+            shafts.append(shaft)
+            
         return shafts

@@ -4047,3 +4047,384 @@ class BodyBlockRounded(Solid):
                      [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
+class BodyBlockShapeTRounded(BodyBlockRounded):
+    
+    line_type = '-'
+    color = 'k'
+
+    num_of_lines_view = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+
+    @classmethod
+    def num_of_lines(cls,type_of_view):
+        
+        if type_of_view == 'view':
+            return cls.num_of_lines_view
+        elif type_of_view == 'section':
+            return cls.num_of_lines_sec
+        elif type_of_view == 'halfsection':
+            return cls.num_of_lines_half_sec
+        else:
+            return {}
+
+    @property
+    def space_btwn(self):
+        return 90
+    
+    @property
+    def height_upper(self):
+        return self.height -self.axis_height
+
+    @property
+    def height_lower(self):
+        return -self.axis_height
+    
+    @property
+    def height_wider(self):
+        return 20
+    
+    @property
+    def indentation_wider(self):
+        return self.width * 1/2
+    
+    def _plot_2d(self, language='en'):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        #         print(f'plot_2d is called for {class_name}')
+
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+        
+        s = self.space_btwn /10
+        
+
+        t_l = origin + l / 4
+        t_r = (-l - 20)
+
+        line_type = self.line_type
+        color = self.color
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [h_lw, h_up, h_up, h_lw, h_lw],
+            line_type,
+            color=color,
+            linewidth = 1) + GeometryScene.ax_2d.plot(
+                [origin + 0, origin + l],
+                [h_lw + h_w, h_lw + h_w],
+                line_type,
+                color=color,
+                linewidth = 1) + GeometryScene.ax_2d.plot(
+                    [origin + s, origin + s, origin + s + w/2 - w_w/2 , origin + s + w/2 - w_w/2 , origin + s + w/2 + w_w/2, origin + s + w/2 + w_w/2, origin + s + w,  origin + s + w,  origin + s], 
+                    [h_lw, h_lw + h_w, h_lw + h_w, h_up, h_up, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+                    '-',
+                    color='k',
+                    linewidth = 1)
+
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
+        print(res)
+
+class BodyBlockShapeCRounded(BodyBlockRounded):
+    
+    line_type = '-'
+    color = 'k'
+
+    num_of_lines_view = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+
+    @classmethod
+    def num_of_lines(cls,type_of_view):
+        
+        if type_of_view == 'view':
+            return cls.num_of_lines_view
+        elif type_of_view == 'section':
+            return cls.num_of_lines_sec
+        elif type_of_view == 'halfsection':
+            return cls.num_of_lines_half_sec
+        else:
+            return {}
+
+    @property
+    def space_btwn(self):
+        return 90
+    
+    @property
+    def height_upper(self):
+        return self.height -self.axis_height
+
+    @property
+    def height_lower(self):
+        return -self.axis_height
+    
+    @property
+    def height_wider(self):
+        return 20
+    
+    @property
+    def indentation_wider(self):
+        return self.width * 2/3
+    
+    def _plot_2d(self, language='en'):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        #         print(f'plot_2d is called for {class_name}')
+
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+        
+        s = self.space_btwn /10
+        
+
+        t_l = origin + l / 4
+        t_r = (-l - 20)
+
+        line_type = self.line_type
+        color = self.color
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [h_lw, h_up, h_up, h_lw, h_lw],
+            line_type,
+            color=color,
+            linewidth = 1) + GeometryScene.ax_2d.plot(
+                [origin + 0, origin + l],
+                [h_up - h_w, h_up - h_w],
+                line_type,
+                color=color,
+                linewidth = 1) + GeometryScene.ax_2d.plot(
+                    [origin + 0, origin + l],
+                    [h_lw + h_w, h_lw + h_w],
+                    line_type,
+                    color=color,
+                    linewidth = 1) + GeometryScene.ax_2d.plot(
+                        [origin + s, origin + s, origin + s + w - w_w, origin + s + w - w_w,  origin + s,  origin + s,  origin + s + w,  origin + s + w,  origin + s], 
+                        [h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up - h_w, h_up, h_up, h_lw, h_lw],
+                        '-',
+                        color='k',
+                        linewidth = 1)
+
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
+        print(res)
+
+class BodyBlockCutTypeRounded(BodyBlockRounded):
+    
+    line_type = '-'
+    color = 'k'
+
+    num_of_lines_view = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+
+    @classmethod
+    def num_of_lines(cls,type_of_view):
+        
+        if type_of_view == 'view':
+            return cls.num_of_lines_view
+        elif type_of_view == 'section':
+            return cls.num_of_lines_sec
+        elif type_of_view == 'halfsection':
+            return cls.num_of_lines_half_sec
+        else:
+            return {}
+
+    @property
+    def space_btwn(self):
+        return 90
+    
+    @property
+    def height_upper(self):
+        return self.height -self.axis_height
+
+    @property
+    def height_lower(self):
+        return -self.axis_height
+    
+    @property
+    def height_wider(self):
+        return 20
+    
+    @property
+    def indentation_wider(self):
+        return self.width * 2/3
+    
+    def _plot_2d(self, language='en'):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        #         print(f'plot_2d is called for {class_name}')
+
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+        
+        s = self.space_btwn /10
+        
+
+        t_l = origin - 1 / 10
+        t_r = (-l - 22)
+
+        line_type = self.line_type
+        color = self.color
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [h_lw, h_up, h_up, h_lw, h_lw],
+            line_type,
+            color=color,
+            linewidth = 1) + GeometryScene.ax_2d.plot(
+                [origin + 0, origin + l],
+                [h_up - h_w, h_up - h_w],
+                line_type,
+                color=color,
+                linewidth = 1) + GeometryScene.ax_2d.plot(
+                    [origin + 0, origin + l],
+                    [h_lw + h_w, h_lw + h_w],
+                    line_type,
+                    color=color,
+                    linewidth = 1) + GeometryScene.ax_2d.plot(
+                        [origin + s, origin + s, origin + s + w - w_w, origin + s + w - w_w,  origin + s + w,  origin + s + w + w_w,  origin + s + w + w_w,  origin + s], 
+                        [h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up, h_up, h_lw, h_lw],
+                        '-',
+                        color='k',
+                        linewidth = 1)
+
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(5, 5, origin / 2,
+                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
+        print(res)
