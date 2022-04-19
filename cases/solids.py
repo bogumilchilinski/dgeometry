@@ -850,14 +850,10 @@ class ScrewCore(Cylinder):
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
 
     def str_en(self):
-<<<<<<< HEAD
+
         return 'Shank of the screw \n with L={length}mm \n and diameter={d}mm'.format(
             length=self.height, d=self.diameter)
-=======
-        return 'Shank of the screw \n with diameter={d}mm'.format(
-            length=self.height,
-            d=self.diameter)
->>>>>>> 5d427993582574accddc9eeffcc5c643cfb417be
+
 
     def str_pl(self):
         return 'Trzpień śruby \n o średnicy={d}mm'.format(
@@ -3223,11 +3219,7 @@ class HexagonalHeadOfScrew(ChamferedHexagonalPrism):
     def str_pl(self):
         return 'Łeb sześciokątny śruby \n o L={length}mm  \n i wymiarze pod klucz {d}mm'.format(
             length=self.height,
-            d=self.indiameter,
-<<<<<<< HEAD
-        )
-=======
-            )
+            d=self.indiameter,)
     
 class ThreadOfScrew(Thread):
     
@@ -3303,4 +3295,4 @@ class ThreadOfScrew(Thread):
             l_ch=self.chamfer_length,
             )
     
->>>>>>> 5d427993582574accddc9eeffcc5c643cfb417be
+

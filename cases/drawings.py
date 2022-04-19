@@ -905,7 +905,7 @@ class SimpleGearSketch(ShaftSketch
 
         return shafts
 
-class ChoinkaGearSketch(ShaftSketch
+class MultipleGearSketch(ShaftSketch
                              #GeometricalCase
                              ):
 
