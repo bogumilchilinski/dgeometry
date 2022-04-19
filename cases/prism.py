@@ -197,6 +197,8 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             line_eb=Line(E,B)('|EB|')
             line_da=Line(D,A)('|DA|')
             line_fc=Line(F,C)('|FC|')
+
+            
             
             elems+=[D,E,F,G]
 
