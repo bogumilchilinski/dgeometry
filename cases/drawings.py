@@ -1468,7 +1468,7 @@ class BodyBlockRoundedView(ShaftSketch
         for i in range(50):
             body_length=random.randint(30,90)
             
-            shaft = [sol. BodyBlockShapeCRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            shaft = [sol.BodyBlockShapeCRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
             shaft[-1]._origin = 0
             shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
             shaft[-1]._origin = 0

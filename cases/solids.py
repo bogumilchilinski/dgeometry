@@ -5,7 +5,7 @@ from numbers import Number
 
 import numpy as np
 from matplotlib.patches import Circle
-from matplotlib.patches import RegularPolygon
+from matplotlib.patches import RegularPolygon, Polygon
 import mpl_toolkits.mplot3d.art3d as art3d
 import matplotlib.pyplot as plt
 
@@ -45,7 +45,7 @@ class ShaftPreview:
         for i in range(len(self.data)):
             if i == 5:
                 self.total_length = 0
-            self.Xc, self.Yc, self.Zc = data_for_cylinder_along_z(
+            self.Xc, self.Yc, self.Zc = self.data_for_cylinder_along_z(
                 self.x0, self.y0, self.data[i][0], self.data[i][1], self.z0)
 
             self.total_length += self.data[i][1]
@@ -64,13 +64,13 @@ class ShaftPreview:
         art3d.pathpatch_2d_to_3d(p, z=zlength, zdir="x")
 
 
-def data_for_cylinder_along_z(center_z, center_y, radius, height_x, x_begin):
-    x = np.linspace(x_begin, x_begin + height_x, 500)
-    theta = np.linspace(0, 2 * np.pi, 500)
-    theta_grid, x_grid = np.meshgrid(theta, x)
-    z_grid = radius * np.cos(theta_grid) + center_z
-    y_grid = radius * np.sin(theta_grid) + center_y
-    return x_grid, y_grid, z_grid
+    def data_for_cylinder_along_z(self,center_z, center_y, radius, height_x, x_begin):
+        x = np.linspace(x_begin, x_begin + height_x, 500)
+        theta = np.linspace(0, 2 * np.pi, 500)
+        theta_grid, x_grid = np.meshgrid(theta, x)
+        z_grid = radius * np.cos(theta_grid) + center_z
+        y_grid = radius * np.sin(theta_grid) + center_y
+        return x_grid, y_grid, z_grid
 
 
 class HexPreview:
@@ -108,7 +108,7 @@ class HexPreview:
         for i in range(len(self.data)):
             if i == 5:
                 self.total_length = 0
-            self.Xc, self.Yc, self.Zc = data_for_cylinder_along_z(
+            self.Xc, self.Yc, self.Zc = self.data_for_cylinder_along_z(
                 self.x0, self.y0, self.data[i][0], self.data[i][1], self.z0)
 
             self.total_length += self.data[i][1]
@@ -133,13 +133,83 @@ class HexPreview:
         art3d.pathpatch_2d_to_3d(p, z=zlength, zdir="x")
 
 
-def data_for_cylinder_along_z(center_z, center_y, radius, height_x, x_begin):
-    x = np.linspace(x_begin, x_begin + height_x, 500)
-    theta = np.linspace(0, 2 * np.pi, 500)
-    theta_grid, x_grid = np.meshgrid(theta, x)
-    z_grid = radius * np.cos(theta_grid) + center_z
-    y_grid = radius * np.sin(theta_grid) + center_y
-    return x_grid, y_grid, z_grid
+    def data_for_cylinder_along_z(self,center_z, center_y, radius, height_x, x_begin):
+        x = np.linspace(x_begin, x_begin + height_x, 500)
+        theta = np.linspace(0, 2 * np.pi, 500)
+        theta_grid, x_grid = np.meshgrid(theta, x)
+        z_grid = radius * np.cos(theta_grid) + center_z
+        y_grid = radius * np.sin(theta_grid) + center_y
+        return x_grid, y_grid, z_grid
+
+
+class BlockPreview:
+
+    def __init__(self, x0, y0, z0, *args):
+        self.x0 = x0
+        self.y0 = y0
+        self.z0 = z0
+        self.data = []
+        self.total_length = 0
+
+        #self.fig = plt.figure()
+        self.ax = GeometryScene.ax_3d
+        self.Xc = None
+        self.Yc = None
+        self.Zc = None
+        self.ax.azim = 128
+        self.ax.elev = 26
+
+        for arg in args:
+            self.data.append(arg)
+
+        for i in range(len(self.data)):
+            if i == 5:
+                self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0],
+                                       self.total_length, self.data[i][3])
+                self.total_length = 0
+            self.shaft_steps_sides((self.x0, self.y0), self.data[i][0],
+                                   self.z0, self.data[i][3])
+            self.total_length += self.data[i][1]
+        self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0],
+                               self.z0 + self.total_length, self.data[i][3])
+        self.total_length = 0
+
+        for i in range(len(self.data)):
+            if i == 5:
+                self.total_length = 0
+            self.Xc, self.Yc, self.Zc = self.data_for_cylinder_along_z(
+                self.x0, self.y0, self.data[i][0], self.data[i][1], self.z0)
+
+            self.total_length += self.data[i][1]
+            self.ax.plot_surface(self.Xc,
+                                 self.Yc,
+                                 self.Zc,
+                                 alpha=self.data[i][3],
+                                 color=self.data[i][4],
+                                 edgecolor="black")
+        self.ax.scatter(10, 0, 0)
+
+    def shaft_steps_sides(self, begin_cords, radius, zlength, transparency):
+
+        # Draw a circle on the x axis 'wall'
+        p = Polygon(np.array([[1,2],[1,3],[4,3],[1,3]]),
+                           alpha=0.6,
+                           color='#6b7aa1')
+        self.ax.add_patch(p)
+
+        art3d.pathpatch_2d_to_3d(p, z=zlength, zdir="x")
+
+
+    def data_for_cylinder_along_z(self,center_z, center_y, radius, height_x, x_begin):
+        x = np.linspace(x_begin, x_begin + height_x, 500)
+        theta = np.linspace(0, 2 * np.pi, 500)
+        theta_grid, x_grid = np.meshgrid(theta, x)
+        z_grid = (x_grid+1) + center_z
+        y_grid = (x_grid+2)  + center_y
+        return x_grid, y_grid, z_grid
+
+
+
 
 
 class DrawingObject:
@@ -3474,7 +3544,7 @@ class BodyBlock(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        BlockPreview(5, 5, origin / 2,
                      [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
