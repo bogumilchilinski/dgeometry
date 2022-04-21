@@ -2202,8 +2202,8 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             line_k = (A ^ point_P1)('k')
 
            
-
-            current_obj.add_solution_step('Base ABC', [A, B, C])
+            current_obj.add_solution_step("")
+            #current_obj.add_solution_step('Base ABC', [A, B, C])
             
             # it creates next step of solution - lines are presented
             #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]

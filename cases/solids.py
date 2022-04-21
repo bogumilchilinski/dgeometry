@@ -8,7 +8,7 @@ from matplotlib.patches import Circle
 from matplotlib.patches import RegularPolygon, Polygon
 import mpl_toolkits.mplot3d.art3d as art3d
 import matplotlib.pyplot as plt
-
+SPACE_BTW=250
 
 class ShaftPreview:
 
@@ -158,54 +158,52 @@ class BlockPreview:
         self.Zc = None
         self.ax.azim = 128
         self.ax.elev = 26
+        
+        self.contour= args[0]
+        self.height =args[1]
+        
+        
 
-        for arg in args:
-            self.data.append(arg)
 
-        for i in range(len(self.data)):
-            if i == 5:
-                self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0],
-                                       self.total_length, self.data[i][3])
-                self.total_length = 0
-            self.shaft_steps_sides((self.x0, self.y0), self.data[i][0],
-                                   self.z0, self.data[i][3])
-            self.total_length += self.data[i][1]
-        self.shaft_steps_sides((self.x0, self.y0), self.data[-1][0],
-                               self.z0 + self.total_length, self.data[i][3])
         self.total_length = 0
 
-        for i in range(len(self.data)):
-            if i == 5:
-                self.total_length = 0
-            self.Xc, self.Yc, self.Zc = self.data_for_cylinder_along_z(
-                self.x0, self.y0, self.data[i][0], self.data[i][1], self.z0)
+        self.shaft_steps_sides((self.x0, self.y0), None  ,z0,transparency=0.6)
+        
 
-            self.total_length += self.data[i][1]
-            self.ax.plot_surface(self.Xc,
-                                 self.Yc,
-                                 self.Zc,
-                                 alpha=self.data[i][3],
-                                 color=self.data[i][4],
-                                 edgecolor="black")
+        self.Xc, self.Yc, self.Zc = self.data_for_cylinder_along_z(
+                self.x0, self.y0,10, self.height, self.z0)
+
+
+        self.ax.plot_surface(self.Xc,
+                             self.Yc,
+                             self.Zc,
+                             alpha=0.2,
+                             color='#6b7aa1',
+                             edgecolor="black")
+        
+        self.shaft_steps_sides((self.x0, self.y0), None  ,z0+self.height,transparency=0.6)
         self.ax.scatter(10, 0, 0)
 
     def shaft_steps_sides(self, begin_cords, radius, zlength, transparency):
 
         # Draw a circle on the x axis 'wall'
-        p = Polygon(np.array([[1,2],[1,3],[4,3],[1,3]]),
+        p = Polygon(self.contour,
                            alpha=0.6,
                            color='#6b7aa1')
+
         self.ax.add_patch(p)
 
         art3d.pathpatch_2d_to_3d(p, z=zlength, zdir="x")
 
 
     def data_for_cylinder_along_z(self,center_z, center_y, radius, height_x, x_begin):
-        x = np.linspace(x_begin, x_begin + height_x, 500)
-        theta = np.linspace(0, 2 * np.pi, 500)
+        x = np.linspace(x_begin, x_begin + height_x, 2)
+        theta = np.arange(len(self.contour))
         theta_grid, x_grid = np.meshgrid(theta, x)
-        z_grid = (x_grid+1) + center_z
-        y_grid = (x_grid+2)  + center_y
+        z_grid = self.contour[:,1][theta_grid] + center_z
+        y_grid = self.contour[:,0][theta_grid]  + center_y
+        
+        
         return x_grid, y_grid, z_grid
 
 
@@ -710,7 +708,7 @@ class Cone(Solid):
                                         rotation='vertical',
                                         multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r_t / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
 
@@ -852,7 +850,7 @@ class Cylinder(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -975,7 +973,7 @@ class ScrewCore(Cylinder):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -1057,7 +1055,7 @@ class Plate(Cylinder):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
     def str_en(self):
@@ -1199,7 +1197,7 @@ class Hole(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
 
 
@@ -1301,7 +1299,7 @@ class OpenHole(Hole):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
 
 
@@ -1484,7 +1482,7 @@ class ChamferedHole(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
 
 
@@ -1628,7 +1626,7 @@ class ChamferedOpenHoleWithKeyway(ChamferedHole):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
 
 
@@ -1812,7 +1810,7 @@ class ChamferedCylinder(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
 
@@ -1957,7 +1955,7 @@ class Thread(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.2, '#56754A'])
 
 
@@ -2169,7 +2167,7 @@ class ThreadedOpenHole(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
 
 
@@ -2328,7 +2326,7 @@ class Gear(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -2440,7 +2438,7 @@ class HexagonalPrism(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        HexPreview(5, 5, origin / 2,
+        HexPreview(0,0, origin / 2,
                    [2 * r / 2, l / 2, "bez fazy", 0.6, '#6b7aa1'])
 
         print(res)
@@ -2576,7 +2574,7 @@ class ChamferedHexagonalPrism(HexagonalPrism):
                                             multialignment='center')
 
         #ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        HexPreview(5, 5, origin / 2,
+        HexPreview(0,0, origin / 2,
                    [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -2712,7 +2710,7 @@ class FlangeWithHoles(Solid):
                                         rotation='vertical',
                                         multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         for hole_no in range(holes_no):
@@ -3046,7 +3044,7 @@ class DoubleChamferedHexagonalPrism(HexagonalPrism):
                                             multialignment='center')
 
         #ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        HexPreview(5, 5, origin / 2,
+        HexPreview(0,0, origin / 2,
                    [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -3129,7 +3127,7 @@ class Washer(Cylinder):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -3224,7 +3222,7 @@ class StandarizedNut(DoubleChamferedHexagonalPrism):
                                             multialignment='center')
 
         #ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-        HexPreview(5, 5, origin / 2,
+        HexPreview(0,0, origin / 2,
                    [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -3415,7 +3413,7 @@ class BodyBlock(Solid):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
@@ -3423,7 +3421,7 @@ class BodyBlock(Solid):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
@@ -3445,7 +3443,9 @@ class BodyBlock(Solid):
              height,
              length,
              width,
-             axis_height):
+             axis_height,
+             holes_diameter=None,
+             holes_no=4 ):
 
         num_of_lines_view = self.num_of_lines('view')
         num_of_lines_sec = self.__class__.num_of_lines_sec
@@ -3462,30 +3462,37 @@ class BodyBlock(Solid):
  
         self.width = width
         self.axis_height=axis_height
-#         #self._parameters = lenght, height_upper, height_lower, width
-#         self._class_description = "with L={}mm and diameter ={}mm".format(
-#             *self._parameters)
+        self.holes_no = holes_no
+        self._holes_diameter=holes_diameter
 
-#         self._name['pl'] = 'Walec'
-#         self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
-#             *self._parameters)
+        
+    @property
+    def holes_diameter(self):
+        if self._holes_diameter:
+            return self._holes_diameter
+        else:
+            return round(self.length*0.15)
 
     def str_en(self):
-        return 'Body with length={l}mm, \n height={h}mm and widht={w}mm'.format(
+        return 'Simple bearing block with length={l}mm, \n height={h}mm, width={w}mm \n and {no} fixing holes d={hole_d}mm \n placed on the body edge'.format(
             l=self.length,
             h=self.height,
-            w=self.width)
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter)
 
     def str_pl(self):
-        return 'Korpus o grubości g={l}mm \n wysokości={h}mm i szerokości={w}mm'.format(
+        return 'Podpora łożyskowa o grubości g={l}mm \n wysokości={h}mm, zerokości={w}mm \n i {no} otworach montażowych d={hole_d}mm \n umiejscowionych na brzegu'.format(
             l=self.length,
             h=self.height,
-            w=self.width).replace('right',
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter).replace('right',
                                      'prawej').replace('left', 'lewej')
 
     @property
     def space_btwn(self):
-        return 10
+        return SPACE_BTW
     
     @property
     def height_upper(self):
@@ -3495,16 +3502,32 @@ class BodyBlock(Solid):
     def height_lower(self):
         return -self.axis_height
     
+    @property    
+    def _front_view_outline(self):
+        
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        
+        t_l = origin + l 
+        t_r = (-l - 25)
+        
+        
+        x_coords=np.array([0, 0, w,  w, 0])-w/2
+        y_coords=np.array([h_lw, h_up, h_up, h_lw, h_lw])
+        
+        
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
+    
     
     def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
 
-        class_name = self.__class__.__name__
 
-        span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
 
         origin = self.origin / 10
         l = self.length / 10
@@ -3512,24 +3535,36 @@ class BodyBlock(Solid):
         h_lw = self.height_lower / 10
         w = self.width / 10
         
-        s = self.space_btwn
+        s = self.space_btwn/10
 
         t_l = origin + l 
-        t_r = (-l - 25)
+        t_r = (+h_up +1)
 
         line_type = self.line_type
         color = self.color
+        
+        front_view=self._front_view_outline
+        
+        
 
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            origin +np.array([0, 0,  l,  l,  0]),
             [h_lw, h_up, h_up, h_lw, h_lw],
             line_type,
             color=color) + GeometryScene.ax_2d.plot(
-                [origin + s, origin + s, origin + s + w, origin + s+ w, origin + s], 
-                [h_lw, h_up, h_up, h_lw, h_lw],
+                front_view[:,0]+s, 
+                front_view[:,1],
                 '-',
                 color='k',
-                linewidth=1)
+                linewidth=1) + GeometryScene.ax_2d.plot(
+            s - w/2 + 0.15*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_up, h_up, h_lw, h_lw],
+            '--',
+            color='b')  + GeometryScene.ax_2d.plot(
+            s + w/2 - 0.3*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_up, h_up, h_lw, h_lw],
+            '--',
+            color='b')
 
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
@@ -3544,18 +3579,20 @@ class BodyBlock(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        BlockPreview(5, 5, origin / 2,
-                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        BlockPreview(0,0, origin/2,
+                     self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
 
-        print(res)
 
 class BodyBlockShapeT(BodyBlock):
     
     line_type = '-'
     color = 'k'
 
+    line_type = '-'
+    color = 'k'
+
     num_of_lines_view = {
-        'horizontal_lines': 3,
+        'horizontal_lines': 4,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
         'vertical_dimensions': 1,
@@ -3565,61 +3602,54 @@ class BodyBlockShapeT(BodyBlock):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
     num_of_lines_half_sec = {
-        'horizontal_lines': 3,
+        'horizontal_lines': 4,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
 
-    @classmethod
-    def num_of_lines(cls,type_of_view):
-        
-        if type_of_view == 'view':
-            return cls.num_of_lines_view
-        elif type_of_view == 'section':
-            return cls.num_of_lines_sec
-        elif type_of_view == 'halfsection':
-            return cls.num_of_lines_half_sec
-        else:
-            return {}
 
-    @property
-    def space_btwn(self):
-        return 90
-    
-    @property
-    def height_upper(self):
-        return self.height -self.axis_height
-
-    @property
-    def height_lower(self):
-        return -self.axis_height
     
     @property
     def height_wider(self):
-        return 20
+        return round(self.height*0.2)
     
     @property
     def indentation_wider(self):
-        return self.width * 1/2
+        return round(self.width * 0.55)
+    
+    @property
+    def _front_view_outline(self):
+        
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+
+        t_l = origin + l 
+        t_r = (-l - 25)
+        
+        
+        x_coords=np.array([0, 0,  w/2 - w_w/2 ,  w/2 - w_w/2 ,  w/2 + w_w/2,  w/2 + w_w/2,  w,   w,  0])-w/2
+        y_coords=np.array([h_lw, h_lw + h_w, h_lw + h_w, h_up, h_up, h_lw + h_w, h_lw + h_w, h_lw, h_lw])
+        
+        
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
     
     def _plot_2d(self, language='en'):
 
-        #         print(f'self.origin property is {self.origin()}')
-        #         print(f'self.end property is {self.end()}')
 
-        class_name = self.__class__.__name__
-
-        span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
 
         origin = self.origin / 10
         l = self.length / 10
@@ -3632,28 +3662,34 @@ class BodyBlockShapeT(BodyBlock):
         s = self.space_btwn /10
         
 
-        t_l = origin + l / 4
-        t_r = (-l - 20)
+        t_l = origin + l 
+        t_r = (+h_up +1)
 
         line_type = self.line_type
         color = self.color
+        
+        front_view=self._front_view_outline
+        
+        
 
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            origin +np.array([0, 0,  l,  l,  0]),
             [h_lw, h_up, h_up, h_lw, h_lw],
             line_type,
-            color=color,
-            linewidth = 1) + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + l],
-                [h_lw + h_w, h_lw + h_w],
-                line_type,
-                color=color,
-                linewidth = 1) + GeometryScene.ax_2d.plot(
-                    [origin + s, origin + s, origin + s + w/2 - w_w/2 , origin + s + w/2 - w_w/2 , origin + s + w/2 + w_w/2, origin + s + w/2 + w_w/2, origin + s + w,  origin + s + w,  origin + s], 
-                    [h_lw, h_lw + h_w, h_lw + h_w, h_up, h_up, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
-                    '-',
-                    color='k',
-                    linewidth = 1)
+            color=color) + GeometryScene.ax_2d.plot(
+                front_view[:,0]+s, 
+                front_view[:,1],
+                '-',
+                color='k',
+                linewidth=1) + GeometryScene.ax_2d.plot(
+            s - w/2 + 0.1*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+            '--',
+            color='b')  + GeometryScene.ax_2d.plot(
+            s + w/2 - 0.25*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+            '--',
+            color='b')
 
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
@@ -3668,11 +3704,88 @@ class BodyBlockShapeT(BodyBlock):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
-                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        BlockPreview(0,0, origin/2,
+                     self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
 
-        print(res)
+        
+        
+    def str_en(self):
+        return 'Bearing block (type T - light) with length={l}mm, \n height={h}mm, width={w}mm \n and {no} fixing holes d={hole_d}mm \n placed on the body edge'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter)
 
+    def str_pl(self):
+        return 'Podpora łożyskowa (typ T - lekka) o grubości g={l}mm \n wysokości={h}mm, zerokości={w}mm \n i {no} otworach montażowych d={hole_d}mm \n umiejscowionych na brzegu'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter).replace('right',
+                                     'prawej').replace('left', 'lewej')
+
+    
+class MediumBodyBlockShapeT(BodyBlockShapeT):
+    
+    
+    @property
+    def height_wider(self):
+        return round(self.height*0.6)
+    
+
+
+    
+    def str_en(self):
+        return 'Bearing block (type T - medium) with length={l}mm, \n height={h}mm, width={w}mm \n and {no} fixing holes d={hole_d}mm \n placed on the body edge'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter)
+
+    def str_pl(self):
+        return 'Podpora łożyskowa (typ T - średnia) o grubości g={l}mm \n wysokości={h}mm, zerokości={w}mm \n i {no} otworach montażowych d={hole_d}mm \n umiejscowionych na brzegu'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter).replace('right',
+                                     'prawej').replace('left', 'lewej')
+    
+
+    
+class HeavyBodyBlockShapeT(BodyBlockShapeT):
+    
+    
+    @property
+    def height_wider(self):
+        return round(self.height*0.6)
+    
+
+
+    
+    def str_en(self):
+        return 'Bearing block (type T - heavy) with length={l}mm, \n height={h}mm, width={w}mm \n and {no} fixing holes d={hole_d}mm \n placed on the body edge'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter)
+
+    def str_pl(self):
+        return 'Podpora łożyskowa (typ T - ciężka) o grubości g={l}mm \n wysokości={h}mm, zerokości={w}mm \n i {no} otworach montażowych d={hole_d}mm \n umiejscowionych na brzegu'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter).replace('right',
+                                     'prawej').replace('left', 'lewej')    
+    
+    
+    
+    
 class BodyBlockShapeC(BodyBlock):
     
     line_type = '-'
@@ -3754,10 +3867,13 @@ class BodyBlockShapeC(BodyBlock):
         h_w = self.height_wider /10
         
         s = self.space_btwn /10
-        
+    @property    
+    def _front_view_outline(self):
 
         t_l = origin + l / 4
         t_r = (-l - 20)
+        x_coords=[origin, origin, origin + w/2 - w_w/2 , origin + w/2 - w_w/2 , origin + w/2 + w_w/2, origin + w/2 + w_w/2, origin + w,  origin + w,  origin]
+        y_coords=[h_lw, h_lw + h_w, h_lw + h_w, h_up, h_up, h_lw + h_w, h_lw + h_w, h_lw, h_lw]
 
         line_type = self.line_type
         color = self.color
@@ -3797,8 +3913,12 @@ class BodyBlockShapeC(BodyBlock):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
-                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+#         BlockPreview(0,0, origin/2,
+#         self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
+        BlockPreview(0,0, origin/2,
+        self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
+#         ShaftPreview(0,0, origin / 2,
+#                      [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
 
@@ -3926,7 +4046,7 @@ class BodyBlockCutType(BodyBlock):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -4033,7 +4153,7 @@ class BodyBlockRounded(Solid):
 #             *self._parameters)
 
     def str_en(self):
-        return 'Rounded Body with length={l}mm, \n height={h}mm and widht={w}mm'.format(
+        return 'Rounded Body with length={l}mm, \n height={h}mm and width={w}mm'.format(
             l=self.length,
             h=self.height,
             w=self.width)
@@ -4106,7 +4226,7 @@ class BodyBlockRounded(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -4210,8 +4330,7 @@ class BodyBlockShapeTRounded(BodyBlockRounded):
                 line_type,
                 color=color,
                 linewidth = 1) + GeometryScene.ax_2d.plot(
-                    [origin + s, origin + s, origin + s + w/2 - w_w/2 , origin + s + w/2 - w_w/2 , origin + s + w/2 + w_w/2, origin + s + w/2 + w_w/2, origin + s + w,  origin + s + w,  origin + s], 
-                    [h_lw, h_lw + h_w, h_lw + h_w, h_up, h_up, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+                    [origin + s, origin + s, origin + s + w/2 - w_w/2 , origin + s + w/2 - w_w/2 , origin + s + w/2 + w_w/2, origin + s + w/2 + w_w/2, origin + s + w,  origin + s + w,  origin + s],                    [h_lw, h_lw + h_w, h_lw + h_w, h_up, h_up, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
                     '-',
                     color='k',
                     linewidth = 1)
@@ -4229,7 +4348,7 @@ class BodyBlockShapeTRounded(BodyBlockRounded):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -4358,7 +4477,7 @@ class BodyBlockShapeCRounded(BodyBlockRounded):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
@@ -4487,8 +4606,299 @@ class BodyBlockCutTypeRounded(BodyBlockRounded):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(5, 5, origin / 2,
+        ShaftPreview(0,0, origin / 2,
                      [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
 
+class BlockHole(Hole):
+    """This object represents hole that can be made inside solid.
+    
+    The hole object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height and diameter.
+    
+    Parameters
+    ==========
+    
+    height : int
+        The value of height of hole
+        
+    diameter : int
+        The value of diameter of hole
+    
+    Examples
+    ========
+    
+    >>> from solids import Hole
+    >>> hole = Hole(5,2)
+    >>> hole._parameters
+    (5, 2)
+    
+    >>> hole._class_description
+    'with L=5mm and diameter =2mm'
+    
+    >>> hole._class_description_pl
+    'o L=5mm i średnicy =2mm'
+    
+    >>> hole._name
+    {'pl': 'Otwór'}
+    
+    """
+    num_of_lines_view = {
+        'horizontal_lines': 1,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 0,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 2,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    def str_en(self):
+        return 'Hole \n with diameter={d}mm \n and length L={length}mm'.format(length=self.height,
+                                                         d=self.diameter)
+
+    def str_pl(self):
+        return 'Otwór \n o średnicy D={d}mm i długości L={length}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                     'prawej').replace('left', 'lewej')
+
+    @property
+    def shift_vertical(self):
+        return 0
+    
+    @property
+    def space_btwn(self):
+        return SPACE_BTW
+    
+    @property    
+    def _front_view_outline(self):
+        
+        origin = self.origin / 10
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        end = self.end / 10
+
+        h_p = l * 2
+        v_p = self.shift_vertical
+        v_p = self.shift_vertical
+        
+        t_l = origin + l 
+        t_r = (-l - 25)
+        
+        angle = np.linspace(0,2*np.pi,100)
+        x_c = r * np.cos(angle)
+        y_c = r * np.sin(angle)
+        
+        x_coords=x_c
+        y_coords=y_c # np.cos zwraca array, czyli taką listę, tylko bardzo wydajną
+       
+        
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
+
+    def _plot_2d(self, language='en'):
+
+        origin = self.origin / 10
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        end = self.end / 10
+
+        s_v = 0
+        s = self.space_btwn / 10
+        
+        front_view = self._front_view_outline
+        
+        t_l = origin + l / 3
+        t_r = (-r - 23)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r + s_v, r + s_v, r + s_v, -r + s_v, -r + s_v],
+            '--',
+            color='b') + GeometryScene.ax_2d.plot(
+                [origin - 0.5, origin + l + 0.5],
+                [0 + s_v, 0 + s_v],
+                '-.',
+                color='k',
+                linewidth=1) + GeometryScene.ax_2d.plot(
+                    front_view[:,0] + s , 
+                    front_view[:,1] ,
+                    '-',
+                    color='b',
+                    linewidth=1)
+
+
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        BlockPreview(0,0, origin/2,
+        self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
+
+class BlockHiddenHole(OpenHole):
+    """This object represents hole that can be made inside solid.
+    
+    The hole object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height and diameter.
+    
+    Parameters
+    ==========
+    
+    height : int
+        The value of height of hole
+        
+    diameter : int
+        The value of diameter of hole
+    
+    Examples
+    ========
+    
+    >>> from solids import Hole
+    >>> hole = Hole(5,2)
+    >>> hole._parameters
+    (5, 2)
+    
+    >>> hole._class_description
+    'with L=5mm and diameter =2mm'
+    
+    >>> hole._class_description_pl
+    'o L=5mm i średnicy =2mm'
+    
+    >>> hole._name
+    {'pl': 'Otwór'}
+    
+    """
+    num_of_lines_view = {
+        'horizontal_lines': 1,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 0,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 2,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 0,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    def str_en(self):
+        return 'Open hole \n with diameter={d}mm'.format(length=self.height,
+                                                         d=self.diameter)
+
+    def str_pl(self):
+        return 'Otwór przelotowy \n o średnicy={d}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                     'prawej').replace('left', 'lewej')
+
+    @property
+    def shift_vertical(self):
+        return 0
+    
+    @property
+    def space_btwn(self):
+        return SPACE_BTW
+    
+    @property    
+    def _front_view_outline(self):
+        
+        origin = self.origin / 10
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        end = self.end / 10
+
+        h_p = l * 2
+        v_p = self.shift_vertical
+        v_p = self.shift_vertical
+        
+        t_l = origin + l 
+        t_r = (-l - 25)
+        
+        angle = np.linspace(0,2*np.pi,100)
+        x_c = r * np.cos(angle)
+        y_c = r * np.sin(angle)
+        
+        x_coords=x_c
+        y_coords=y_c # np.cos zwraca array, czyli taką listę, tylko bardzo wydajną
+       
+        
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
+
+    def _plot_2d(self, language='en'):
+
+        origin = self.origin / 10
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        end = self.end / 10
+
+        s_v = self.shift_vertical /10
+        s = self.space_btwn / 10
+        
+        front_view = self._front_view_outline
+        
+        t_l = origin + l / 2
+        t_r = (-r - 21)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r + s_v, r + s_v, r + s_v, -r + s_v, -r + s_v],
+            '--',
+            color='b') + GeometryScene.ax_2d.plot(
+                [origin - 0.5, origin + l + 0.5],
+                [0 + s_v, 0 + s_v],
+                '-.',
+                color='k',
+                linewidth=1) + GeometryScene.ax_2d.plot(
+                    front_view[:,0] + s, 
+                    front_view[:,1],
+                    '--',
+                    color='b',
+                    linewidth=1)
+
+
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        BlockPreview(0,0, origin/2,
+        self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
