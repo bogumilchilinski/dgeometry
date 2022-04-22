@@ -36,6 +36,97 @@ def plots_no():
         yield num
         num += 1
 
+        
+class GeometrySceneDG:
+    plt.clf()
+
+#     plt.figure(figsize=(12,9))
+#     ax_2d = plt.subplot(121)
+#     ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
+
+#     plt.xlim(0, 16)
+#     plt.ylim(-12, 12)
+#     plt.grid(True)    
+#    
+#     ax_2d.set_yticks(  range(-12,12,2) )
+#     ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
+
+#     ax_3d = plt.subplot(122, projection='3d')
+#     ax_3d.view_init(30,10)
+#     ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
+
+#     plt.xlim(0, 16)
+#     plt.ylim(0, 16)
+
+#    
+#     ax_3d.set_zlim(0, 16)
+#     plt.tight_layout()
+
+    #plt.figure(figsize=(12,9))
+    plt.figure(figsize=(20,20))
+    
+    ax_2d = plt.subplot(121)
+    #ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
+
+    plt.xlim(0, 200)
+    plt.ylim(-100, 100)
+    plt.grid(False)
+
+    ax_2d.axis('off')
+
+
+    #ax_2d.set_yticks(  range(-12,12,2) )
+    #ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
+
+    ax_3d = plt.subplot(122, projection='3d')
+    #ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
+
+    #plt.xlim(0, 16)
+    #plt.ylim(0, 16)
+
+
+    #ax_3d.set_zlim(0, 16)
+
+    ax_3d.view_init(30,80)
+    plt.tight_layout()  
+    plt.axis("off")
+
+    ax_2d=ax_2d 
+    ax_3d=ax_3d 
+
+    #def __init__(self,height=12,width=9,figsize=(12,9)):
+    def __init__(self,height=12,width=20,figsize=(12,20)):
+        plt.figure(figsize=figsize)
+        ax_2d = plt.subplot(121)
+        ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
+
+        plt.xlim(0, width)
+        plt.ylim(-height, height)
+        plt.grid(True)      
+
+        ax_2d.set_yticks(  range(-12,12,2) )
+        ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
+
+        ax_3d = plt.subplot(122, projection='3d')
+        ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
+
+        plt.xlim(0, 12)
+        plt.ylim(0, 20)
+
+
+        ax_3d.set_zlim(0, 20)
+
+        ax_3d.view_init(30,10)
+        plt.tight_layout()  
+
+        self.__class__.ax_2d=ax_2d 
+        self.__class__.ax_3d=ax_3d 
+
+
+        
+        
+        
+        
 class GeometryScene:
     plt.clf()
 
@@ -61,7 +152,7 @@ class GeometryScene:
 #     ax_3d.set_zlim(0, 16)
 #     plt.tight_layout()
 
-    plt.figure(figsize=(12,9))
+    plt.figure(figsize=(12,12))
     ax_2d = plt.subplot(121)
     #ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
 
@@ -343,14 +434,14 @@ class Entity:
         text=None,
         fontsize=13,
         linewidth=linewidth,
-        scene=GeometryScene.ax_3d,
+        scene=GeometrySceneDG.ax_3d,
     ):
         '''
         Set the coordinates of the points with the text explanation 
         Return: Line with the text that presents the actual point on the chosen plane
         '''
 
-        scene = GeometryScene.ax_3d   
+        scene = GeometrySceneDG.ax_3d   
 
         if fmt is None:
             fmt = self.__fmt
@@ -399,7 +490,7 @@ class Entity:
         Return: Line with the text that presents the actual point on the chosen plane
         '''
 
-        scene = GeometryScene.ax_2d
+        scene = GeometrySceneDG.ax_2d
 
         if fmt is None:
             fmt = self.__fmt
@@ -440,13 +531,13 @@ class Entity:
         text=None,
         fontsize=13,
         linewidth=linewidth,
-        scene=GeometryScene.ax_2d,
+        scene=GeometrySceneDG.ax_2d,
     ):
         '''
         Set the coordinates of the points with the text explanation 
         Return: Line with the text that presents the actual point on the chosen plane
         '''
-        scene = GeometryScene.ax_2d
+        scene = GeometrySceneDG.ax_2d
 
         if fmt is None:
             fmt = self.__fmt
@@ -498,7 +589,7 @@ class Entity:
 
     def draw_projection(self,
                         projection_name='frontal',
-                        scene=GeometryScene.ax_2d,
+                        scene=GeometrySceneDG.ax_2d,
                         marker=None,
                         style='-',
                         color=None,
@@ -955,7 +1046,7 @@ class DrawingSet(Entity,list):
         style='-',
         text=None,
         fontsize=13,
-        scene=GeometryScene.ax_3d,
+        scene=GeometrySceneDG.ax_3d,
         ):
 
         obj = copy.deepcopy(self)
@@ -978,7 +1069,7 @@ class DrawingSet(Entity,list):
         style='-',
         text=None,
         fontsize=13,
-        scene=GeometryScene.ax_2d,
+        scene=GeometrySceneDG.ax_2d,
         ):
 
 
@@ -1002,7 +1093,7 @@ class DrawingSet(Entity,list):
         style='-',
         text=None,
         fontsize=13,
-        scene=GeometryScene.ax_2d,
+        scene=GeometrySceneDG.ax_2d,
         ):
 
         obj = copy.deepcopy(self)
@@ -1051,7 +1142,7 @@ class GeometricalCase(DrawingSet):
 
     
     def preview(self, example=False):
-        GeometryScene()
+        GeometrySceneDG()
 
         print('preview')
         print(self._assumptions3d)
@@ -1164,7 +1255,7 @@ class GeometricalCase(DrawingSet):
         style='-',
         text=None,
         fontsize=13,
-        scene=GeometryScene.ax_3d,
+        scene=GeometrySceneDG.ax_3d,
         ):
 
         print(type(self._assumptions))
@@ -1185,7 +1276,7 @@ class GeometricalCase(DrawingSet):
         style='-',
         text=None,
         fontsize=13,
-        scene=GeometryScene.ax_2d,
+        scene=GeometrySceneDG.ax_2d,
         ):
 
         self._assumptions.plot_hp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
@@ -1202,7 +1293,7 @@ class GeometricalCase(DrawingSet):
         style='-',
         text=None,
         fontsize=13,
-        scene=GeometryScene.ax_3d,
+        scene=GeometrySceneDG.ax_3d,
         ):
 
         self._assumptions.plot_vp(fmt=fmt,marker=marker,color=color,style=style,text=text,fontsize=fontsize,scene=scene)
