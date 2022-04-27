@@ -2141,10 +2141,10 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             projections = []
 
         # it creates first step of solution
-        self.add_solution_step('Assumptions',
+        self.add_solution_step('',
                                [point_A, point_O, point_P, point_H])
         self._assumptions3d = DrawingSet(point_A, point_O, point_P,
-                                         point_H)('Assumptions')
+                                         point_H)('')
         self._assumptions = DrawingSet(*projections)
         #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
 
@@ -2192,6 +2192,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             plane_beta = HorizontalPlane(P)
             plane_eta = VerticalPlane(P)
 
+            
             line_a = plane_alpha.intersection(plane_beta)[0]('a')
 
             point_P1 = plane_beta.intersection(A ^ O)[0]('P1')
@@ -2202,7 +2203,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             line_k = (A ^ point_P1)('k')
 
            
-            current_obj.add_solution_step("")
+            current_obj.add_solution_step("", [A, B, C])
             #current_obj.add_solution_step('Base ABC', [A, B, C])
             
             # it creates next step of solution - lines are presented
@@ -2210,7 +2211,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
             #it sets the step elements
             current_obj.add_solution_step(
-                'Axis of rotation', [point_P2, point_P1,
+                '', [point_P2, point_P1,
                                      line_k, line_p, line_l])
 
             
@@ -2227,21 +2228,21 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
             #line_kk = Line(P, (O @ line_k))('k')
 
-            A0 = A.rotate_about(axis=line_k)('A_0')
+            A0 = A.rotate_about(axis=line_a)('A_0')
             current_obj.A0 = A0
 
             ### Step 2 #####
             ###  plane of rotation of A ####
 
-            current_obj.add_solution_step('Point A rotation', [A0])
+            current_obj.add_solution_step('', [A0])
 
             #### Step 3 ####
             ### rotated point A0 of A #####
 
-            B0 = B.rotate_about(axis=line_k)('B_0')
+            B0 = B.rotate_about(axis=line_a)('B_0')
             current_obj.B0 = B0
 
-            current_obj.add_solution_step('Point B rotation', [B0])
+            current_obj.add_solution_step('', [B0])
 
             #### Step 4 ####
             ### postion of B0 (based on triangle geometry) #####
@@ -2250,15 +2251,15 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
                 #'Point B rotation - plane of rotation',
                 #[(B0 ^ (B0 @ line_k))('eps_B')])
 
-            C0 = C.rotate_about(axis=line_k)('C_0')
+            C0 = C.rotate_about(axis=line_a)('C_0')
             current_obj.C0 = C0
-            current_obj.add_solution_step('Point C rotation', [C0])
+            current_obj.add_solution_step('', [C0])
 
             #### Step 5 ####
             ### postion of C0 (based on triangle geometry) #####
 
             #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-            current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+            current_obj.O0 = O.rotate_about(axis=line_a)('O_0')
 
         
 
@@ -2276,7 +2277,7 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             A, B, C, D, E, F = Prism(triangle_plane,
                                      dirHG / distance_HG * triangle_height)
 
-            current_obj.add_solution_step('Vertices D,E,F', [D, E, F])
+            current_obj.add_solution_step('', [D, E, F])
 
             line_ab=Line(A,B)('|AB|')
             line_bc=Line(B,C)('|BC|')
@@ -2287,8 +2288,8 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             line_de=Line(D,E)('|DE|')
             line_ef=Line(E,F)('|EF|')
             #line_fd=Line(F,D)('|FD|')
-            line_fd = (F ^ D)('FD')
-            current_obj.add_solution_step('Lines implementation', [line_ab, line_bc, line_ca, line_eb, line_da, line_fc, line_de, line_ef, line_fd])
+            line_fd = (F ^ D)('|FD|')
+            current_obj.add_solution_step('', [line_ab, line_bc, line_ca, line_eb, line_da, line_fc, line_de, line_ef, line_fd])
             
             elems += [D, E, F, G]
 
@@ -3288,11 +3289,11 @@ class GivenHeightSquarePrism(GeometricalCase):
             projections = []
 
         # it creates first step of solution
-        self.add_solution_step('Assumptions',
+        self.add_solution_step('',
                                [point_A, point_O, point_P, point_H])
 
         self._assumptions3d = DrawingSet(point_A, point_O, point_P,
-                                         point_H)('Assumptions')
+                                         point_H)('')
         self._assumptions = DrawingSet(*projections)
         #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
 
@@ -3341,21 +3342,25 @@ class GivenHeightSquarePrism(GeometricalCase):
             plane_beta = HorizontalPlane(P)
             plane_eta = VerticalPlane(P)
 
-            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+            line_a = plane_alpha.intersection(plane_beta)[0]('a')
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+            point_P1 = plane_beta.intersection(A ^ O)[0]('P1')
+            point_P2 = plane_eta.intersection(A ^ O)[0]('P2')
             current_obj.P1 = point_P1
-            line_kk = (P ^ point_P1)('a')
-            line_f = (P ^ point_P2)('f')
+            #line_kk = (P ^ point_P1)('a')
+            #line_f = (P ^ point_P2)('f')
+            line_p = (P ^ point_P1)('p')
+            line_l = (P ^ point_P2)('l')
+            line_k = (A ^ point_P1)('k')
 
+            current_obj.add_solution_step("", [A, B, C, D])
             # it creates next step of solution - lines are presented
             #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
             #it sets the step elements
             current_obj.add_solution_step(
-                'Axis of rotation', [(A ^ point_P1)('AO'), point_P1,
-                                     (P ^ point_P1)('a'), point_P2, line_f])
+                '', [point_P1, point_P2,
+                                     line_k, line_p, line_l])
 
             elems = self._assumptions
             projections = []
@@ -3368,42 +3373,42 @@ class GivenHeightSquarePrism(GeometricalCase):
 
             ##################   plane rotation
 
-            line_kk = Line(P, (O @ line_k))('k')
+            #line_kk = Line(P, (O @ line_k))('k')
 
-            A0 = A.rotate_about(axis=line_k)('A_0')
+            A0 = A.rotate_about(axis=line_a)('A_0')
             current_obj.A0 = A0
 
             ### Step 2 #####
             ###  plane of rotation of A ####
 
-            current_obj.add_solution_step('Point A rotation', [A0])
+            current_obj.add_solution_step('', [A0])
 
             #### Step 3 ####
             ### rotated point A0 of A #####
 
-            B0 = B.rotate_about(axis=line_k)('B_0')
+            B0 = B.rotate_about(axis=line_a)('B_0')
             current_obj.B0 = B0
 
-            current_obj.add_solution_step('Point B rotation', [B0])
+            current_obj.add_solution_step('', [B0])
 
             #### Step 4 ####
             ### postion of B0 (based on triangle geometry) #####
 
-            C0 = C.rotate_about(axis=line_k)('C_0')
+            C0 = C.rotate_about(axis=line_a)('C_0')
             current_obj.C0 = C0
-            current_obj.add_solution_step('Point C rotation', [C0])
+            current_obj.add_solution_step('', [C0])
 
             #### Step 5 ####
             ### postion of C0 (based on triangle geometry) #####
 
-            D0 = D.rotate_about(axis=line_k)('D_0')
+            D0 = D.rotate_about(axis=line_a)('D_0')
             current_obj.D0 = D0
-            current_obj.add_solution_step('Point D rotation', [D0])
+            current_obj.add_solution_step('', [D0])
 
             #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-            current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+            current_obj.O0 = O.rotate_about(axis=line_a)('O_0')
 
-            current_obj.add_solution_step('Base ABCD', [A, B, C, D])
+            current_obj.add_solution_step('', [A, B, C, D])
 
             T = (H @ plane_alpha)('T')
 
@@ -3424,7 +3429,7 @@ class GivenHeightSquarePrism(GeometricalCase):
             G = G('G')
             I = (D + (E - A))('I')
 
-            current_obj.add_solution_step('Vertices E,F,G,H', [E, F, G, I])
+            current_obj.add_solution_step('', [E, F, G, I])
 
             elems += [D, E, F, G]
 
@@ -3433,6 +3438,22 @@ class GivenHeightSquarePrism(GeometricalCase):
                 F @ VPP
             ]
 
+            
+            
+            line_ab=Line(A,B)('|AB|')
+            line_bc=Line(B,C)('|BC|')
+            line_cd=Line(C,D)('|CD|')
+            line_da=Line(D,A)('|DA|')
+            line_ae=Line(A,E)('|AE|')
+            line_bf=Line(B,F)('|BF|')
+            line_cg=Line(C,G)('|CG|')
+            line_di=Line(D,I)('|DI|')
+            line_ef=Line(E,F)('|EF|')
+            line_fg=Line(F,G)('|FG|')
+            line_gi=Line(G,I)('|GI|')
+            line_ie=Line(I,E)('|IE|')
+            current_obj.add_solution_step('', [line_ab, line_bc, line_cd, line_da, line_ae, line_bf, line_cg, line_di, line_ef, line_fg, line_gi, line_ie])
+            
             current_obj._assumptions = DrawingSet(
                 *current_obj.get_projections())('Solution')
             current_obj._assumptions3d = DrawingSet(*current_obj)
@@ -3462,14 +3483,14 @@ class GivenHeightSquarePrism(GeometricalCase):
         #ReportText.set_directory('./SDAresults')
 
         for no, step3d in enumerate(self._solution3d_step):
-            GeometryScene()
+            GeometrySceneDG()
 
             for elem in range(no):
                 self._solution3d_step[elem].plot(color='k')
                 self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
 
             self._solution3d_step[no].plot(color='r')
-            self._solution_step[no].plot_vp(color='r').plot_hp(color='r')
+            self._solution_step[no].plot_vp(color='r').plot_hp(color='g')
 
             with doc_model.create(Figure(position='H')) as fig:
                 #path=f'./images/image{no}.png'
