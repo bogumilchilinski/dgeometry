@@ -3595,7 +3595,7 @@ class BodyBlockShapeT(BodyBlock):
         'horizontal_lines': 4,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
@@ -3795,7 +3795,7 @@ class BodyBlockShapeC(BodyBlock):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
@@ -3931,7 +3931,7 @@ class BodyBlockCutType(BodyBlock):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
@@ -4090,7 +4090,7 @@ class BodyBlockRounded(Solid):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
@@ -4239,7 +4239,7 @@ class BodyBlockShapeTRounded(BodyBlockRounded):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
@@ -4362,7 +4362,7 @@ class BodyBlockShapeCRounded(BodyBlockRounded):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
@@ -4491,7 +4491,7 @@ class BodyBlockCutTypeRounded(BodyBlockRounded):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
