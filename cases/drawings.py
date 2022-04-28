@@ -1686,22 +1686,22 @@ class ShaftWithKeyseats(ShaftSketch
             
 #             shaft = [sol.ChamferedCylinderWithKeyseat(0.7*body_length,1.2*body_length)]
 #             shaft[-1]._origin = 0
-#             shaft += [sol.ShaftWithKeyseatsSketch(2*body_length,1.3*body_length)]
-#             shaft[-1]._origin = shaft[-2].end
+#             #shaft += [sol.ShaftWithKeyseatsSketch(2*body_length,1.3*body_length)]
+#             #shaft[-1]._origin = shaft[-2].end
 #             shaft += [sol.CylinderWithKeyseat(0.2*body_length,1.45*body_length)]
 #             shaft[-1]._origin = shaft[-2].end
-#             shaft += [sol.Gear(0.9*body_length,0.8*body_length,random.randint(2,3))] 
-#             shaft[-1]._origin = shaft[-2].end
-#             shaft += [sol.CylinderWithKeyseat(0.2*body_length,1.45*body_length)]
-#             shaft[-1]._origin = shaft[-2].end
-#             shaft += [sol.ShaftWithKeyseatsSketch(3*body_length,1.3*body_length)]
-#             shaft[-1]._origin = shaft[-2].end
-#             shaft += [sol.CylinderWithKeyseat(0.6*body_length,1.2*body_length)]
-#             shaft[-1]._origin = shaft[-2].end
-#             shaft += [sol.ShaftWithKeyseatsSketch(3*body_length,1.1*body_length)]
-#             shaft[-1]._origin = shaft[-2].end
-#             shaft += [sol.ChamferedCylinderWithKeyseat(0.7*body_length,1*body_length)]
-#             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.Gear(0.9*body_length,0.8*body_length,random.randint(2,3))] 
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.CylinderWithKeyseat(0.2*body_length,1.45*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.ShaftWithKeyseatsSketch(3*body_length,1.3*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.CylinderWithKeyseat(0.6*body_length,1.2*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.ShaftWithKeyseatsSketch(3*body_length,1.1*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.ChamferedCylinderWithKeyseat(0.7*body_length,1*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
             
 
             
@@ -1740,8 +1740,8 @@ class ShaftWithKeyseats(ShaftSketch
                                   step_lengths=[27, 29],
                                   step_modificator=step_mod_dec_hole_chamfer,
                                   step_type=sol.Hole,origin=0) 
-#             shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,14)]
-#             shaft[-1]._origin=shaft[-2].end
+            #shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,14)]
+            #shaft[-1]._origin=shaft[-2].end
             
             shafts.append(shaft)
         
