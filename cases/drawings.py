@@ -314,6 +314,8 @@ step_mod_inc_chamfer = lambda step: random.choice([
         step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
 ])
 
+
+
 step_mod_dec_hole_chamfer = lambda step: random.choice([
     copy.copy(step),
     sol.ChamferedHole(
@@ -328,6 +330,34 @@ step_mod_dec_chamfer = lambda step: random.choice([
                           chamfer_length=1,
                           chamfer_pos='right'),
 ])
+
+
+step_mod_inc_keyseat = lambda step: random.choice([
+    copy.copy(step),
+    sol.ChamferedCylinder(
+        step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
+    sol.ChamferedCylinderWithKeyseat(
+        step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
+])
+
+
+step_mod_dec_keyseat = lambda step: random.choice([
+    copy.copy(step),
+    sol.ChamferedCylinderWithKeyseat(step.height,
+                          step.diameter,
+                          chamfer_angle=45,
+                          chamfer_length=1,
+                          chamfer_pos='right'),
+    sol.ChamferedCylinder(step.height,
+                          step.diameter,
+                          chamfer_angle=45,
+                          chamfer_length=1,
+                          chamfer_pos='right'),
+    sol.CylinderWithKeyseat(step.height,
+                          step.diameter),
+])
+
+
 
 step_mod_chamfer_hex_prism = lambda step: random.choice([
     copy.copy(step),
@@ -1637,3 +1667,88 @@ class BodyBlockRoundedView(ShaftSketch
             shafts.append(shaft)
             
         return shafts
+    
+    
+class ShaftWithKeyseats(ShaftSketch
+                              #GeometricalCase
+                              ):
+
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts  = []
+#         for i in range(50):
+#             body_length=random.randint(30,50)
+            
+#             shaft = [sol.ChamferedCylinderWithKeyseat(0.7*body_length,1.2*body_length)]
+#             shaft[-1]._origin = 0
+#             #shaft += [sol.ShaftWithKeyseatsSketch(2*body_length,1.3*body_length)]
+#             #shaft[-1]._origin = shaft[-2].end
+#             shaft += [sol.CylinderWithKeyseat(0.2*body_length,1.45*body_length)]
+#             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.Gear(0.9*body_length,0.8*body_length,random.randint(2,3))] 
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.CylinderWithKeyseat(0.2*body_length,1.45*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.ShaftWithKeyseatsSketch(3*body_length,1.3*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.CylinderWithKeyseat(0.6*body_length,1.2*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.ShaftWithKeyseatsSketch(3*body_length,1.1*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
+# #             shaft += [sol.ChamferedCylinderWithKeyseat(0.7*body_length,1*body_length)]
+# #             shaft[-1]._origin = shaft[-2].end
+            
+
+            
+#             shafts.append(shaft)
+            
+        for i in range(50):
+            shaft = [sol.ChamferedCylinder(60, 40)]
+            shaft[0]._origin = 0
+            
+
+            
+            shaft += create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      4,
+                                      5,
+                                      6,
+                                  ],
+                                  step_modificator=step_mod_inc_keyseat,origin=shaft[-1].end) 
+            
+            shaft +=create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_modificator=step_mod_dec_keyseat,origin = shaft[-1].end)
+            
+            shaft += create_random_profile(3,
+                                  0,
+                                  initial_diameter=[30,25,20],
+                                  increase_values=[
+                                      -2,
+                                      -3,
+                                      -4,
+                                  ],
+                                  step_lengths=[27, 29],
+                                  step_modificator=step_mod_dec_hole_chamfer,
+                                  step_type=sol.Hole,origin=0) 
+            #shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,14)]
+            #shaft[-1]._origin=shaft[-2].end
+            
+            shafts.append(shaft)
+        
+
+        return shafts            
+            
+            
+            
+        return shafts
+    

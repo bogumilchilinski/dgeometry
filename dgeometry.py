@@ -63,7 +63,7 @@ class GeometrySceneDG:
 #     plt.tight_layout()
 
     #plt.figure(figsize=(12,9))
-    plt.figure(figsize=(20,20))
+    plt.figure(figsize=(9,12))
     
     ax_2d = plt.subplot(121)
     #ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
@@ -78,7 +78,7 @@ class GeometrySceneDG:
     #ax_2d.set_yticks(  range(-12,12,2) )
     #ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
 
-    ax_3d = plt.subplot(122, projection='3d')
+    ax_3d = plt.subplot(121, projection='3d')
     #ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
 
     #plt.xlim(0, 16)
@@ -95,22 +95,25 @@ class GeometrySceneDG:
     ax_3d=ax_3d 
 
     #def __init__(self,height=12,width=9,figsize=(12,9)):
-    def __init__(self,height=12,width=20,figsize=(12,20)):
+    def __init__(self,height=12,width=20,figsize=(18,9)):
         plt.figure(figsize=figsize)
         ax_2d = plt.subplot(121)
         ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
-
+        
         plt.xlim(0, width)
         plt.ylim(-height, height)
         plt.grid(True)      
 
-        ax_2d.set_yticks(  range(-12,12,2) )
-        ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
+        ax_2d.set_yticks(  range(-12,12,4) )
+        ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,4)))  )
+        
+        ax_2d.set_xticks(  range(0,20,4) )
+        ax_2d.set_xticklabels(  list(map(lambda tick: str(abs(tick)),range(0,20,4)))  )
 
         ax_3d = plt.subplot(122, projection='3d')
         ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
 
-        plt.xlim(0, 12)
+        plt.xlim(0, 20)
         plt.ylim(0, 20)
 
 
