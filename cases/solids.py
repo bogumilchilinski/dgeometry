@@ -3685,7 +3685,7 @@ class BodyBlockShapeT(BodyBlock):
             s - w/2 + 0.1*l +np.array([0, 0,  l,  l,  0])*0.15,
             [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
             '--',
-            color='b')  + GeometryScene.ax_2d.plot(
+            color='b') + GeometryScene.ax_2d.plot(
             s + w/2 - 0.25*l +np.array([0, 0,  l,  l,  0])*0.15,
             [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
             '--',
@@ -3828,9 +3828,6 @@ class BodyBlockShapeC(BodyBlock):
         else:
             return {}
 
-    @property
-    def space_btwn(self):
-        return 90
     
     @property
     def height_upper(self):
@@ -3846,7 +3843,26 @@ class BodyBlockShapeC(BodyBlock):
     
     @property
     def indentation_wider(self):
-        return self.width * 2/3
+        return self.width * 1/5
+    
+    @property    
+    def _front_view_outline(self):
+
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+        
+        t_l = origin + l / 4
+        t_r = (-l - 20)
+        
+        x_coords=np.array([0, 0, w_w, w_w, 0, 0, w, w, 0])-w*3/5
+        y_coords=np.array([h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up - h_w, h_up, h_up, h_lw, h_lw])
+
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
     
     def _plot_2d(self, language='en'):
 
@@ -3867,38 +3883,44 @@ class BodyBlockShapeC(BodyBlock):
         h_w = self.height_wider /10
         
         s = self.space_btwn /10
-    @property    
-    def _front_view_outline(self):
-
-        t_l = origin + l / 4
-        t_r = (-l - 20)
-        x_coords=[origin, origin, origin + w/2 - w_w/2 , origin + w/2 - w_w/2 , origin + w/2 + w_w/2, origin + w/2 + w_w/2, origin + w,  origin + w,  origin]
-        y_coords=[h_lw, h_lw + h_w, h_lw + h_w, h_up, h_up, h_lw + h_w, h_lw + h_w, h_lw, h_lw]
-
+        
+        t_l = origin + l 
+        t_r = (-l - 25)
+        
+        front_view=self._front_view_outline
+        
         line_type = self.line_type
         color = self.color
 
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            origin +np.array([0, 0, l, l, 0]),
             [h_lw, h_up, h_up, h_lw, h_lw],
             line_type,
             color=color,
             linewidth = 1) + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + l],
+                origin +np.array([0, l]),
                 [h_up - h_w, h_up - h_w],
                 line_type,
                 color=color,
                 linewidth = 1) + GeometryScene.ax_2d.plot(
-                    [origin + 0, origin + l],
+                    origin +np.array([0, l]),
                     [h_lw + h_w, h_lw + h_w],
                     line_type,
                     color=color,
                     linewidth = 1) + GeometryScene.ax_2d.plot(
-                        [origin + s, origin + s, origin + s + w - w_w, origin + s + w - w_w,  origin + s,  origin + s,  origin + s + w,  origin + s + w,  origin + s], 
-                        [h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up - h_w, h_up, h_up, h_lw, h_lw],
+                        front_view[:,0]+s, 
+                        front_view[:,1],
                         '-',
                         color='k',
-                        linewidth = 1)
+                        linewidth=1) + GeometryScene.ax_2d.plot(
+            s - w/2 - 0.07*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+            '--',
+            color='b')  + GeometryScene.ax_2d.plot(
+            s - w/2 - 0.07*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_up, h_up - h_w, h_up - h_w, h_up, h_up],
+            '--',
+            color='b') 
 
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
@@ -3964,9 +3986,6 @@ class BodyBlockCutType(BodyBlock):
         else:
             return {}
 
-    @property
-    def space_btwn(self):
-        return 90
     
     @property
     def height_upper(self):
@@ -3982,7 +4001,24 @@ class BodyBlockCutType(BodyBlock):
     
     @property
     def indentation_wider(self):
-        return self.width * 2/3
+        return self.width * 1/5
+    
+    @property    
+    def _front_view_outline(self):
+
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+        
+
+        x_coords=np.array([0, 0, w_w, w_w, 2*w_w, w, w, 0])-w*3/5
+        y_coords=np.array([h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up, h_up, h_lw, h_lw])
+
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
     
     def _plot_2d(self, language='en'):
 
@@ -4003,35 +4039,38 @@ class BodyBlockCutType(BodyBlock):
         h_w = self.height_wider /10
         
         s = self.space_btwn /10
-        
-
+        front_view=self._front_view_outline
         t_l = origin - 1 / 10
         t_r = (-l - 22)
-
+        
         line_type = self.line_type
         color = self.color
 
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            origin +np.array([0, 0, l, l, 0]),
             [h_lw, h_up, h_up, h_lw, h_lw],
             line_type,
             color=color,
             linewidth = 1) + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + l],
+                origin +np.array([0, l]),
                 [h_up - h_w, h_up - h_w],
                 line_type,
                 color=color,
                 linewidth = 1) + GeometryScene.ax_2d.plot(
-                    [origin + 0, origin + l],
+                    origin +np.array([0, l]),
                     [h_lw + h_w, h_lw + h_w],
                     line_type,
                     color=color,
                     linewidth = 1) + GeometryScene.ax_2d.plot(
-                        [origin + s, origin + s, origin + s + w - w_w, origin + s + w - w_w,  origin + s + w,  origin + s + w + w_w,  origin + s + w + w_w,  origin + s], 
-                        [h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up, h_up, h_lw, h_lw],
+                        front_view[:,0]+s, 
+                        front_view[:,1],
                         '-',
                         color='k',
-                        linewidth = 1)
+                        linewidth=1)  + GeometryScene.ax_2d.plot(
+            s - w/2 - 0.07*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+            '--',
+            color='b') 
 
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
@@ -4046,11 +4085,12 @@ class BodyBlockCutType(BodyBlock):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        BlockPreview(0,0, origin/2,
+        self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
 
         print(res)
-class BodyBlockRounded(Solid):
+        
+class RoundedBodyBlock(Solid):
     """This object represents cylinder solid.
     
     The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
@@ -4090,14 +4130,14 @@ class BodyBlockRounded(Solid):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2,
+        'vertical_dimensions': 1,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
@@ -4105,7 +4145,7 @@ class BodyBlockRounded(Solid):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
@@ -4127,7 +4167,9 @@ class BodyBlockRounded(Solid):
              height,
              length,
              width,
-             axis_height):
+             axis_height,
+             holes_diameter=None,
+             holes_no=4 ):
 
         num_of_lines_view = self.num_of_lines('view')
         num_of_lines_sec = self.__class__.num_of_lines_sec
@@ -4144,30 +4186,37 @@ class BodyBlockRounded(Solid):
  
         self.width = width
         self.axis_height=axis_height
-#         #self._parameters = lenght, height_upper, height_lower, width
-#         self._class_description = "with L={}mm and diameter ={}mm".format(
-#             *self._parameters)
+        self.holes_no = holes_no
+        self._holes_diameter=holes_diameter
 
-#         self._name['pl'] = 'Walec'
-#         self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
-#             *self._parameters)
+        
+    @property
+    def holes_diameter(self):
+        if self._holes_diameter:
+            return self._holes_diameter
+        else:
+            return round(self.length*0.15)
 
     def str_en(self):
-        return 'Rounded Body with length={l}mm, \n height={h}mm and width={w}mm'.format(
+        return 'Simple rounded bearing block with length={l}mm, \n height={h}mm, width={w}mm \n and {no} fixing holes d={hole_d}mm \n placed on the body edge'.format(
             l=self.length,
             h=self.height,
-            w=self.width)
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter)
 
     def str_pl(self):
-        return 'Zaokrąglony Korpus o grubości g={l}mm \n wysokości={h}mm i szerokości={w}mm'.format(
+        return 'Zaokrąglona podpora łożyskowa o grubości g={l}mm \n wysokości={h}mm, zerokości={w}mm \n i {no} otworach montażowych d={hole_d}mm \n umiejscowionych na brzegu'.format(
             l=self.length,
             h=self.height,
-            w=self.width).replace('right',
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter).replace('right',
                                      'prawej').replace('left', 'lewej')
 
     @property
     def space_btwn(self):
-        return 10
+        return SPACE_BTW
     
     @property
     def height_upper(self):
@@ -4177,16 +4226,32 @@ class BodyBlockRounded(Solid):
     def height_lower(self):
         return -self.axis_height
     
+    @property    
+    def _front_view_outline(self):
+        
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        
+        t_l = origin + l 
+        t_r = (-l - 25)
+        
+        
+        x_coords=np.array([0, 0, w,  w, 0])-w/2
+        y_coords=np.array([h_lw, h_up, h_up, h_lw, h_lw])
+        
+        
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
+    
     
     def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
         #         print(f'self.end property is {self.end()}')
 
-        class_name = self.__class__.__name__
 
-        span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
 
         origin = self.origin / 10
         l = self.length / 10
@@ -4194,24 +4259,36 @@ class BodyBlockRounded(Solid):
         h_lw = self.height_lower / 10
         w = self.width / 10
         
-        s = self.space_btwn
+        s = self.space_btwn/10
 
         t_l = origin + l 
-        t_r = (-l - 25)
+        t_r = (+h_up +1)
 
         line_type = self.line_type
         color = self.color
+        
+        front_view=self._front_view_outline
+        
+        
 
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            origin +np.array([0, 0,  l,  l,  0]),
             [h_lw, h_up, h_up, h_lw, h_lw],
             line_type,
             color=color) + GeometryScene.ax_2d.plot(
-                [origin + s, origin + s, origin + s + w, origin + s+ w, origin + s], 
-                [h_lw, h_up, h_up, h_lw, h_lw],
+                front_view[:,0]+s, 
+                front_view[:,1],
                 '-',
                 color='k',
-                linewidth=1)
+                linewidth=1) + GeometryScene.ax_2d.plot(
+            s - w/2 + 0.15*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_up, h_up, h_lw, h_lw],
+            '--',
+            color='b')  + GeometryScene.ax_2d.plot(
+            s + w/2 - 0.3*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_up, h_up, h_lw, h_lw],
+            '--',
+            color='b')
 
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
@@ -4226,11 +4303,214 @@ class BodyBlockRounded(Solid):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        BlockPreview(0,0, origin/2,
+                     self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
 
-        print(res)
-class BodyBlockShapeTRounded(BodyBlockRounded):
+
+class RoundedBodyBlockShapeT(RoundedBodyBlock):
+    
+    line_type = '-'
+    color = 'k'
+
+    line_type = '-'
+    color = 'k'
+
+    num_of_lines_view = {
+        'horizontal_lines': 4,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 2,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 4,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+
+
+    
+    @property
+    def height_wider(self):
+        return round(self.height*0.2)
+    
+    @property
+    def indentation_wider(self):
+        return round(self.width * 0.55)
+    
+    @property
+    def _front_view_outline(self):
+        
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+
+        t_l = origin + l 
+        t_r = (-l - 25)
+        
+        
+        x_coords=np.array([0, 0,  w/2 - w_w/2 ,  w/2 - w_w/2 ,  w/2 + w_w/2,  w/2 + w_w/2,  w,   w,  0])-w/2
+        y_coords=np.array([h_lw, h_lw + h_w, h_lw + h_w, h_up, h_up, h_lw + h_w, h_lw + h_w, h_lw, h_lw])
+        
+        
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
+    
+    def _plot_2d(self, language='en'):
+
+
+
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+        
+        s = self.space_btwn /10
+        
+
+        t_l = origin + l 
+        t_r = (+h_up +1)
+
+        line_type = self.line_type
+        color = self.color
+        
+        front_view=self._front_view_outline
+        
+        
+
+        res = GeometryScene.ax_2d.plot(
+            origin +np.array([0, 0,  l,  l,  0]),
+            [h_lw, h_up, h_up, h_lw, h_lw],
+            line_type,
+            color=color) + GeometryScene.ax_2d.plot(
+                front_view[:,0]+s, 
+                front_view[:,1],
+                '-',
+                color='k',
+                linewidth=1) + GeometryScene.ax_2d.plot(
+            s - w/2 + 0.1*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+            '--',
+            color='b')  + GeometryScene.ax_2d.plot(
+            s + w/2 - 0.25*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+            '--',
+            color='b')
+
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        BlockPreview(0,0, origin/2,
+                     self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
+
+        
+        
+    def str_en(self):
+        return 'Bearing rounded block (type T - light) with length={l}mm, \n height={h}mm, width={w}mm \n and {no} fixing holes d={hole_d}mm \n placed on the body edge'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter)
+
+    def str_pl(self):
+        return 'Zaokrąglona podpora łożyskowa (typ T - lekka) o grubości g={l}mm \n wysokości={h}mm, zerokości={w}mm \n i {no} otworach montażowych d={hole_d}mm \n umiejscowionych na brzegu'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter).replace('right',
+                                     'prawej').replace('left', 'lewej')
+
+    
+class RoundedMediumBodyBlockShapeT(RoundedBodyBlockShapeT):
+    
+    
+    @property
+    def height_wider(self):
+        return round(self.height*0.6)
+    
+
+
+    
+    def str_en(self):
+        return 'Bearing rounded block (type T - medium) with length={l}mm, \n height={h}mm, width={w}mm \n and {no} fixing holes d={hole_d}mm \n placed on the body edge'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter)
+
+    def str_pl(self):
+        return 'Zaokrąglona podpora łożyskowa (typ T - średnia) o grubości g={l}mm \n wysokości={h}mm, zerokości={w}mm \n i {no} otworach montażowych d={hole_d}mm \n umiejscowionych na brzegu'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter).replace('right',
+                                     'prawej').replace('left', 'lewej')
+    
+
+    
+class RoundedHeavyBodyBlockShapeT(RoundedBodyBlockShapeT):
+    
+    
+    @property
+    def height_wider(self):
+        return round(self.height*0.6)
+    
+
+
+    
+    def str_en(self):
+        return 'Bearing rounded block (type T - heavy) with length={l}mm, \n height={h}mm, width={w}mm \n and {no} fixing holes d={hole_d}mm \n placed on the body edge'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter)
+
+    def str_pl(self):
+        return 'Zaokrąglona podpora łożyskowa (typ T - ciężka) o grubości g={l}mm \n wysokości={h}mm, zerokości={w}mm \n i {no} otworach montażowych d={hole_d}mm \n umiejscowionych na brzegu'.format(
+            l=self.length,
+            h=self.height,
+            w=self.width,
+            no=self.holes_no,
+            hole_d= self.holes_diameter).replace('right',
+                                     'prawej').replace('left', 'lewej')    
+    
+    
+    
+    
+class RoundedBodyBlockShapeC(RoundedBodyBlock):
     
     line_type = '-'
     color = 'k'
@@ -4271,10 +4551,6 @@ class BodyBlockShapeTRounded(BodyBlockRounded):
             return cls.num_of_lines_half_sec
         else:
             return {}
-
-    @property
-    def space_btwn(self):
-        return 90
     
     @property
     def height_upper(self):
@@ -4290,7 +4566,26 @@ class BodyBlockShapeTRounded(BodyBlockRounded):
     
     @property
     def indentation_wider(self):
-        return self.width * 1/2
+        return self.width * 1/5
+    
+    @property
+    def _front_view_outline(self):
+
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+        
+        t_l = origin + l / 4
+        t_r = (-l - 20)
+        
+        x_coords=np.array([0, 0, w_w, w_w, 0, 0, w, w, 0])-w*3/5
+        y_coords=np.array([h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up - h_w, h_up, h_up, h_lw, h_lw])
+
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
     
     def _plot_2d(self, language='en'):
 
@@ -4312,157 +4607,43 @@ class BodyBlockShapeTRounded(BodyBlockRounded):
         
         s = self.space_btwn /10
         
-
-        t_l = origin + l / 4
-        t_r = (-l - 20)
-
+        t_l = origin + l 
+        t_r = (-l - 25)
+        
+        front_view=self._front_view_outline
+        
         line_type = self.line_type
         color = self.color
 
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            origin +np.array([0, 0, l, l, 0]),
             [h_lw, h_up, h_up, h_lw, h_lw],
             line_type,
             color=color,
             linewidth = 1) + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + l],
-                [h_lw + h_w, h_lw + h_w],
-                line_type,
-                color=color,
-                linewidth = 1) + GeometryScene.ax_2d.plot(
-                    [origin + s, origin + s, origin + s + w/2 - w_w/2 , origin + s + w/2 - w_w/2 , origin + s + w/2 + w_w/2, origin + s + w/2 + w_w/2, origin + s + w,  origin + s + w,  origin + s],                    [h_lw, h_lw + h_w, h_lw + h_w, h_up, h_up, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
-                    '-',
-                    color='k',
-                    linewidth = 1)
-
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_pl(),
-                                            rotation='vertical',
-                                            multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_en(),
-                                            rotation='vertical',
-                                            multialignment='center')
-
-        ShaftPreview(0,0, origin / 2,
-                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
-
-        print(res)
-
-class BodyBlockShapeCRounded(BodyBlockRounded):
-    
-    line_type = '-'
-    color = 'k'
-
-    num_of_lines_view = {
-        'horizontal_lines': 3,
-        'vertical_lines': 2,
-        'horizontal_dimensions': 1,
-        'vertical_dimensions': 2,
-        'inclined_lines': 0,
-    }
-    num_of_lines_sec = {
-        'horizontal_lines': 3,
-        'vertical_lines': 2,
-        'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
-        'inclined_lines': 0,
-    }
-
-    num_of_lines_half_sec = {
-        'horizontal_lines': 3,
-        'vertical_lines': 2,
-        'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
-        'inclined_lines': 0,
-    }
-
-    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
-
-    @classmethod
-    def num_of_lines(cls,type_of_view):
-        
-        if type_of_view == 'view':
-            return cls.num_of_lines_view
-        elif type_of_view == 'section':
-            return cls.num_of_lines_sec
-        elif type_of_view == 'halfsection':
-            return cls.num_of_lines_half_sec
-        else:
-            return {}
-
-    @property
-    def space_btwn(self):
-        return 90
-    
-    @property
-    def height_upper(self):
-        return self.height -self.axis_height
-
-    @property
-    def height_lower(self):
-        return -self.axis_height
-    
-    @property
-    def height_wider(self):
-        return 20
-    
-    @property
-    def indentation_wider(self):
-        return self.width * 2/3
-    
-    def _plot_2d(self, language='en'):
-
-        #         print(f'self.origin property is {self.origin()}')
-        #         print(f'self.end property is {self.end()}')
-
-        class_name = self.__class__.__name__
-
-        span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
-
-        origin = self.origin / 10
-        l = self.length / 10
-        h_up = self.height_upper / 10
-        h_lw = self.height_lower / 10
-        w = self.width / 10
-        w_w = self.indentation_wider /10
-        h_w = self.height_wider /10
-        
-        s = self.space_btwn /10
-        
-
-        t_l = origin + l / 4
-        t_r = (-l - 20)
-
-        line_type = self.line_type
-        color = self.color
-
-        res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [h_lw, h_up, h_up, h_lw, h_lw],
-            line_type,
-            color=color,
-            linewidth = 1) + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + l],
+                origin +np.array([0, l]),
                 [h_up - h_w, h_up - h_w],
                 line_type,
                 color=color,
                 linewidth = 1) + GeometryScene.ax_2d.plot(
-                    [origin + 0, origin + l],
+                    origin +np.array([0, l]),
                     [h_lw + h_w, h_lw + h_w],
                     line_type,
                     color=color,
                     linewidth = 1) + GeometryScene.ax_2d.plot(
-                        [origin + s, origin + s, origin + s + w - w_w, origin + s + w - w_w,  origin + s,  origin + s,  origin + s + w,  origin + s + w,  origin + s], 
-                        [h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up - h_w, h_up, h_up, h_lw, h_lw],
+                        front_view[:,0]+s, 
+                        front_view[:,1],
                         '-',
                         color='k',
-                        linewidth = 1)
+                        linewidth=1) + GeometryScene.ax_2d.plot(
+            s - w/2 - 0.07*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+            '--',
+            color='b')  + GeometryScene.ax_2d.plot(
+            s - w/2 - 0.07*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_up, h_up - h_w, h_up - h_w, h_up, h_up],
+            '--',
+            color='b') 
 
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
@@ -4477,12 +4658,16 @@ class BodyBlockShapeCRounded(BodyBlockRounded):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+#         BlockPreview(0,0, origin/2,
+#         self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
+        BlockPreview(0,0, origin/2,
+        self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
+#         ShaftPreview(0,0, origin / 2,
+#                      [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
 
-class BodyBlockCutTypeRounded(BodyBlockRounded):
+class RoundedBodyBlockCutType(RoundedBodyBlock):
     
     line_type = '-'
     color = 'k'
@@ -4523,10 +4708,6 @@ class BodyBlockCutTypeRounded(BodyBlockRounded):
             return cls.num_of_lines_half_sec
         else:
             return {}
-
-    @property
-    def space_btwn(self):
-        return 90
     
     @property
     def height_upper(self):
@@ -4542,7 +4723,24 @@ class BodyBlockCutTypeRounded(BodyBlockRounded):
     
     @property
     def indentation_wider(self):
-        return self.width * 2/3
+        return self.width * 1/5
+    
+    @property    
+    def _front_view_outline(self):
+
+        origin = self.origin / 10
+        l = self.length / 10
+        h_up = self.height_upper / 10
+        h_lw = self.height_lower / 10
+        w = self.width / 10
+        w_w = self.indentation_wider /10
+        h_w = self.height_wider /10
+        
+
+        x_coords=np.array([0, 0, w_w, w_w, 2*w_w, w, w, 0])-w*3/5
+        y_coords=np.array([h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up, h_up, h_lw, h_lw])
+
+        return np.array([[x,y]  for x,y in zip(x_coords,y_coords)])
     
     def _plot_2d(self, language='en'):
 
@@ -4563,35 +4761,38 @@ class BodyBlockCutTypeRounded(BodyBlockRounded):
         h_w = self.height_wider /10
         
         s = self.space_btwn /10
-        
-
+        front_view=self._front_view_outline
         t_l = origin - 1 / 10
         t_r = (-l - 22)
-
+        
         line_type = self.line_type
         color = self.color
 
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            origin +np.array([0, 0, l, l, 0]),
             [h_lw, h_up, h_up, h_lw, h_lw],
             line_type,
             color=color,
             linewidth = 1) + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + l],
+                origin +np.array([0, l]),
                 [h_up - h_w, h_up - h_w],
                 line_type,
                 color=color,
                 linewidth = 1) + GeometryScene.ax_2d.plot(
-                    [origin + 0, origin + l],
+                    origin +np.array([0, l]),
                     [h_lw + h_w, h_lw + h_w],
                     line_type,
                     color=color,
                     linewidth = 1) + GeometryScene.ax_2d.plot(
-                        [origin + s, origin + s, origin + s + w - w_w, origin + s + w - w_w,  origin + s + w,  origin + s + w + w_w,  origin + s + w + w_w,  origin + s], 
-                        [h_lw, h_lw + h_w, h_lw + h_w, h_up - h_w, h_up, h_up, h_lw, h_lw],
+                        front_view[:,0]+s, 
+                        front_view[:,1],
                         '-',
                         color='k',
-                        linewidth = 1)
+                        linewidth=1) + GeometryScene.ax_2d.plot(
+            s - w/2 - 0.07*l +np.array([0, 0,  l,  l,  0])*0.15,
+            [h_lw, h_lw + h_w, h_lw + h_w, h_lw, h_lw],
+            '--',
+            color='b') 
 
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
@@ -4606,8 +4807,8 @@ class BodyBlockCutTypeRounded(BodyBlockRounded):
                                             rotation='vertical',
                                             multialignment='center')
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * l / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        BlockPreview(0,0, origin/2,
+        self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
 
         print(res)
 

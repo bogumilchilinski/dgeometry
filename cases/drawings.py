@@ -1423,10 +1423,13 @@ class BodyBlockView(ShaftSketch
             
             axis_pos= round(0.01*random.randint(50,70) * body_height)
             
-            body_type = random.choice([sol.BodyBlock,
-                                       sol.BodyBlockShapeT,
-                                       sol.HeavyBodyBlockShapeT,
-                                        sol.MediumBodyBlockShapeT,
+            body_type = random.choice([
+#                                        sol.BodyBlock,
+#                                        sol.BodyBlockShapeT,
+#                                        sol.HeavyBodyBlockShapeT,
+#                                        sol.MediumBodyBlockShapeT,
+#                                        sol.BodyBlockShapeC,
+                                       sol.BodyBlockCutType,
                                       ])
             
             shaft = [body_type(body_height,body_length,body_width,axis_pos)]
@@ -1455,10 +1458,13 @@ class BodyBlockView(ShaftSketch
             
             axis_pos= round(0.01*random.randint(50,70) * body_height)
             
-            body_type = random.choice([sol.BodyBlock,
-                                       sol.BodyBlockShapeT,
-                                       sol.HeavyBodyBlockShapeT,
-                                        sol.MediumBodyBlockShapeT,
+            body_type = random.choice([
+#                                        sol.BodyBlock,
+#                                        sol.BodyBlockShapeT,
+#                                        sol.HeavyBodyBlockShapeT,
+#                                        sol.MediumBodyBlockShapeT,
+#                                        sol.BodyBlockShapeC,
+                                       sol.BodyBlockCutType,
                                       ])
             
             shaft = [body_type(body_height,body_length,body_width,axis_pos)]
@@ -1511,7 +1517,7 @@ class BearingBlockView(ShaftSketch
             body_type = random.choice([sol.BodyBlock,
                                        sol.BodyBlockShapeT,
                                        sol.HeavyBodyBlockShapeT,
-                                        sol.MediumBodyBlockShapeT,
+                                       sol.MediumBodyBlockShapeT,
                                       ])
             
             shaft = [body_type(body_height,body_length,body_width,axis_pos)]
@@ -1546,7 +1552,9 @@ class BearingBlockView(ShaftSketch
             body_type = random.choice([sol.BodyBlock,
                                        sol.BodyBlockShapeT,
                                        sol.HeavyBodyBlockShapeT,
-                                        sol.MediumBodyBlockShapeT,
+                                       sol.MediumBodyBlockShapeT,
+                                       sol.BodyBlockShapeC,
+                                       sol.BodyBlockCutType,
                                       ])
             
             shaft = [body_type(body_height,body_length,body_width,axis_pos)]
@@ -1581,7 +1589,9 @@ class BearingBlockView(ShaftSketch
             body_type = random.choice([sol.BodyBlock,
                                        sol.BodyBlockShapeT,
                                        sol.HeavyBodyBlockShapeT,
-                                        sol.MediumBodyBlockShapeT,
+                                       sol.MediumBodyBlockShapeT,
+                                       sol.BodyBlockShapeC,
+                                       sol.BodyBlockCutType,
                                       ])
             
             shaft = [body_type(body_height,body_length,body_width,axis_pos)]
@@ -1612,8 +1622,6 @@ class BearingBlockView(ShaftSketch
 class BodyBlockRoundedView(ShaftSketch
                               #GeometricalCase
                               ):
-
-
     @classmethod
     def _structure_generator(cls):
         
@@ -1622,51 +1630,78 @@ class BodyBlockRoundedView(ShaftSketch
         
         shafts  = []
         for i in range(50):
-            body_length=random.randint(30,90)
+            body_height=random.randint(120,150)
+            body_width=random.randint(140,170)
             
-            shaft = [sol.BodyBlockRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            body_length = round(0.7*body_width)
+            
+            axis_pos= round(0.01*random.randint(50,70) * body_height)
+            
+            body_type = random.choice([sol.RoundedBodyBlock,
+                                       sol.RoundedBodyBlockShapeT,
+                                       sol.RoundedHeavyBodyBlockShapeT,
+                                       sol.RoundedMediumBodyBlockShapeT,
+                                       sol.RoundedBodyBlockShapeC,
+                                       sol.RoundedBodyBlockCutType,
+                                      ])
+            
+            shaft = [body_type(body_height,body_length,body_width,axis_pos)]
             shaft[-1]._origin = 0
-            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
+            
+            step_length = random.randint(10,20)
+            
+            shaft += [sol.BlockHole(step_length,round(0.35*body_width))]
             shaft[-1]._origin = 0
-            shaft[-1]._end = shaft[-2].end
+            
+            
+            shaft += [sol.BlockHiddenHole(body_length-step_length,round(0.4*body_width))]
+            shaft[-1]._origin =step_length
+            #shaft[-1]._end = shaft[-2].end
             
             
             shafts.append(shaft)
+            
+            
+
         for i in range(50):
-            body_length=random.randint(30,90)
+            body_height=random.randint(120,150)
+            body_width=random.randint(140,170)
             
-            shaft = [sol.BodyBlockShapeTRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
+            body_length = round(0.7*body_width)
+            
+            axis_pos= round(0.01*random.randint(50,70) * body_height)
+            
+            body_type = random.choice([sol.RoundedBodyBlock,
+                                       sol.RoundedBodyBlockShapeT,
+                                       sol.RoundedHeavyBodyBlockShapeT,
+                                       sol.RoundedMediumBodyBlockShapeT,
+                                       sol.RoundedBodyBlockShapeC,
+                                       sol.RoundedBodyBlockCutType,
+                                      ])
+            
+            shaft = [body_type(body_height,body_length,body_width,axis_pos)]
             shaft[-1]._origin = 0
-            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
+            shaft += [sol.BlockHole(round(body_length*0.4),round(0.4*body_width))]
             shaft[-1]._origin = 0
-            shaft[-1]._end = shaft[-2].end
+
+
+            step_length = random.randint(10,30)
+            
+            shaft += [sol.BlockHole(step_length,round(0.3*body_width))]
+            shaft[-1]._origin = shaft[-2].end
+            
+            
+            shaft += [sol.BlockHiddenHole(body_length-(round(body_length*0.4) + step_length ) ,round(0.4*body_width))]
+            shaft[-1]._origin = shaft[-2].end
+            #shaft[-1]._end = shaft[-2].end
             
             
             shafts.append(shaft)
-        for i in range(50):
-            body_length=random.randint(30,90)
             
-            shaft = [sol.BodyBlockShapeCRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
-            shaft[-1]._origin = 0
-            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
-            shaft[-1]._origin = 0
-            shaft[-1]._end = shaft[-2].end
-            
-            
-            shafts.append(shaft)
-        for i in range(50):
-            body_length=random.randint(30,90)
-            
-            shaft = [sol.BodyBlockCutTypeRounded(random.randint(100,150),0.5*body_length,random.randint(100,150),random.randint(30,60))]
-            shaft[-1]._origin = 0
-            shaft += [sol.OpenHole(0.5*body_length,random.randint(30,60))]
-            shaft[-1]._origin = 0
-            shaft[-1]._end = shaft[-2].end
-            
-            
-            shafts.append(shaft)
+
             
         return shafts
+
     
     
 class ShaftWithKeyseats(ShaftSketch
