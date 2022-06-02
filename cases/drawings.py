@@ -1238,44 +1238,51 @@ class BasicGearSketch(ShaftSketch
         holes = cls.holes_no
         
         shafts =  []
-        for i in range(50): # Git
+#         for i in range(50): # Git
 
-            shaft = [sol.Cylinder(random.randint(20,40),random.randint(50,60))] + [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))]
-            shaft[-1]._origin=0
-            shaft[-2]._origin=shaft[-1].end
+#             shaft = [sol.Cylinder(random.randint(20,40),random.randint(50,60))] + [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))]
+#             shaft[-1]._origin=0
+#             shaft[-2]._origin=shaft[-1].end
             
-            shaft +=[sol.ChamferedOpenHoleWithKeyway(shaft[-2].end,random.randint(20,40))]
-            shaft[-1]._origin=shaft[-2].origin
-            shaft[-1]._end=shaft[-3].end
+#             shaft +=[sol.ChamferedOpenHoleWithKeyway(shaft[-2].end,random.randint(20,40))]
+#             shaft[-1]._origin=shaft[-2].origin
+#             shaft[-1]._end=shaft[-3].end
             
-            shafts.append(shaft)
+#             shafts.append(shaft)
             
               
+#         for i in range(50): # Git
+#             shaft =[sol.Cylinder(random.randint(20,40),random.randint(50,60))] + [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))] + [sol.Cylinder(random.randint(20,40),random.randint(50,60))]
+#             shaft[-3]._origin = 0
+#             shaft[-2]._origin=shaft[-3].end
+#             shaft[-1]._origin = shaft[-2].end
+            
+#             shaft +=[sol.ChamferedOpenHoleWithKeyway(shaft[-1].end,random.randint(20,40))]
+#             shaft[-1]._origin=shaft[-4].origin
+#             shaft[-1]._end=shaft[-2].end
+              
+#             shafts.append(shaft)
+            
+#         for i in range(50): # Git
+
+#             shaft = [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))] + [sol.Cylinder(random.randint(20,40),random.randint(50,60))]
+#             shaft[-1]._origin =0
+#             shaft[-2]._origin = shaft[-1].end
+#             shaft +=[sol.ChamferedHole(shaft[-2].end,random.randint(20,40))]
+#             shaft[-1]._origin=shaft[-2].origin
+#             shaft[-1]._end=shaft[-3].end
+            
+            
+#             shafts.append(shaft)
         for i in range(50): # Git
-            shaft =[sol.Cylinder(random.randint(20,40),random.randint(50,60))] + [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))] + [sol.Cylinder(random.randint(20,40),random.randint(50,60))]
+            shaft =[sol.Cylinder(random.randint(20,40),random.randint(50,60))] +[sol.Cylinder(random.randint(20,40),random.randint(50,60))]+[sol.Cylinder(random.randint(20,40),random.randint(50,60))]
             shaft[-3]._origin = 0
             shaft[-2]._origin=shaft[-3].end
             shaft[-1]._origin = shaft[-2].end
-            
-            shaft +=[sol.ChamferedOpenHoleWithKeyway(shaft[-1].end,random.randint(20,40))]
-            shaft[-1]._origin=shaft[-4].origin
-            shaft[-1]._end=shaft[-2].end
+          
               
+           
             shafts.append(shaft)
-            
-        for i in range(50): # Git
-
-            shaft = [sol.Gear(random.randint(30,60), random.randint(40,50), random.randint(3,4))] + [sol.Cylinder(random.randint(20,40),random.randint(50,60))]
-            shaft[-1]._origin =0
-            shaft[-2]._origin = shaft[-1].end
-            shaft +=[sol.ChamferedHole(shaft[-2].end,random.randint(20,40))]
-            shaft[-1]._origin=shaft[-2].origin
-            shaft[-1]._end=shaft[-3].end
-            
-            
-            shafts.append(shaft)
-        
-            
   
             
         return shafts
