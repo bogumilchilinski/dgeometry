@@ -32,6 +32,7 @@ class SegmentMidpoint(GeometricalCase):
             projections=[]
         
         self._assumptions=DrawingSet(point_A,point_B,*projections)
+        self._assumptions3d = DrawingSet(point_A,point_B)
         self._given_data={'A':point_A,'B':point_B}
 
         self._point_A=point_A
@@ -92,6 +93,7 @@ class PointOnLine(GeometricalCase):
             self._given_data={'A':point_A,'B':point_B}
         
         self._assumptions=DrawingSet(point_A,point_B,*projections)
+        self._assumptions3d = DrawingSet(point_A,point_B,point_D)
         #self._given_data={'A':point_A,'B':point_B,'D':point_D}
 
         self._point_A=point_A
@@ -384,18 +386,19 @@ class LineOnPlane(GeometricalCase):
 #     point_F = [pt + dist  for pt,dist   in  it.product(point_B,distance_BF) if (pt+dist).x != 0]
 
     point_D=[Point(x,y,z) for x in range(7,11) for y in range(2,6) for z in range(8,12) ]
+    point_C = [Point(x,y,z) for x in range(1,5) for y in range(8,12) for z in range(2,5) ]
     point_E = [Point(x,y,z) for x in range(1,5) for y in range(8,12) for z in range(2,5) ]
     point_F = [Point(x,y,z) for x in range(7,11) for y in range(13,16) for z in range(8,12) ]
     
     
-    def __init__(self,point_A=None,point_B=None,point_O=None,point_C=None,point_D=None,**kwargs):
+    def __init__(self,point_A=None,point_B=None,point_O=None,point_E=None,point_F=None,**kwargs):
 
         super().__init__()
 
-        if point_A and point_B and point_O and point_C and point_D:
+        if point_A and point_B and point_O and point_E and point_E:
             projections=(point_A@HPP,point_B@HPP,Line(point_A@HPP,point_O@HPP),Line(point_A@VPP,point_O@VPP),
                          Line(point_B@HPP,point_O@HPP),Line(point_B@VPP,point_O@VPP),point_A@VPP,point_B@VPP,
-                         point_O@HPP,point_O@VPP,point_C@VPP,point_D@VPP,point_C@HPP,point_D@HPP,point_C@VPP,point_D@VPP
+                         point_O@HPP,point_O@VPP,point_E@VPP,point_E@VPP,point_E@HPP,point_F@HPP,point_E@VPP,point_F@VPP
                         )
         else:
             projections=[]
@@ -406,15 +409,16 @@ class LineOnPlane(GeometricalCase):
         self._point_A=point_A
         self._point_B=point_B
         self._point_O=point_O
-        self._point_C=point_C
-        self._point_D=point_D
+        self._point_E=point_E
+        self._point_F=point_F
 
 
-        self._given_data={'A':point_A,'B':point_B,'O':point_A,'C':point_C,'D':point_D}
+        self._given_data={'A':point_A,'B':point_B,'O':point_O,'E':point_E,'F':point_F}
 
 
         
         self._solution_step.append(self._assumptions)
+        
 #     def solution(self):
 
         
@@ -426,37 +430,48 @@ class LineOnPlane(GeometricalCase):
         
 #         current_obj.midpoint = midpoint
 #         current_obj.point_C = midpoint
-        
+
 #         return current_obj
     def solution(self):
-        self._line=Line(self._point_C,self._point_D)
+
         current_obj=copy.deepcopy(self)
         
         A=current_obj._point_A
         B=current_obj._point_B
         O=current_obj._point_O
-        n=current_obj._line
+        
+        E = current_obj._point_E
+        F = current_obj._point_F
+        
+
         current_set=DrawingSet(*current_obj._solution_step[-1])
 
         base_plane=Plane(A,B,O)('base')
-        line_a=Line(self._point_C,self._point_C+Point(15,0,0))('a')
-        line_b=Line(self._point_D,self._point_D+Point(15,0,0))('b')
+
 
         plane_v=base_plane('alpha') #why is the line created? #looks unnecessary
         #plane_h=Plane(n.p1,n.p2,n.p1@HPP)('beta')
-        #int_line_h=Line(plane_h.intersection(line_a)[0],plane_h.intersection(line_b)[0])('n')
-        int_line_v=Line(plane_v.intersection(line_a)[0],plane_v.intersection(line_b)[0])('n') 
 
-        elems=[line_a,line_b,int_line_v]
-        projections=[line_a@HPP,line_b@HPP,line_a@VPP,line_b@VPP]
-        current_set+=[*elems,*projections]
+
+
 
         current_obj._solution_step.append(current_set)
-        current_obj.int_line_v_p1=(int_line_v).p1 #names
-        current_obj.int_line_v_p2=(int_line_v).p2 #names
+
         
-        current_obj.point_P=(int_line_v).p1 #names
-        current_obj.point_Q=(int_line_v).p2 #names
+        
+        #tu dodaj
+        
+        lineE=E^(E+Point(15,0,0))
+        lineF=F^(F+Point(15,0,0))
+
+        
+        
+        current_obj.point_C = plane_v.intersection(lineE)[0]
+        current_obj.point_D = plane_v.intersection(lineF)[0]
+        
+        elems=[lineE,lineF]
+        projections=[lineE@HPP,lineF@HPP,lineE@VPP,lineF@VPP]
+        current_set+=[*elems,*projections]
         
         
         return current_obj
@@ -499,10 +514,29 @@ class LineOnPlane(GeometricalCase):
             Symbol('B'): point_B,
             Symbol('O'): point_O,
 
-            Symbol('C'): point_D,
-            Symbol('D'): point_F,
+            Symbol('E'): point_E,
+            Symbol('F'): point_F,
         }
         return default_data_dict
+    
+    
+    
+class HorizontalLineOnPlane(LineOnPlane):
+
+
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_E=parameters_dict[Symbol('E')]
+        point_F=parameters_dict[Symbol('F')] 
+
+        
+        parameters_dict[Symbol('F')]=Point(point_F.x,point_F.y,point_E.z)
+
+        return parameters_dict
     
     
     
@@ -515,7 +549,7 @@ class PointOnPlane(GeometricalCase):
     point_O = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in range(8,12) ]
     distance_OB = [Point(-4,4,-4),Point(-5,5,-4),Point(-4,5,-6),Point(-5,4,-7)]
 
-    point_B=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5,3,3.5] ]
+    point_B=[Point(x,y,z) for x in [4,4.5,5,5.5,6] for y in [12,12.5,13,13.5] for z in [1,1.5,2,2.5,3,3.5] ]
 
 
     distance_AD = [Point(x,y,z) for x in range(1,5) for y in range(0,4) for z in range(1,5) ]
@@ -527,7 +561,7 @@ class PointOnPlane(GeometricalCase):
 #     point_F = [pt + dist  for pt,dist   in  it.product(point_B,distance_BF) if (pt+dist).x != 0]
 
     point_D=[Point(x,y,z) for x in range(7,11) for y in range(2,6) for z in range(8,12) ]
-    point_E = [Point(x,y,z) for x in range(1,5) for y in range(8,12) for z in range(2,5) ]
+    point_E = [Point(x,y,z) for x in range(1,5) for y in range(8,12) for z in range(5,7) ]
     point_F = [Point(x,y,z) for x in range(7,11) for y in range(13,16) for z in range(8,12) ]
     
     

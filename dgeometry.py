@@ -90,7 +90,7 @@ class GeometrySceneDG:
     ax_3d = None
 
     #def __init__(self,height=12,width=9,figsize=(12,9)):
-    def __init__(self, init_3d=(30, 10), height=12, width=20, figsize=(18, 9)):
+    def __init__(self, init_3d=(30, 10), height=12, width=16, figsize=(12, 9)):
         plt.figure(figsize=figsize)
         ax_2d = plt.subplot(121)
         ax_2d.set(ylabel=(r'<-x | z ->'), xlabel='y')
@@ -99,13 +99,13 @@ class GeometrySceneDG:
         plt.ylim(-height, height)
         plt.grid(True)
 
-        ax_2d.set_yticks(range(-12, 12, 4))
+        ax_2d.set_yticks(range(-12, 12, 1))
         ax_2d.set_yticklabels(
-            list(map(lambda tick: str(abs(tick)), range(-12, 12, 4))))
+            list(map(lambda tick: str(abs(tick)), range(-12, 12, 1))))
 
-        ax_2d.set_xticks(range(0, 20, 4))
+        ax_2d.set_xticks(range(0, 16, 1))
         ax_2d.set_xticklabels(
-            list(map(lambda tick: str(abs(tick)), range(0, 20, 4))))
+            list(map(lambda tick: str(abs(tick)), range(0, 16, 1))))
 
         ax_3d = plt.subplot(122, projection='3d')
         ax_3d.set(xlabel='x', ylabel='y', zlabel='z')
@@ -460,7 +460,7 @@ class Entity:
         text=None,
         fontsize=13,
         linewidth=linewidth,
-        scene=GeometryScene.ax_2d,
+        scene=GeometrySceneDG.ax_2d,
     ):
         '''
         Set the coordinates of the points with the text explanation         
@@ -585,9 +585,8 @@ class Entity:
             style=style,
             text=text,
             fontsize=fontsize,
-            linewidth=linewidth,
-            scene=scene
-        )
+            #linewidth=linewidth,
+            scene=scene)
 
         self.plot_hp(
             fmt=fmt,
@@ -596,9 +595,8 @@ class Entity:
             style=style,
             text=text,
             fontsize=fontsize,
-            linewidth=linewidth,
-            scene=scene
-        )
+            #linewidth=linewidth,
+            scene=scene)
         
         
         self.plot_vp(
@@ -608,9 +606,8 @@ class Entity:
             style=style,
             text=text,
             fontsize=fontsize,
-            linewidth=linewidth,
-            scene=scene
-        )
+            #linewidth=linewidth,
+            scene=scene)
         
         
         return self
@@ -1185,32 +1182,39 @@ class GeometricalCase(DrawingSet):
         return self._path
 
     def preview(self, example=False):
-        GeometrySceneDG()
+        
 
-        print('preview')
+#        print('preview')
         print(self._assumptions3d)
         if self._assumptions3d is None:
             self._assumptions3d = self._assumptions
 
         print(self._assumptions3d)
+        
+        if self._path:
+            path = self._path
+            
+        else:
+            GeometrySceneDG()
 
-        self._assumptions3d.plot()
-        self._assumptions.plot_hp()
-        self._assumptions.plot_vp()
+            self._assumptions3d.plot()
+            self._assumptions.plot_hp()
+            self._assumptions.plot_vp()
 
-        path = __file__.replace('dgeometry.py',
-                                'images/') + self.__class__.__name__ + str(
-                                    next(self.__class__._case_no)) + '.png'
+            path = __file__.replace('dgeometry.py',
+                                    'images/') + self.__class__.__name__ + str(
+                                        next(self.__class__._case_no)) + '.png'
 
-        plt.savefig(path)
+            plt.savefig(path)
+            self._path=path
 
-        plt.close()
+            plt.close()
 
-        self._path = path
+        
 
-        print('check' * 100)
+#        print('check' * 100)
         print(self._path)
-        print('check' * 100)
+#        print('check' * 100)
         plt.close()
 
         with open(f"{path}", "rb") as image_file:
@@ -1248,6 +1252,8 @@ class GeometricalCase(DrawingSet):
         self._solution_step = list(assumptions)
 
         self._cached_solution = None
+        
+        self._path = None
 
     def add_solution_step(self,
                           title,
