@@ -537,8 +537,21 @@ class HorizontalLineOnPlane(LineOnPlane):
         parameters_dict[Symbol('F')]=Point(point_F.x,point_F.y,point_E.z)
 
         return parameters_dict
-    
-    
+
+class FrontalLineOnPlane(LineOnPlane):
+
+
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+        point_E=parameters_dict[Symbol('E')]
+        point_F=parameters_dict[Symbol('F')] 
+
+        
+        parameters_dict[Symbol('F')]=Point(point_E.x,point_F.y,point_F.z)
+
+        return parameters_dict
     
 class PointOnPlane(GeometricalCase):
 
@@ -907,6 +920,42 @@ class LineAndPlaneIntersection(GeometricalCase):
         }
         return default_data_dict
     
+class LineAndHorizontalEdgePlaneIntersection(LineAndPlaneIntersection):
+    
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_A=parameters_dict[Symbol('A')]
+        print(point_A.coordinates)
+        point_B=parameters_dict[Symbol('B')] 
+        print(point_B.coordinates)
+        
+        parameters_dict[Symbol('O')]=(point_A+point_B)*0.5+Point(0,0,5)
+        print(parameters_dict[Symbol('O')].coordinates)
+
+        return parameters_dict
+    
+class LineAndFrontalEdgePlaneIntersection(LineAndPlaneIntersection):
+    
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_A=parameters_dict[Symbol('A')]
+        print(point_A.coordinates)
+        point_B=parameters_dict[Symbol('B')] 
+        print(point_B.coordinates)
+        
+        parameters_dict[Symbol('O')]=(point_A+point_B)*0.5+Point(5,0,0)
+        print(parameters_dict[Symbol('O')].coordinates)
+
+        return parameters_dict
+    
     
 class TwoPlanesIntersection(GeometricalCase):
     
@@ -954,6 +1003,18 @@ class TwoPlanesIntersection(GeometricalCase):
 
         
     def solution(self):
+
+        if self._cached_solution is None:
+            current_obj = self._solve()
+        
+        else:
+            current_obj = copy.deepcopy(self._cached_solution)
+            
+            
+        return current_obj        
+
+    def _solve(self):
+    
 #         self._line=Line(self._point_N1,self._point_N2)
         current_obj=copy.deepcopy(self)
         
@@ -1023,6 +1084,7 @@ class TwoPlanesIntersection(GeometricalCase):
             Symbol('F'): point_F,
         }
         return default_data_dict
+        
 class HorizontalEgdePlaneAndPlaneIntersection(TwoPlanesIntersection):
     
     point_A = [Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]
@@ -1074,7 +1136,60 @@ class HorizontalEgdePlaneAndPlaneIntersection(TwoPlanesIntersection):
         parameters_dict[Symbol('O')]=(point_A+point_B)*0.5+Point(0,0,5)
 
         return parameters_dict
+
+class FrontalEgdePlaneAndPlaneIntersection(TwoPlanesIntersection):
     
+    point_A = [Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]
+
+    point_O = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in range(8,12) ]
+
+
+    point_B=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5,3,3.5] ]
+
+    point_D=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [1,1.5,2,2.5,3,3.5] for z in range(8,12) ]
+    point_E = [Point(x,y,z) for x in [7,7.5,8,8.5,9] for y in [7,7.5,8.5,9,9.5] for z in range(2,5) ]
+
+    point_F = [Point(x,y,z) for x in  [1,1.5,2,2.5,3,3.5] for y in [10,10.5,11,11.5,12] for z in range(8,12) ]
+
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        
+        point_O = self.__class__.point_O 
+        
+        point_B=self.__class__.point_B
+        
+        point_D=self.__class__.point_D
+        point_E = self.__class__.point_E
+        point_F = self.__class__.point_F
+        
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('B'): point_B,
+            Symbol('O'): point_O,
+
+            Symbol('D'): point_D,
+            Symbol('E'): point_E,
+            Symbol('F'): point_F,
+        }
+        return default_data_dict
+
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_A=parameters_dict[Symbol('A')]
+        print(point_A.coordinates)
+        point_B=parameters_dict[Symbol('B')] 
+        print(point_B.coordinates)
+        
+        parameters_dict[Symbol('O')]=(point_A+point_B)*0.5+Point(1,0,0)
+        print(parameters_dict[Symbol('O')].coordinates)
+
+        return parameters_dict
     
 class LinePerpendicularToPlaneIntersection(GeometricalCase):
     
@@ -1188,6 +1303,22 @@ class LinePerpendicularToPlaneIntersection(GeometricalCase):
         }
         return default_data_dict
 
+    
+class LinePerpendicularToEdgePlaneIntersection(LinePerpendicularToPlaneIntersection):
+    
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_A=parameters_dict[Symbol('A')]
+        point_B=parameters_dict[Symbol('B')] 
+
+        
+        parameters_dict[Symbol('O')]=(point_A+point_B)*0.5+Point(0,0,5)
+
+        return parameters_dict
 
 class LinePerpendicularToHFLinesIntersection(LinePerpendicularToPlaneIntersection):
     
