@@ -35,62 +35,16 @@ def plots_no():
 
 
 class GeometrySceneDG:
-    #     plt.clf()
 
-    # #     plt.figure(figsize=(12,9))
-    # #     ax_2d = plt.subplot(121)
-    # #     ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
-
-    # #     plt.xlim(0, 16)
-    # #     plt.ylim(-12, 12)
-    # #     plt.grid(True)
-    # #
-    # #     ax_2d.set_yticks(  range(-12,12,2) )
-    # #     ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
-
-    # #     ax_3d = plt.subplot(122, projection='3d')
-    # #     ax_3d.view_init(30,10)
-    # #     ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
-
-    # #     plt.xlim(0, 16)
-    # #     plt.ylim(0, 16)
-
-    # #
-    # #     ax_3d.set_zlim(0, 16)
-    # #     plt.tight_layout()
-
-    #     #plt.figure(figsize=(12,9))
-    #     plt.figure(figsize=(9,12))
-
-    #     ax_2d = plt.subplot(121)
-    #     #ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
-
-    #     plt.xlim(0, 200)
-    #     plt.ylim(-100, 100)
-    #     plt.grid(False)
-
-    #     ax_2d.axis('off')
-
-    #     #ax_2d.set_yticks(  range(-12,12,2) )
-    #     #ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
-
-    #     ax_3d = plt.subplot(121, projection='3d')
-    #     #ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
-
-    #     #plt.xlim(0, 16)
-    #     #plt.ylim(0, 16)
-
-    #     #ax_3d.set_zlim(0, 16)
-
-    #     ax_3d.view_init(30,80)
-    #     plt.tight_layout()
-    #     plt.axis("off")
 
     ax_2d = None
     ax_3d = None
 
     #def __init__(self,height=12,width=9,figsize=(12,9)):
     def __init__(self, init_3d=(30, 10), height=12, width=16, figsize=(12, 9)):
+        
+        
+        
         plt.figure(figsize=figsize)
         ax_2d = plt.subplot(121)
         ax_2d.set(ylabel=(r'<-x | z ->'), xlabel='y')
@@ -120,7 +74,7 @@ class GeometrySceneDG:
 
         self.__class__.ax_2d = ax_2d
         self.__class__.ax_3d = ax_3d
-
+        self.__class__.size_3d=16
 
 class GeometryScene:
     #     plt.clf()
@@ -1015,7 +969,7 @@ class Tetragon(Plane):
 
 
 class HorizontalPlane(Plane):
-    _at_symbol = ''
+    _at_symbol =  ''
 
     def __init__(self, p1=None):
 
@@ -1037,10 +991,26 @@ class VerticalPlane(Plane):
         super().__init__(p1, p1 + Point(0, 5, 0), p1 + Point(0, 0, 5))
         self._label = "\'\'"
 
+class LateralPlane(Plane):
+    _at_symbol = ''
 
-HPP = HorizontalPlane()
-VPP = VerticalPlane()
+    def __init__(self, p1=None):
 
+        if p1 is None:
+            p1 = Point(0, 0, 0)
+
+        super().__init__(p1, p1 + Point(5, 0, 0), p1 + Point(0, 0, 5))
+        self._label = "\'\'\'"
+        
+
+HPP = HorizontalPlane( Point(0,0,16) )
+VPP = VerticalPlane( Point(16,0,0) )
+LPP = LateralPlane( Point(0,16,0) )
+
+
+HPPend = HorizontalPlane()
+VPPend = VerticalPlane()
+LPPend = LateralPlane()
 
 class DrawingSet(Entity, list):
 
