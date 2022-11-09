@@ -2746,18 +2746,20 @@ class PerpendicularLineAndParallelPlaneIntersection(GeometricalCase):
 #         line_be = Line(B, E)('b')
 #         line_cf = Line(C, F)('c')
 
-        plane_aux = Plane(A, D, A + Point(5, 0, 0))
+#         plane_aux = Plane(A, D, A + Point(5, 0, 0))
 
-        point_P3 = (((O - (point_P1 - A)) ^ O)('h_H') & plane_aux)[0]('3')
-        point_P4 = (((O - (point_P2 - A)) ^ O)('f_H') & plane_aux)[0]('4')
+#         point_P3 = (((O - (point_P1 - A)) ^ O)('h_H') & plane_aux)[0]('3')
+#         point_P4 = (((O - (point_P2 - A)) ^ O)('f_H') & plane_aux)[0]('4')
 
-        current_obj.add_solution_step('Piercing point',
-                                      [point_P3, point_P4])
+#         current_obj.add_solution_step('Piercing point',
+#                                       [point_P3, point_P4])
 
 
         elems = [D, E, F, plane_alpha, plane_gamma, line_ad,# line_be, line_cf
                 ]
 
+        print(D,D.n().coordinates)
+    
         projections = [
             line_ad @ HPP,
             line_ad @ VPP,
@@ -2779,15 +2781,19 @@ class PerpendicularLineAndParallelPlaneIntersection(GeometricalCase):
         current_obj.point_D = D
         
         
-        current_obj.point_P = D
+        current_obj.point_P = D('P')
         
         #current_obj.point_E = E
         #current_obj.point_F = F
+        
+        current_obj.add_solution_step('D vertex', [D])
+        #current_obj.add_solution_step('P vertex', [D])
+        
         current_obj._assumptions = DrawingSet(
             *current_obj.get_projections())('Solution')
         current_obj._assumptions3d = DrawingSet(*current_obj)
 
-        current_obj.add_solution_step('D vertex', [D])
+
         
         return current_obj
 
@@ -2902,4 +2908,29 @@ class PerpendicularLineAndParallelHFLinesPlaneIntersection(PerpendicularLineAndP
 
         return parameters_dict
     
+class PerpendicularLineAndParallelEdgePlaneIntersection(PerpendicularLineAndParallelPlaneIntersection):
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+
+    point_B = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in [5,5.5,6,6.5,7] ]
+
+
+    point_C=[Point(x,y,z) for x in [4,4.5,5,5.5,6] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5] ]
+
+
+    point_O=[Point(x,y,z) for x in range(9,12) for y in [6,6.5,7,7.5,8.5] for z in range(9,12) ]
+
+
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+        point_A=parameters_dict[Symbol('A')]
+        point_B=parameters_dict[Symbol('B')] 
+        point_C=parameters_dict[Symbol('C')] 
+
+        
+        parameters_dict[Symbol('C')]=(point_A+point_B)*0.5+Point(0,0,5)
+        #parameters_dict[Symbol('C')]=Point(point_B.x,point_B.y,point_A.z)
+
+        return parameters_dict
     
