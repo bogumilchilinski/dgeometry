@@ -879,11 +879,23 @@ class Plane(Entity):
     def projection(self, other):
         if isinstance(other, Point):
             projection = self._geo_ref.projection(other._geo_ref)
+            new_obj = entity_convert(projection)
 
         elif isinstance(other, Line):
             projection = self._geo_ref.projection_line(other._geo_ref)
+            new_obj = entity_convert(projection)
 
-        new_obj = entity_convert(projection)
+        elif isinstance(other, Plane):
+            projected_pts=[(pts @ self)  for pts in other._vertices()]
+            
+            if geo.Point.is_collinear(*[pts._geo_ref for pts in projected_pts]):
+                
+                new_obj = Line(*projected_pts[0:2])
+                #new_obj = Plane(*projected_pts)
+            else:
+                new_obj = Plane(*projected_pts)
+            #new_obj = Plane(*projected_pts)
+        
 
         at = self.__class__._at_symbol
 
