@@ -1917,8 +1917,10 @@ class IsoscelesRightTriangleRotation(GeometricalCase):
 
         current_obj._solution_step.append(current_set)
         current_obj._assumptions=DrawingSet(*elems,*projections)
-        current_obj._point_B=B
-        current_obj._point_C=C
+#         current_obj._point_B=B
+#         current_obj._point_C=C
+        current_obj.point_B=B
+        current_obj.point_C=C
 
         return current_obj
 
