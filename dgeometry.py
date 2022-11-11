@@ -1014,15 +1014,17 @@ class LateralPlane(Plane):
         super().__init__(p1, p1 + Point(5, 0, 0), p1 + Point(0, 0, 5))
         self._label = "\'\'\'"
         
+HPP = HorizontalPlane()
+VPP = VerticalPlane()
+LPP = LateralPlane()
+        
+        
+HPPend = HorizontalPlane( Point(0,0,16) )
+VPPend = VerticalPlane( Point(16,0,0) )
+LPPend = LateralPlane( Point(0,16,0) )
 
-HPP = HorizontalPlane( Point(0,0,16) )
-VPP = VerticalPlane( Point(16,0,0) )
-LPP = LateralPlane( Point(0,16,0) )
 
 
-HPPend = HorizontalPlane()
-VPPend = VerticalPlane()
-LPPend = LateralPlane()
 
 class DrawingSet(Entity, list):
 
