@@ -632,6 +632,10 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         O0 = current_obj.O0
 
         #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[eps_dict['A'],eps_dict['O']]
+        
+        eps_dict['A']=A
+        eps_dict['O']=O
+        print(eps_dict)
         current_step3d = [eps_dict['A'], eps_dict['O']]
 
         current_obj._solution3d_step.append(
@@ -678,6 +682,8 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
                          ))('Step 5 - triangle vertices B0 and C0'))
 
         #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[eps_dict['B'],eps_dict['C']]
+        eps_dict['B']=B
+        eps_dict['C']=C
         current_step3d = [eps_dict['B'], eps_dict['C']]
 
         current_obj._solution3d_step.append(
@@ -716,8 +722,8 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         #         F=(C@plane_beta)('F')
 
         triangle_plane = Plane(A, B, C)
-        A, B, C, D, E, F = [*Prism
-                            ].right_from_parallel_plane(triangle_plane, H)
+        
+        A, B, C, D, E, F = [*Prism].right_from_parallel_plane(triangle_plane, H)
 
         #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(B^E)('n')]
         current_step3d = [(B ^ E)('n')]

@@ -2494,7 +2494,7 @@ class TriangularPyramidSwappedProjections(TriangularPyramid):
     
     
     
-class TriangularPyramidHFLines(GeometricalCase):
+class TriangularPyramidHFLines(TriangularPyramid):
     point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
 
     point_B = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in [5,5.5,6,6.5,7] ]
