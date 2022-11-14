@@ -654,6 +654,8 @@ class Point(Entity):
     Point class is used to create point object in Entity space and manipulate them
     """
 
+
+
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._geo_ref = geo.Point3D(*args, **kwargs)  #geometrical reference
