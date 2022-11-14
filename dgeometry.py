@@ -20,7 +20,7 @@ from pylatex import Document, Section, Subsection, Subsubsection, Itemize, Packa
 from pylatex.section import Paragraph, Chapter
 from pylatex.utils import italic, NoEscape
 
-from dynpy.utilities.report import ReportText
+#from dynpy.utilities.report import ReportText
 
 import itertools as it
 
@@ -228,6 +228,7 @@ class Entity:
     '''
     Parent class
     '''
+    displayMethod = 'Name'
     #     ax_vert = plt.subplot(221)
     #     ax_vert.set(ylabel=('Frontal view'))
     #     ax_vert.xaxis.tick_top()
@@ -258,6 +259,7 @@ class Entity:
 
     def __init__(self,
                  coding_points=None,
+                 display=None,
                  label=None,
                  fmt='b',
                  color=None,
@@ -279,6 +281,7 @@ class Entity:
         self.__fmt = None
         self._projection = projection
         self._caption = None
+        self.display = display
 
     def __call__(self,
                  label=None,
@@ -296,7 +299,10 @@ class Entity:
         """
         obj = copy.deepcopy(self)
         if label is not None:
-            obj._label = label
+            if obj.display is None:
+                obj._label = label
+                
+                    
 
         if color is not None:
             obj.__color = color
@@ -318,7 +324,7 @@ class Entity:
     def __repr__(self):
 
         if self._label is None:
-            self._label = self.__class__.__name__  #+' '+ str(self._coding_point())
+            self._label = self.__class__.__name__ 
 
         return self._label
 
@@ -331,6 +337,9 @@ class Entity:
 
     @property
     def label(self):
+        return self.getLabel()
+
+    def getLabel(self):
         return self._label
 
     def _generating_points(self):
@@ -379,7 +388,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self._label
+            text = self.getLabel()
 
         if marker is None:
             marker = self.__marker
@@ -427,7 +436,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self._label
+            text = self.getLabel()
 
         if marker is None:
             marker = self.__marker
@@ -474,7 +483,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self._label
+            text = self.getLabel()
 
         if marker is None:
             marker = self.__marker
@@ -681,6 +690,15 @@ class Point(Entity):
 
     def n(self):
         return (self._geo_ref.n())
+
+    def getCords(self):
+        return str(self.x) + ',' + str(self.y) + ',' + str(self.z)
+
+    def getLabel(self):
+        if Entity.displayMethod == 'Name':
+            return self._label
+        if Entity.displayMethod == 'Cords':
+            return self._label + '(' + self.getCords() + ')'
 
 
 #     def __repr__(self):
