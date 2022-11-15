@@ -20,7 +20,7 @@ from pylatex import Document, Section, Subsection, Subsubsection, Itemize, Packa
 from pylatex.section import Paragraph, Chapter
 from pylatex.utils import italic, NoEscape
 
-from dynpy.utilities.report import ReportText
+#from dynpy.utilities.report import ReportText
 
 import itertools as it
 
@@ -228,6 +228,7 @@ class Entity:
     '''
     Parent class
     '''
+    displayMethod = 'Name'
     #     ax_vert = plt.subplot(221)
     #     ax_vert.set(ylabel=('Frontal view'))
     #     ax_vert.xaxis.tick_top()
@@ -258,6 +259,7 @@ class Entity:
 
     def __init__(self,
                  coding_points=None,
+                 display=None,
                  label=None,
                  fmt='b',
                  color=None,
@@ -279,6 +281,7 @@ class Entity:
         self.__fmt = None
         self._projection = projection
         self._caption = None
+        self.display = display
 
     def __call__(self,
                  label=None,
@@ -296,7 +299,10 @@ class Entity:
         """
         obj = copy.deepcopy(self)
         if label is not None:
-            obj._label = label
+            if obj.display is None:
+                obj._label = label
+                
+                    
 
         if color is not None:
             obj.__color = color
@@ -318,7 +324,7 @@ class Entity:
     def __repr__(self):
 
         if self._label is None:
-            self._label = self.__class__.__name__  #+' '+ str(self._coding_point())
+            self._label = self.__class__.__name__ 
 
         return self._label
 
@@ -331,6 +337,9 @@ class Entity:
 
     @property
     def label(self):
+        return self.getLabel()
+
+    def getLabel(self):
         return self._label
 
     def _generating_points(self):
@@ -379,7 +388,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self._label
+            text = self.getLabel()
 
         if marker is None:
             marker = self.__marker
@@ -427,7 +436,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self._label
+            text = self.getLabel()
 
         if marker is None:
             marker = self.__marker
@@ -474,7 +483,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self._label
+            text = self.getLabel()
 
         if marker is None:
             marker = self.__marker
@@ -654,6 +663,8 @@ class Point(Entity):
     Point class is used to create point object in Entity space and manipulate them
     """
 
+
+
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._geo_ref = geo.Point3D(*args, **kwargs)  #geometrical reference
@@ -679,6 +690,15 @@ class Point(Entity):
 
     def n(self):
         return (self._geo_ref.n())
+
+    def getCords(self):
+        return str(self.x) + ',' + str(self.y) + ',' + str(self.z)
+
+    def getLabel(self):
+        if Entity.displayMethod == 'Name':
+            return self._label
+        if Entity.displayMethod == 'Cords':
+            return self._label + '(' + self.getCords() + ')'
 
 
 #     def __repr__(self):
@@ -871,10 +891,10 @@ class Plane(Entity):
 #             self._geo_ref = geo.Plane(p1=p1._geo_ref, a=a._geo_ref, b=b._geo_ref, **kwargs)
 
     def _vertices(self):
-        return self._p1, self._p2, self._p3
+        return self._p1, self._p2, self._p3,
 
     def _coding_points(self):
-        return (self._geo_ref.p1, self._p2, self._p3, self._geo_ref.p1)
+        return (self._p1, self._p2,self._p2 + (self._p3 - self._p1)  , self._p3,   self._geo_ref.p1)
 
     def projection(self, other):
         if isinstance(other, Point):
@@ -992,7 +1012,7 @@ class HorizontalPlane(Plane):
         self._label = "\'"
 
 
-class VerticalPlane(Plane):
+class FrontalPlane(Plane):
     _at_symbol = ''
 
     def __init__(self, p1=None):
@@ -1002,6 +1022,9 @@ class VerticalPlane(Plane):
 
         super().__init__(p1, p1 + Point(0, 5, 0), p1 + Point(0, 0, 5))
         self._label = "\'\'"
+
+class VerticalPlane(FrontalPlane):
+    pass
 
 class LateralPlane(Plane):
     _at_symbol = ''
@@ -1015,13 +1038,16 @@ class LateralPlane(Plane):
         self._label = "\'\'\'"
         
 HPP = HorizontalPlane()
+FPP = FrontalPlane()
 VPP = VerticalPlane()
 LPP = LateralPlane()
         
         
 HPPend = HorizontalPlane( Point(0,0,16) )
 VPPend = VerticalPlane( Point(16,0,0) )
+FPPend = FrontalPlane( Point(16,0,0) )
 LPPend = LateralPlane( Point(0,16,0) )
+
 
 
 
