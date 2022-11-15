@@ -228,6 +228,7 @@ class Entity:
     '''
     Parent class
     '''
+    printingMethod = 'name'
     #     ax_vert = plt.subplot(221)
     #     ax_vert.set(ylabel=('Frontal view'))
     #     ax_vert.xaxis.tick_top()
@@ -318,7 +319,7 @@ class Entity:
     def __repr__(self):
 
         if self._label is None:
-            self._label = self.__class__.__name__  #+' '+ str(self._coding_point())
+            self._label = self.__class__.__name__  #+' '#+ str(self._coding_point())
 
         return self._label
 
@@ -871,10 +872,10 @@ class Plane(Entity):
 #             self._geo_ref = geo.Plane(p1=p1._geo_ref, a=a._geo_ref, b=b._geo_ref, **kwargs)
 
     def _vertices(self):
-        return self._p1, self._p2, self._p3
+        return self._p1, self._p2, self._p3,
 
     def _coding_points(self):
-        return (self._geo_ref.p1, self._p2, self._p3, self._geo_ref.p1)
+        return (self._p1, self._p2,self._p2 + (self._p3 - self._p1)  , self._p3,   self._geo_ref.p1)
 
     def projection(self, other):
         if isinstance(other, Point):
@@ -992,7 +993,7 @@ class HorizontalPlane(Plane):
         self._label = "\'"
 
 
-class VerticalPlane(Plane):
+class FrontalPlane(Plane):
     _at_symbol = ''
 
     def __init__(self, p1=None):
@@ -1002,6 +1003,9 @@ class VerticalPlane(Plane):
 
         super().__init__(p1, p1 + Point(0, 5, 0), p1 + Point(0, 0, 5))
         self._label = "\'\'"
+
+class VerticalPlane(FrontalPlane):
+    pass
 
 class LateralPlane(Plane):
     _at_symbol = ''
@@ -1015,13 +1019,16 @@ class LateralPlane(Plane):
         self._label = "\'\'\'"
         
 HPP = HorizontalPlane()
+FPP = FrontalPlane()
 VPP = VerticalPlane()
 LPP = LateralPlane()
         
         
 HPPend = HorizontalPlane( Point(0,0,16) )
 VPPend = VerticalPlane( Point(16,0,0) )
+FPPend = FrontalPlane( Point(16,0,0) )
 LPPend = LateralPlane( Point(0,16,0) )
+
 
 
 
