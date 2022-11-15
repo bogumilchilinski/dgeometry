@@ -1842,11 +1842,11 @@ class TriangularPrism(GeometricalCase):
 
             plane_aux = Plane(A, F, A + Point(5, 0, 0))
 
-            point_P3 = (((O - (point_P1 - A)) ^ O)('h_H') & plane_aux)[0]('3')
-            point_P4 = (((O - (point_P2 - A)) ^ O)('f_H') & plane_aux)[0]('4')
+            #point_P3 = (((O - (point_P1 - A)) ^ O)('h_H') & plane_aux)[0]('3')
+            #point_P4 = (((O - (point_P2 - A)) ^ O)('f_H') & plane_aux)[0]('4')
 
-            current_obj.add_solution_step('Piercing point',
-                                          [point_P3, point_P4])
+            #current_obj.add_solution_step('Piercing point',
+            #                              [point_P3, point_P4])
 
             line_ae = Line(A, E)('a')
             line_bf = Line(B, F)('b')
