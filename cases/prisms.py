@@ -1909,6 +1909,39 @@ class TriangularPrism(GeometricalCase):
 
         return parameters_dict
 
+class TriangularPrismHFLines(TriangularPrism):
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [4,4.5,5] for z in [2,2.5,3,3.5]  ]
+
+    point_B = [Point(x,y,z) for x in [3,3.5,4,4.5,5] for y in range(9,12) for z in [5,5.5,6,6.5,7] ]
+
+
+    point_C=[Point(x,y,z) for x in [4,4.5,5,5.5,6] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5] ]
+
+
+    point_O=[Point(x,y,z) for x in range(9,12) for y in [6,6.5,7,7.5,8.5] for z in range(9,12) ]
+
+    shift = [
+        Point(x, y, z) for x in [-1, -0.5, 0, 0.5, 1]
+        for y in [0, 0.5]
+        for z in [-1, -0.5, 0, 0.5, 1]
+    ]
+    
+
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_A=parameters_dict[Symbol('A')]
+        point_B=parameters_dict[Symbol('B')] 
+        point_C=parameters_dict[Symbol('C')] 
+
+        
+        parameters_dict[Symbol('C')]=Point(point_A.x,point_C.y,point_C.z)
+        parameters_dict[Symbol('B')]=Point(point_B.x,point_B.y,point_A.z)
+
+        return parameters_dict
     
 class TriangularPrismSwappedProjections(TriangularPrism):
     shift = [
@@ -1927,7 +1960,7 @@ class ParallelogramPrismSwappedProjections(ParallelogramPrism):
 class TruncatedParallelogramPrism(GeometricalCase):
 
     point_A = [
-        Point(x, y, z) for x in [1, 1.5, 2, 2.5]
+        Point(x, y, z) for x in [3, 3.5, 4, 4.5]
         for y in [2, 2.5, 3, 3.5, 4, 4.5, 5] for z in range(0, 1)
     ]
 
@@ -1937,23 +1970,23 @@ class TruncatedParallelogramPrism(GeometricalCase):
     ]
 
     point_C = [
-        Point(x, y, z) for x in range(5, 7) for y in [13.5, 14, 14.5, 15.5]
-        for z in range(7, 8)
+        Point(x, y, z) for x in range(4, 6) for y in [11.5, 12, 12.5, 13.5]
+        for z in range(5, 6)
     ]
 
     point_O = [
-        Point(x, y, z) for x in range(5, 8) for y in [1, 1.5, 2, 2.5]
-        for z in range(5, 8)
+        Point(x, y, z) for x in range(4, 7) for y in [1, 1.5, 2, 2.5]
+        for z in range(2, 4)
     ]
 
     point_M = [
         Point(x, y, z) for x in [4, 5, 6] for y in [7, 7.5, 8.5, 9, 9.5]
-        for z in [6, 7, 8, 9]
+        for z in [4, 5, 6, 7]
     ]
 
     point_N = [
         Point(x, y, z) for x in [7, 7.5, 8, 8.5, 9]
-        for y in [10, 10.5, 11, 11.5, 12] for z in range(2, 5)
+        for y in [10, 10.5, 11, 11.5, 12] for z in range(2, 4)
     ]
 
     shift = [
@@ -1969,6 +2002,7 @@ class TruncatedParallelogramPrism(GeometricalCase):
                  point_M=None,
                  point_N=None,
                  point_O=None,
+                 *args,
                  **kwargs):
 
         super().__init__()

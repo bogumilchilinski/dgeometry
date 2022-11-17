@@ -228,7 +228,7 @@ class Entity:
     '''
     Parent class
     '''
-    displayMethod = 'Name'
+    display = 'Name'
     #     ax_vert = plt.subplot(221)
     #     ax_vert.set(ylabel=('Frontal view'))
     #     ax_vert.xaxis.tick_top()
@@ -695,9 +695,9 @@ class Point(Entity):
         return str(self.x) + ',' + str(self.y) + ',' + str(self.z)
 
     def getLabel(self):
-        if Entity.displayMethod == 'Name':
+        if Entity.display == 'Name':
             return self._label
-        if Entity.displayMethod == 'Cords':
+        if Entity.display == 'Cords':
             return self._label + '(' + self.getCords() + ')'
 
 
