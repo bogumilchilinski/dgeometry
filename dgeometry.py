@@ -167,7 +167,7 @@ class GeometryScene:
         plt.grid(False)
 
         plt.axis('off')
-
+        
         #ax_2d.set_yticks(  range(-12,12,2) )
         #ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
 
@@ -1065,6 +1065,13 @@ class DrawingSet(Entity, list):
 
         obj = copy.deepcopy(self)
         obj._label = label
+
+        return obj
+    
+    def set_display(self, display):
+
+        obj = copy.deepcopy(self)
+        obj._display = display
 
         return obj
 
