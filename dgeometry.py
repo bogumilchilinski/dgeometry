@@ -1058,7 +1058,6 @@ class DrawingSet(Entity, list):
         super(list, self).__init__()
         super(Entity, self).__init__()
         self._label = None
-        self._display = None
 
         self += list(entities)
 
