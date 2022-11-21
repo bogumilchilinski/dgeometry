@@ -894,7 +894,8 @@ class Plane(Entity):
         return self._p1, self._p2, self._p3,
 
     def _coding_points(self):
-        return (self._p1, self._p2,self._p2 + (self._p3 - self._p1)  , self._p3,   self._geo_ref.p1)
+        #return (self._p1, self._p2,self._p2 + (self._p3 - self._p1)  , self._p3,   self._geo_ref.p1)
+        return (*self._vertices(),self._p1)
 
     def projection(self, other):
         if isinstance(other, Point):
