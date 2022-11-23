@@ -943,7 +943,11 @@ class TruncatedTriangularPrism(GeometricalCase):
         }
 
         self._solution_step.append(self._assumptions)
-
+        self.add_solution_step('Assumptions',
+                               self._assumptions)
+        self.add_solution_step('Assumptions',
+                               [point_A, point_B, point_C, point_O])
+        
     def solution(self):
         current_obj = copy.deepcopy(self)
 
@@ -954,7 +958,7 @@ class TruncatedTriangularPrism(GeometricalCase):
         M = current_obj._point_M
         N = current_obj._point_N
         O = current_obj._point_O
-
+        current_obj.ass_solution_step('Assumptions',[A,B,C,M,N,O])
         current_set = DrawingSet(*current_obj._solution_step[-1])
 
         plane_alpha = Plane(A, B, C)
@@ -1144,6 +1148,7 @@ class TruncatedTetragonalPrism(GeometricalCase):
         }
 
         self._solution_step.append(self._assumptions)
+        self.add_solution_step('Assumptions',[point_A, point_B, point_C, point_O])
 
     def solution(self):
         current_obj = copy.deepcopy(self)
@@ -1338,6 +1343,8 @@ class TetragonalPrism(GeometricalCase):
         }
 
         self._solution_step.append(self._assumptions)
+        self.add_solution_step('Assumptions',
+                               [point_A, point_B, point_C, point_O])
 
     def solution(self):
         current_obj = copy.deepcopy(self)

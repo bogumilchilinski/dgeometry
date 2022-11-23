@@ -2411,6 +2411,7 @@ class TriangularPyramid(GeometricalCase):
         
         return current_obj
 
+
     def get_default_data(self):
 
         point_A = self.__class__.point_A
