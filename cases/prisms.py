@@ -84,7 +84,18 @@ class TriangularPrism(GeometricalCase):
         self.add_solution_step('Assumptions',
                         [point_A, point_B, point_C, point_O])
 
+        
+        
     def solution(self):
+        if self._cached_solution is None:
+            
+            current_obj = self._solution()
+            self._cached_solution = current_obj
+        else:
+            current_obj = copy.deepcopy(self._cached_solution)
+        return current_obj
+        
+    def _solution(self):
         current_obj = copy.deepcopy(self)
 
         A = current_obj._point_A
@@ -139,6 +150,9 @@ class TriangularPrism(GeometricalCase):
         current_obj.add_solution_step('Vertices',
                         [D,E,F])
 
+        current_obj += DrawingSet(*[D,E,F])
+        current_obj._assumptions  = DrawingSet(*[A,B,C,D,E,F])
+        
         return current_obj
 
     def get_default_data(self):
@@ -351,6 +365,7 @@ class EquilateralTrianglePrism(GeometricalCase):
             current_obj.point_D = D
             current_obj.point_E = E
             current_obj.point_F = F
+            
             self._cached_solution = current_obj
         else:
             current_obj = copy.deepcopy(self._cached_solution)
@@ -1096,7 +1111,7 @@ class TruncatedTriangularPrism(GeometricalCase):
         M = current_obj._point_M
         N = current_obj._point_N
         O = current_obj._point_O
-        current_obj.ass_solution_step('Assumptions',[A,B,C,M,N,O])
+        current_obj.add_solution_step('Assumptions',[A,B,C,M,N,O])
         current_set = DrawingSet(*current_obj._solution_step[-1])
 
         plane_alpha = Plane(A, B, C)
