@@ -760,13 +760,21 @@ class Point(Entity):
         else:
 
             # zaimplementować w metode dla punktu
-            rotation_dir = (point @ plane) - point_rot_center
+            
+            norm_vec=Point(*(Plane(axis.p1,point,axis.p2)._geo_ref.normal_vector))
+            print('rot coords',norm_vec.coordinates)
+            
+            lever_pnt = point+norm_vec
+            
+            rotation_dir = ((lever_pnt) @ plane) - point_rot_center
 
             #display(dir_I_on_HPP.coordinates)
             #display((point_I @ plane_beta).distance( S_I ))
             #display(point_I.distance( S_I ))
+            
+            
 
-            ratio = radius / ((point @ plane).distance(point_rot_center))
+            ratio = radius / ((lever_pnt @ plane).distance(point_rot_center))
 
             rotated_point = (point_rot_center +
                              (rotation_dir) * ratio)(f'{point._label}_0')
@@ -1387,7 +1395,7 @@ class GeometricalCase(DrawingSet):
 
         if self._cached_solution is None:
 
-            new_obj = copy.deepcopy(self)
+            new_obj = self._solution()
             self._cached_solution = new_obj
 
         else:
@@ -1395,6 +1403,11 @@ class GeometricalCase(DrawingSet):
 
         return new_obj
 
+    
+    def _solution(self):
+
+        return  copy.copy(self)
+    
     def present_solution(self):
 
         doc_model = Document(f'{self.__class__.__name__} solution')

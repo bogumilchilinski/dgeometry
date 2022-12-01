@@ -1100,8 +1100,17 @@ class TruncatedTriangularPrism(GeometricalCase):
                                self._assumptions)
         self.add_solution_step('Assumptions',
                                [point_A, point_B, point_C, point_O])
-        
+
     def solution(self):
+        if self._cached_solution is None:
+            
+            current_obj = self._solution()
+            self._cached_solution = current_obj
+        else:
+            current_obj = copy.deepcopy(self._cached_solution)
+        return current_obj
+        
+    def _solution(self):
         current_obj = copy.deepcopy(self)
 
         A = current_obj._point_A
@@ -1121,7 +1130,10 @@ class TruncatedTriangularPrism(GeometricalCase):
         E = (plane_alpha.perpendicular_line(B) & plane_beta)[0]('E')
         F = (plane_alpha.perpendicular_line(C) & plane_beta)[0]('F')
         plane_gamma = Plane(D, E, F)
-
+        current_obj.add_solution_step('D',[D])
+        current_obj.add_solution_step('E',[E])
+        current_obj.add_solution_step('F',[F])
+        
         line_ad = Line(A, D)('a')
         line_be = Line(B, E)('b')
         line_cf = Line(C, F)('c')

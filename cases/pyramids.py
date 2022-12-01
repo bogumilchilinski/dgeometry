@@ -2334,7 +2334,7 @@ class TriangularPyramid(GeometricalCase):
                                          point_O)('Assumptions')
         self._assumptions = DrawingSet(*projections)
 
-    def solution(self):
+    def _solution(self):
         current_obj = copy.deepcopy(self)
 
         A = current_obj._point_A
