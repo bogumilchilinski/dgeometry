@@ -413,14 +413,14 @@ class IsoscelesRightTriangleRotation(GeometricalCase):
                                [point_A, point_P, point_O])
         
 
-    def solution(self):
-        if self._cached_solution is None:
+#     def solution(self):
+#         if self._cached_solution is None:
             
-            current_obj = self._solution()
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
-        return current_obj
+#             current_obj = self._solution()
+#             self._cached_solution = current_obj
+#         else:
+#             current_obj = copy.deepcopy(self._cached_solution)
+#         return current_obj
         
     def _solution(self):
         current_obj=copy.deepcopy(self)
