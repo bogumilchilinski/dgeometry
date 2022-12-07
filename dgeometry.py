@@ -20,7 +20,7 @@ from pylatex import Document, Section, Subsection, Subsubsection, Itemize, Packa
 from pylatex.section import Paragraph, Chapter
 from pylatex.utils import italic, NoEscape
 
-from dynpy.utilities.report import ReportText
+#from dynpy.utilities.report import ReportText
 
 import itertools as it
 
@@ -35,62 +35,16 @@ def plots_no():
 
 
 class GeometrySceneDG:
-    #     plt.clf()
 
-    # #     plt.figure(figsize=(12,9))
-    # #     ax_2d = plt.subplot(121)
-    # #     ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
-
-    # #     plt.xlim(0, 16)
-    # #     plt.ylim(-12, 12)
-    # #     plt.grid(True)
-    # #
-    # #     ax_2d.set_yticks(  range(-12,12,2) )
-    # #     ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
-
-    # #     ax_3d = plt.subplot(122, projection='3d')
-    # #     ax_3d.view_init(30,10)
-    # #     ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
-
-    # #     plt.xlim(0, 16)
-    # #     plt.ylim(0, 16)
-
-    # #
-    # #     ax_3d.set_zlim(0, 16)
-    # #     plt.tight_layout()
-
-    #     #plt.figure(figsize=(12,9))
-    #     plt.figure(figsize=(9,12))
-
-    #     ax_2d = plt.subplot(121)
-    #     #ax_2d.set(ylabel=(r'<-x | z ->'),xlabel='y')
-
-    #     plt.xlim(0, 200)
-    #     plt.ylim(-100, 100)
-    #     plt.grid(False)
-
-    #     ax_2d.axis('off')
-
-    #     #ax_2d.set_yticks(  range(-12,12,2) )
-    #     #ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
-
-    #     ax_3d = plt.subplot(121, projection='3d')
-    #     #ax_3d.set(xlabel='x',ylabel='y',zlabel='z')
-
-    #     #plt.xlim(0, 16)
-    #     #plt.ylim(0, 16)
-
-    #     #ax_3d.set_zlim(0, 16)
-
-    #     ax_3d.view_init(30,80)
-    #     plt.tight_layout()
-    #     plt.axis("off")
 
     ax_2d = None
     ax_3d = None
 
     #def __init__(self,height=12,width=9,figsize=(12,9)):
-    def __init__(self, init_3d=(30, 10), height=12, width=20, figsize=(18, 9)):
+    def __init__(self, init_3d=(30, 10), height=12, width=16, figsize=(12, 9)):
+        
+        
+        
         plt.figure(figsize=figsize)
         ax_2d = plt.subplot(121)
         ax_2d.set(ylabel=(r'<-x | z ->'), xlabel='y')
@@ -99,13 +53,13 @@ class GeometrySceneDG:
         plt.ylim(-height, height)
         plt.grid(True)
 
-        ax_2d.set_yticks(range(-12, 12, 4))
+        ax_2d.set_yticks(range(-12, 12, 1))
         ax_2d.set_yticklabels(
-            list(map(lambda tick: str(abs(tick)), range(-12, 12, 4))))
+            list(map(lambda tick: str(abs(tick)), range(-12, 12, 1))))
 
-        ax_2d.set_xticks(range(0, 20, 4))
+        ax_2d.set_xticks(range(0, 16, 1))
         ax_2d.set_xticklabels(
-            list(map(lambda tick: str(abs(tick)), range(0, 20, 4))))
+            list(map(lambda tick: str(abs(tick)), range(0, 16, 1))))
 
         ax_3d = plt.subplot(122, projection='3d')
         ax_3d.set(xlabel='x', ylabel='y', zlabel='z')
@@ -120,7 +74,7 @@ class GeometrySceneDG:
 
         self.__class__.ax_2d = ax_2d
         self.__class__.ax_3d = ax_3d
-
+        self.__class__.size_3d=16
 
 class GeometryScene:
     #     plt.clf()
@@ -213,7 +167,7 @@ class GeometryScene:
         plt.grid(False)
 
         plt.axis('off')
-
+        
         #ax_2d.set_yticks(  range(-12,12,2) )
         #ax_2d.set_yticklabels(  list(map(lambda tick: str(abs(tick)),range(-12,12,2)))  )
 
@@ -274,6 +228,7 @@ class Entity:
     '''
     Parent class
     '''
+    display = 'Name'
     #     ax_vert = plt.subplot(221)
     #     ax_vert.set(ylabel=('Frontal view'))
     #     ax_vert.xaxis.tick_top()
@@ -304,6 +259,7 @@ class Entity:
 
     def __init__(self,
                  coding_points=None,
+                 display=None,
                  label=None,
                  fmt='b',
                  color=None,
@@ -325,6 +281,7 @@ class Entity:
         self.__fmt = None
         self._projection = projection
         self._caption = None
+        self.display = display
 
     def __call__(self,
                  label=None,
@@ -342,7 +299,10 @@ class Entity:
         """
         obj = copy.deepcopy(self)
         if label is not None:
-            obj._label = label
+            if obj.display is None:
+                obj._label = label
+                
+                    
 
         if color is not None:
             obj.__color = color
@@ -364,7 +324,7 @@ class Entity:
     def __repr__(self):
 
         if self._label is None:
-            self._label = self.__class__.__name__  #+' '+ str(self._coding_point())
+            self._label = self.__class__.__name__ 
 
         return self._label
 
@@ -377,6 +337,9 @@ class Entity:
 
     @property
     def label(self):
+        return self.getLabel()
+
+    def getLabel(self):
         return self._label
 
     def _generating_points(self):
@@ -425,7 +388,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self._label
+            text = self.getLabel()
 
         if marker is None:
             marker = self.__marker
@@ -460,7 +423,7 @@ class Entity:
         text=None,
         fontsize=13,
         linewidth=linewidth,
-        scene=GeometryScene.ax_2d,
+        scene=GeometrySceneDG.ax_2d,
     ):
         '''
         Set the coordinates of the points with the text explanation         
@@ -473,7 +436,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self._label
+            text = self.getLabel()
 
         if marker is None:
             marker = self.__marker
@@ -520,7 +483,7 @@ class Entity:
             fmt = self.__fmt
 
         if text is None:
-            text = self._label
+            text = self.getLabel()
 
         if marker is None:
             marker = self.__marker
@@ -585,9 +548,8 @@ class Entity:
             style=style,
             text=text,
             fontsize=fontsize,
-            linewidth=linewidth,
-            scene=scene
-        )
+            #linewidth=linewidth,
+            scene=scene)
 
         self.plot_hp(
             fmt=fmt,
@@ -596,9 +558,8 @@ class Entity:
             style=style,
             text=text,
             fontsize=fontsize,
-            linewidth=linewidth,
-            scene=scene
-        )
+            #linewidth=linewidth,
+            scene=scene)
         
         
         self.plot_vp(
@@ -608,9 +569,8 @@ class Entity:
             style=style,
             text=text,
             fontsize=fontsize,
-            linewidth=linewidth,
-            scene=scene
-        )
+            #linewidth=linewidth,
+            scene=scene)
         
         
         return self
@@ -703,6 +663,8 @@ class Point(Entity):
     Point class is used to create point object in Entity space and manipulate them
     """
 
+
+
     def __init__(self, *args, **kwargs):
         super().__init__()
         self._geo_ref = geo.Point3D(*args, **kwargs)  #geometrical reference
@@ -728,6 +690,15 @@ class Point(Entity):
 
     def n(self):
         return (self._geo_ref.n())
+
+    def getCords(self):
+        return str(self.x) + ',' + str(self.y) + ',' + str(self.z)
+
+    def getLabel(self):
+        if Entity.display == 'Name':
+            return self._label
+        if Entity.display == 'Cords':
+            return self._label + '(' + self.getCords() + ')'
 
 
 #     def __repr__(self):
@@ -789,13 +760,21 @@ class Point(Entity):
         else:
 
             # zaimplementować w metode dla punktu
-            rotation_dir = (point @ plane) - point_rot_center
+            
+            norm_vec=Point(*(Plane(axis.p1,point,axis.p2)._geo_ref.normal_vector))
+            print('rot coords',norm_vec.coordinates)
+            
+            lever_pnt = point+norm_vec
+            
+            rotation_dir = ((lever_pnt) @ plane) - point_rot_center
 
             #display(dir_I_on_HPP.coordinates)
             #display((point_I @ plane_beta).distance( S_I ))
             #display(point_I.distance( S_I ))
+            
+            
 
-            ratio = radius / ((point @ plane).distance(point_rot_center))
+            ratio = radius / ((lever_pnt @ plane).distance(point_rot_center))
 
             rotated_point = (point_rot_center +
                              (rotation_dir) * ratio)(f'{point._label}_0')
@@ -920,19 +899,32 @@ class Plane(Entity):
 #             self._geo_ref = geo.Plane(p1=p1._geo_ref, a=a._geo_ref, b=b._geo_ref, **kwargs)
 
     def _vertices(self):
-        return self._p1, self._p2, self._p3
+        return self._p1, self._p2, self._p3,
 
     def _coding_points(self):
-        return (self._geo_ref.p1, self._p2, self._p3, self._geo_ref.p1)
+        #return (self._p1, self._p2,self._p2 + (self._p3 - self._p1)  , self._p3,   self._geo_ref.p1)
+        return (*self._vertices(),self._p1)
 
     def projection(self, other):
         if isinstance(other, Point):
             projection = self._geo_ref.projection(other._geo_ref)
+            new_obj = entity_convert(projection)
 
         elif isinstance(other, Line):
             projection = self._geo_ref.projection_line(other._geo_ref)
+            new_obj = entity_convert(projection)
 
-        new_obj = entity_convert(projection)
+        elif isinstance(other, Plane):
+            projected_pts=[(pts @ self)  for pts in other._vertices()]
+            
+            if geo.Point.is_collinear(*[pts._geo_ref for pts in projected_pts]):
+                
+                new_obj = Line(*projected_pts[0:2])
+                #new_obj = Plane(*projected_pts)
+            else:
+                new_obj = Plane(*projected_pts)
+            #new_obj = Plane(*projected_pts)
+        
 
         at = self.__class__._at_symbol
 
@@ -1018,7 +1010,7 @@ class Tetragon(Plane):
 
 
 class HorizontalPlane(Plane):
-    _at_symbol = ''
+    _at_symbol =  ''
 
     def __init__(self, p1=None):
 
@@ -1029,7 +1021,7 @@ class HorizontalPlane(Plane):
         self._label = "\'"
 
 
-class VerticalPlane(Plane):
+class FrontalPlane(Plane):
     _at_symbol = ''
 
     def __init__(self, p1=None):
@@ -1040,9 +1032,33 @@ class VerticalPlane(Plane):
         super().__init__(p1, p1 + Point(0, 5, 0), p1 + Point(0, 0, 5))
         self._label = "\'\'"
 
+class VerticalPlane(FrontalPlane):
+    pass
 
+class LateralPlane(Plane):
+    _at_symbol = ''
+
+    def __init__(self, p1=None):
+
+        if p1 is None:
+            p1 = Point(0, 0, 0)
+
+        super().__init__(p1, p1 + Point(5, 0, 0), p1 + Point(0, 0, 5))
+        self._label = "\'\'\'"
+        
 HPP = HorizontalPlane()
+FPP = FrontalPlane()
 VPP = VerticalPlane()
+LPP = LateralPlane()
+        
+        
+HPPend = HorizontalPlane( Point(0,0,16) )
+VPPend = VerticalPlane( Point(16,0,0) )
+FPPend = FrontalPlane( Point(16,0,0) )
+LPPend = LateralPlane( Point(0,16,0) )
+
+
+
 
 
 class DrawingSet(Entity, list):
@@ -1058,6 +1074,13 @@ class DrawingSet(Entity, list):
 
         obj = copy.deepcopy(self)
         obj._label = label
+
+        return obj
+    
+    def set_display(self, display):
+
+        obj = copy.deepcopy(self)
+        obj._display = display
 
         return obj
 
@@ -1185,32 +1208,39 @@ class GeometricalCase(DrawingSet):
         return self._path
 
     def preview(self, example=False):
-        GeometrySceneDG()
+        
 
-        print('preview')
+#        print('preview')
         print(self._assumptions3d)
         if self._assumptions3d is None:
             self._assumptions3d = self._assumptions
 
         print(self._assumptions3d)
+        
+        if self._path:
+            path = self._path
+            
+        else:
+            GeometrySceneDG()
 
-        self._assumptions3d.plot()
-        self._assumptions.plot_hp()
-        self._assumptions.plot_vp()
+            self._assumptions3d.plot()
+            self._assumptions.plot_hp()
+            self._assumptions.plot_vp()
 
-        path = __file__.replace('dgeometry.py',
-                                'images/') + self.__class__.__name__ + str(
-                                    next(self.__class__._case_no)) + '.png'
+            path = __file__.replace('dgeometry.py',
+                                    'images/') + self.__class__.__name__ + str(
+                                        next(self.__class__._case_no)) + '.png'
 
-        plt.savefig(path)
+            plt.savefig(path)
+            self._path=path
 
-        plt.close()
+            plt.close()
 
-        self._path = path
+        
 
-        print('check' * 100)
+#        print('check' * 100)
         print(self._path)
-        print('check' * 100)
+#        print('check' * 100)
         plt.close()
 
         with open(f"{path}", "rb") as image_file:
@@ -1248,6 +1278,8 @@ class GeometricalCase(DrawingSet):
         self._solution_step = list(assumptions)
 
         self._cached_solution = None
+        
+        self._path = None
 
     def add_solution_step(self,
                           title,
@@ -1363,7 +1395,7 @@ class GeometricalCase(DrawingSet):
 
         if self._cached_solution is None:
 
-            new_obj = copy.deepcopy(self)
+            new_obj = self._solution()
             self._cached_solution = new_obj
 
         else:
@@ -1371,6 +1403,11 @@ class GeometricalCase(DrawingSet):
 
         return new_obj
 
+    
+    def _solution(self):
+
+        return  copy.copy(self)
+    
     def present_solution(self):
 
         doc_model = Document(f'{self.__class__.__name__} solution')

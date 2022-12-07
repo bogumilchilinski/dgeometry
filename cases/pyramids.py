@@ -2334,7 +2334,7 @@ class TriangularPyramid(GeometricalCase):
                                          point_O)('Assumptions')
         self._assumptions = DrawingSet(*projections)
 
-    def solution(self):
+    def _solution(self):
         current_obj = copy.deepcopy(self)
 
         A = current_obj._point_A
@@ -2372,11 +2372,11 @@ class TriangularPyramid(GeometricalCase):
 
         plane_aux = Plane(A, D, A + Point(5, 0, 0))
 
-        point_P3 = (((O - (point_P1 - A)) ^ O)('h_H') & plane_aux)[0]('3')
-        point_P4 = (((O - (point_P2 - A)) ^ O)('f_H') & plane_aux)[0]('4')
+        #point_P3 = (((O - (point_P1 - A)) ^ O)('h_H') & plane_aux)[0]('3')
+        #point_P4 = (((O - (point_P2 - A)) ^ O)('f_H') & plane_aux)[0]('4')
 
-        current_obj.add_solution_step('Piercing point',
-                                      [point_P3, point_P4])
+        #current_obj.add_solution_step('Piercing point',
+        #                              [point_P3, point_P4])
 
 
         elems = [D, E, F, plane_alpha, plane_gamma, line_ad,# line_be, line_cf
@@ -2410,6 +2410,7 @@ class TriangularPyramid(GeometricalCase):
         current_obj.add_solution_step('D vertex', [D])
         
         return current_obj
+
 
     def get_default_data(self):
 
@@ -2494,10 +2495,10 @@ class TriangularPyramidSwappedProjections(TriangularPyramid):
     
     
     
-class TriangularPyramidHFLines(GeometricalCase):
-    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+class TriangularPyramidHFLines(TriangularPyramid):
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [4,4.5,5] for z in [2,2.5,3,3.5]  ]
 
-    point_B = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in [5,5.5,6,6.5,7] ]
+    point_B = [Point(x,y,z) for x in [3,3.5,4,4.5,5] for y in range(9,12) for z in [5,5.5,6,6.5,7] ]
 
 
     point_C=[Point(x,y,z) for x in [4,4.5,5,5.5,6] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5] ]
@@ -2505,6 +2506,12 @@ class TriangularPyramidHFLines(GeometricalCase):
 
     point_O=[Point(x,y,z) for x in range(9,12) for y in [6,6.5,7,7.5,8.5] for z in range(9,12) ]
 
+    shift = [
+        Point(x, y, z) for x in [-1, -0.5, 0, 0.5, 1]
+        for y in [0, 0.5]
+        for z in [-1, -0.5, 0, 0.5, 1]
+    ]
+    
 
     def get_random_parameters(self):
 
@@ -2517,7 +2524,7 @@ class TriangularPyramidHFLines(GeometricalCase):
         point_C=parameters_dict[Symbol('C')] 
 
         
-        parameters_dict[Symbol('B')]=Point(point_A.x,point_C.y,point_C.z)
-        parameters_dict[Symbol('C')]=Point(point_B.x,point_B.y,point_A.z)
+        parameters_dict[Symbol('C')]=Point(point_A.x,point_C.y,point_C.z)
+        parameters_dict[Symbol('B')]=Point(point_B.x,point_B.y,point_A.z)
 
         return parameters_dict
