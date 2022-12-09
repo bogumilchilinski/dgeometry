@@ -269,14 +269,6 @@ class PlaneRotation(GeometricalCase):
         
         self._solution_step.append(self._assumptions)
 
-    def solution(self):
-        if self._cached_solution is None:
-            
-            current_obj = self._solution()
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
-        return current_obj
         
     def _solution(self):
         current_obj=copy.deepcopy(self)
@@ -529,7 +521,7 @@ class IsoscelesRightTriangleRotation(GeometricalCase):
         }
         return default_data_dict
 
-class EdgeIsoscelesRightTriangleRotationRotation(IsoscelesRightTriangleRotation):
+class EdgeIsoscelesRightTriangleRotation(IsoscelesRightTriangleRotation):
     def get_random_parameters(self):
 
         parameters_dict = super().get_random_parameters()
@@ -565,21 +557,22 @@ class SquareRotation(GeometricalCase):
 
         self._assumptions=DrawingSet(*projections)
 
-        self._point_A=point_A
-        self._point_P=point_P
-        self._point_O=point_O
+        self.point_A=point_A
+        self.point_P=point_P
+        self.point_O=point_O
 
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O}
         
         self._solution_step.append(self._assumptions)
 
-    def solution(self):
+    def _solution(self):
         current_obj=copy.deepcopy(self)
         
-        A=current_obj._point_A
-        O=current_obj._point_O
-        P=current_obj._point_P
+        A=current_obj.point_A
+        O=current_obj.point_O
+        P=current_obj.point_P
+
         
         S = (A @ (O^P))('S') #'Srodek' podstawy
         
@@ -615,34 +608,16 @@ class SquareRotation(GeometricalCase):
         elems=self._assumptions
         projections=[]
         point_0_dict={}
-        for point_I in [A,B,C,D,O]:
+
+        S_I = (A @ line_k)('k')
         
-            S_I = (point_I @ line_k)('k')
-
-
-
-            # zaimplementować w metode dla punktu 
-            dir_I_on_HPP =(point_I @ plane_beta) - S_I
-            
-            #display(dir_I_on_HPP.coordinates)
-            #display((point_I @ plane_beta).distance( S_I ))
-            #display(point_I.distance( S_I ))
-            
-            ratio = (point_I.distance( S_I )) /(point_I @ plane_beta).distance( S_I )
-            
-            I_o =(S_I+(dir_I_on_HPP)*ratio)(point_I._label+'_0')
-            
-            point_0_dict[str(point_I)]=I_o
-            elems += [I_o]
-            projections+=[I_o@HPP,I_o@VPP]
-
-            
+        current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
+        current_obj.point_D_0 = D.rotate_about(axis=line_k)('D_0')            
         line_kk=Line(P,S_I)('k')
         
-        current_obj.point_A_0=point_0_dict['A']
-        current_obj.point_B_0=point_0_dict['B']
-        current_obj.point_C_0=point_0_dict['C']
-        current_obj.point_D_0=point_0_dict['D']
+
         current_obj.add_solution_step('A0',[current_obj.point_A_0])
         current_obj.add_solution_step('B0',[current_obj.point_B_0])
         current_obj.add_solution_step('C0',[current_obj.point_C_0])
@@ -661,9 +636,9 @@ class SquareRotation(GeometricalCase):
 
         current_obj._solution_step.append(current_set)
         current_obj._assumptions=DrawingSet(*elems,*projections)
-        current_obj._point_B=B
-        current_obj._point_C=C
-        current_obj._point_D=D
+        current_obj.point_B=B
+        current_obj.point_C=C
+        current_obj.point_D=D
         return current_obj
 
     def get_default_data(self):
@@ -683,6 +658,20 @@ class SquareRotation(GeometricalCase):
 
         }
         return default_data_dict
+
+    
+class EdgeSquareRotation(SquareRotation):
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_P = parameters_dict[Symbol('P')]
+        point_O = parameters_dict[Symbol('O')]
+
+        parameters_dict[Symbol('A')] = (point_P + point_O) * 0.5 + Point(0, 0, 5)
+
+        return parameters_dict
+    
     
 class EquilateralTriangleRotation(GeometricalCase):
 
@@ -708,21 +697,21 @@ class EquilateralTriangleRotation(GeometricalCase):
 
         self._assumptions=DrawingSet(*projections)
 
-        self._point_A=point_A
-        self._point_P=point_P
-        self._point_O=point_O
+        self.point_A=point_A
+        self.point_P=point_P
+        self.point_O=point_O
 
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O}
         
         self._solution_step.append(self._assumptions)
 
-    def solution(self):
+    def _solution(self):
         current_obj=copy.deepcopy(self)
         
-        A=current_obj._point_A
-        O=current_obj._point_O
-        P=current_obj._point_P
+        A=current_obj.point_A
+        O=current_obj.point_O
+        P=current_obj.point_P
         
         S = (A @ (O^P))('S') #'Srodek' podstawy
         
@@ -735,11 +724,12 @@ class EquilateralTriangleRotation(GeometricalCase):
         C = (S - dirPS/(P.distance(S))*(triangle_side/2))('C')
 
 
-        
         current_set=DrawingSet(*current_obj._solution_step[-1])
 
         line_a=Line(A,B)('a')
-        line_b=Line(C,A)('b')
+        line_b=Line(B,C)('b')
+        line_c=Line(C,D)('c')
+        line_d=Line(D,A)('d')
         plane_alpha=Plane(A,O,P)
 
         plane_beta=HorizontalPlane(P)
@@ -749,41 +739,27 @@ class EquilateralTriangleRotation(GeometricalCase):
         elems=self._assumptions
         projections=[]
         point_0_dict={}
-        for point_I in [A,B,C,O]:
+
+        S_I = (A @ line_k)('k')
         
-            S_I = (point_I @ line_k)('k')
-
-
-
-            # zaimplementować w metode dla punktu 
-            dir_I_on_HPP =(point_I @ plane_beta) - S_I
-            
-            #display(dir_I_on_HPP.coordinates)
-            #display((point_I @ plane_beta).distance( S_I ))
-            #display(point_I.distance( S_I ))
-            
-            ratio = (point_I.distance( S_I )) /(point_I @ plane_beta).distance( S_I )
-            
-            I_o =(S_I+(dir_I_on_HPP)*ratio)(point_I._label+'_0')
-            
-            point_0_dict[str(point_I)]=I_o
-            elems += [I_o]
-            projections+=[I_o@HPP,I_o@VPP]
-
-            
+        current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
+     
         line_kk=Line(P,S_I)('k')
         
-        current_obj.A0=point_0_dict['A']
-        current_obj.B0=point_0_dict['B']
-        current_obj.C0=point_0_dict['C']
-        
-        
+
+        current_obj.add_solution_step('A0',[current_obj.point_A_0])
+        current_obj.add_solution_step('B0',[current_obj.point_B_0])
+        current_obj.add_solution_step('C0',[current_obj.point_C_0])
+        current_obj.add_solution_step('D0',[current_obj.point_D_0])
         #print(point_0_dict)
         elems+=[line_a,line_b,#,E,F,G,H,line_s1,line_s2,line_s3,line_s4
               ]
 
-        projections+=[current_obj.A0@HPP,current_obj.A0@VPP,current_obj.B0@HPP,current_obj.B0@VPP,
-                      current_obj.C0@HPP,current_obj.C0@VPP,B@HPP,B@VPP,C@HPP,C@VPP,line_a@HPP,line_a@VPP,line_b@HPP,line_b@VPP,
+        projections+=[current_obj.point_D_0@HPP,current_obj.point_D_0@VPP,D@HPP,D@VPP,
+            current_obj.point_A_0@HPP,current_obj.point_A_0@VPP,current_obj.point_B_0@HPP,current_obj.point_B_0@VPP,
+                      current_obj.point_C_0@HPP,current_obj.point_C_0@VPP,B@HPP,B@VPP,C@HPP,C@VPP,line_a@HPP,line_a@VPP,line_b@HPP,line_b@VPP,
                       line_kk@HPP,line_kk@VPP,#line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
                      #line_s4@HPP,line_s4@VPP
                     ]
@@ -791,8 +767,9 @@ class EquilateralTriangleRotation(GeometricalCase):
 
         current_obj._solution_step.append(current_set)
         current_obj._assumptions=DrawingSet(*elems,*projections)
-        current_obj._point_B=B
-        current_obj._point_C=C
+        current_obj.point_B=B
+        current_obj.point_C=C
+
         return current_obj
 
     def get_default_data(self):
@@ -812,6 +789,20 @@ class EquilateralTriangleRotation(GeometricalCase):
 
         }
         return default_data_dict
+
+    
+class EdgeEquilateralTriangleRotation(EquilateralTriangleRotation):
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_P = parameters_dict[Symbol('P')]
+        point_O = parameters_dict[Symbol('O')]
+
+        parameters_dict[Symbol('A')] = (point_P + point_O) * 0.5 + Point(0, 0, 5)
+
+        return parameters_dict
+    
     
 class ShapeOnPlane(GeometricalCase):
 

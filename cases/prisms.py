@@ -549,8 +549,8 @@ class SquarePrism(GeometricalCase):
         current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
         current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
         current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
-        current_obj.point_D_0 = C.rotate_about(axis=line_k)('D_0')        
-        current_obj.point_O_0 = C.rotate_about(axis=line_k)('O_0')    
+        current_obj.point_D_0 = D.rotate_about(axis=line_k)('D_0')        
+        current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')    
     
         #plane_beta=Plane(H,H+(B-A),H-(C-A))
         #         plane_beta=Plane(K,K+(A-P),K-(O-P))
@@ -2372,10 +2372,10 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
         #self += [point_A,point_O,point_P,point_H]
 
-        self._point_A = point_A
-        self._point_P = point_P
-        self._point_O = point_O
-        self._point_H = point_H
+        self.point_A = point_A
+        self.point_P = point_P
+        self.point_O = point_O
+        self.point_H = point_H
 
         self._given_data = {
             'A': point_A,
@@ -2388,11 +2388,11 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
         if self._cached_solution is None:
             current_obj = copy.deepcopy(self)
 
-            A = current_obj._point_A
-            O = current_obj._point_O
-            P = current_obj._point_P
+            A = current_obj.point_A
+            O = current_obj.point_O
+            P = current_obj.point_P
 
-            H = current_obj._point_H
+            H = current_obj.point_H
 
             S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
@@ -2483,7 +2483,11 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
             current_obj.O0 = O.rotate_about(axis=line_a)('O_0')
 
-        
+            current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
+            current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
+            current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
+
+            current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')   
 
             G = (H @ plane_alpha)('G')
 
@@ -2524,8 +2528,8 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
                 *current_obj.get_projections())('Solution')
             current_obj._assumptions3d = DrawingSet(*current_obj)
 
-            current_obj._point_B = B
-            current_obj._point_C = C
+            current_obj.point_B = B
+            current_obj.point_C = C
             current_obj.point_D = D
             current_obj.point_E = E
             current_obj.point_F = F
@@ -2607,6 +2611,19 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
 
         return parameters_dict
 
+class GivenHeightEdgeIsoscelesRightTrianglePrism(GivenHeightIsoscelesRightTrianglePrism):
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_P = parameters_dict[Symbol('P')]
+        point_O = parameters_dict[Symbol('O')]
+
+        parameters_dict[Symbol('A')] = (point_P + point_O) * 0.5 + Point(0, 0, 5)
+
+        return parameters_dict
+    
+    
 class GivenHeightIsoscelesRightTrianglePrismSwappedProjections(GivenHeightIsoscelesRightTrianglePrism):
 
     shift = [
@@ -2800,7 +2817,7 @@ class VerticalTiltedTetragonalPrism(TetragonalPrism):
                                          point_O)('Assumptions')
         self._assumptions = DrawingSet(*projections)
 
-    def solution(self):
+    def _solution(self):
 
         if self._cached_solution is None:
             current_obj = copy.deepcopy(self)
@@ -3390,10 +3407,10 @@ class GivenHeightSquarePrism(GeometricalCase):
 
         #self += [point_A,point_O,point_P,point_H]
 
-        self._point_A = point_A
-        self._point_P = point_P
-        self._point_O = point_O
-        self._point_H = point_H
+        self.point_A = point_A
+        self.point_P = point_P
+        self.point_O = point_O
+        self.point_H = point_H
 
         self._given_data = {
             'A': point_A,
@@ -3402,15 +3419,15 @@ class GivenHeightSquarePrism(GeometricalCase):
             'H': point_H
         }
 
-    def solution(self):
+    def _solution(self):
         if self._cached_solution is None:
             current_obj = copy.deepcopy(self)
 
-            A = current_obj._point_A
-            O = current_obj._point_O
-            P = current_obj._point_P
+            A = current_obj.point_A
+            O = current_obj.point_O
+            P = current_obj.point_P
 
-            H = current_obj._point_H
+            H = current_obj.point_H
 
             S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
@@ -3501,6 +3518,12 @@ class GivenHeightSquarePrism(GeometricalCase):
 
             current_obj.add_solution_step('', [A, B, C, D])
 
+            current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
+            current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
+            current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
+            current_obj.point_D_0 = D.rotate_about(axis=line_k)('D_0')        
+            current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')   
+            
             T = (H @ plane_alpha)('T')
 
             ############  upper  base
@@ -3549,9 +3572,9 @@ class GivenHeightSquarePrism(GeometricalCase):
                 *current_obj.get_projections())('Solution')
             current_obj._assumptions3d = DrawingSet(*current_obj)
 
-            current_obj._point_B = B
-            current_obj._point_C = C
-            current_obj._point_D = D
+            current_obj.point_B = B
+            current_obj.point_C = C
+            current_obj.point_D = D
             current_obj.point_E = E
             current_obj.point_F = F
             current_obj.point_G = G

@@ -2098,10 +2098,10 @@ class SquarePyramid(GeometricalCase):
 
         self._assumptions=DrawingSet(*projections)
 
-        self._point_A=point_A
-        self._point_P=point_P
-        self._point_O=point_O
-        self._point_H=point_H
+        self.point_A=point_A
+        self.point_P=point_P
+        self.point_O=point_O
+        self.point_H=point_H
 
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O,'H':point_H}
@@ -2112,13 +2112,13 @@ class SquarePyramid(GeometricalCase):
         self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
         self._assumptions=DrawingSet(*projections)
 
-    def solution(self):
+    def _solution(self):
         current_obj=copy.deepcopy(self)
         
-        A=current_obj._point_A
-        O=current_obj._point_O
-        P=current_obj._point_P
-        H=current_obj._point_H
+        A=current_obj.point_A
+        O=current_obj.point_O
+        P=current_obj.point_P
+        H=current_obj.point_H
         
         S = (A @ (O^P))('S') #'Srodek' podstawy
         
@@ -2158,7 +2158,7 @@ class SquarePyramid(GeometricalCase):
         
 #         for point_I in [A,B,C,D,O]:
         
-#             S_I = (point_I @ line_k)('k')
+        S_I = (B @ line_k)('k')
 
 
 
@@ -2182,38 +2182,44 @@ class SquarePyramid(GeometricalCase):
         #### Point A rotation ####
 
         current_obj.A0=A.rotate_about(axis=line_k)('A_0')
-        current_obj.A0=point_A
-        current_obj.add_solution_step('Point A rotation',[point_A])
+
+        current_obj.add_solution_step('Point A rotation',[current_obj.A0])
             
         #### Step 2 ####
         #### Point B rotation ####
             
         current_obj.B0=B.rotate_about(axis=line_k)('B_0')
-        current_obj.B0=point_B
-        current_obj.add_solution_step('Point B rotation',[point_B])
+
+        current_obj.add_solution_step('Point B rotation',[current_obj.B0])
             
         #### Step 3 ####
         #### Point C rotation ####
             
         current_obj.C0=C.rotate_about(axis=line_k)('C_0')
-        current_obj.C0=point_C
-        current_obj.add_solution_step('Point C rotation',[point_C])
+
+        current_obj.add_solution_step('Point C rotation',[current_obj.C0])
             
         #### Step 4 ####
         #### Point D rotation ####
             
         current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-        current_obj.D0=point_D
-        current_obj.add_solution_step('Point D rotation',[point_D])
+
+        current_obj.add_solution_step('Point D rotation',[current_obj.D0])
         
         #### Step 5 ####
         #### Point O rotation ####
         
         current_obj.O0=O.rotate_about(axis=line_k)('O_0')
-        current_obj.O0=point_O
-        current_obj.add_solution_step('Point O rotation',[point_O])
+
+        current_obj.add_solution_step('Point O rotation',[current_obj.O0])
     
-#        line_kk=Line(P,S_I)('k')
+        current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
+        current_obj.point_D_0 = D.rotate_about(axis=line_k)('D_0')        
+        current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')    
+    
+        line_kk=Line(P,S_I)('k')
         
 #         current_obj.A0=point_0_dict['A']
 #         current_obj.B0=point_0_dict['B']
@@ -2224,8 +2230,7 @@ class SquarePyramid(GeometricalCase):
         #plane_beta=Plane(H,H+(B-A),H-(C-A))
         plane_beta=Plane(H,H+(A-P),H-(O-P))
         E=(S@plane_beta)('E')
-        current_obj.E=point_E
-        current_obj.add_solution_step('Point E rotation',[point_E])
+
 
         line_ae=Line(S,E)('a')
 
@@ -2248,9 +2253,9 @@ class SquarePyramid(GeometricalCase):
 
         current_obj._solution_step.append(current_set)
         current_obj._assumptions=DrawingSet(*elems,*projections)
-        current_obj._point_B=B
-        current_obj._point_C=C
-        current_obj._point_D=D
+        current_obj.point_B=B
+        current_obj.point_C=C
+        current_obj.point_D=D
         current_obj.point_E=E
         return current_obj
 
