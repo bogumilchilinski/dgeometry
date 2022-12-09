@@ -1570,7 +1570,7 @@ class LineParallelToPlane(TwoPlanesIntersection):
 
     point_F = [Point(x,y,z) for x in  [1,1.5,2,2.5,3,3.5] for y in [10,10.5,11,11.5,12] for z in range(8,12) ]
 
-    def solution(self):
+    def _solution(self):
 #         self._line=Line(self._point_N1,self._point_N2)
         current_obj=copy.deepcopy(self)
         
@@ -1694,7 +1694,7 @@ class PerpendicularLineAndParallelPlaneIntersection(GeometricalCase):
                                          point_O)('Assumptions')
         self._assumptions = DrawingSet(*projections)
 
-    def solution(self):
+    def _solution(self):
         current_obj = copy.deepcopy(self)
 
         A = current_obj._point_A

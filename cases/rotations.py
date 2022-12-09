@@ -405,14 +405,7 @@ class IsoscelesRightTriangleRotation(GeometricalCase):
                                [point_A, point_P, point_O])
         
 
-#     def solution(self):
-#         if self._cached_solution is None:
-            
-#             current_obj = self._solution()
-#             self._cached_solution = current_obj
-#         else:
-#             current_obj = copy.deepcopy(self._cached_solution)
-#         return current_obj
+
         
     def _solution(self):
         current_obj=copy.deepcopy(self)
@@ -1043,145 +1036,142 @@ class SquareOnPlane(GeometricalCase):
 
     
 
-    def solution(self):
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+    def _solution(self):
 
-            A = current_obj._point_A
-            O = current_obj._point_O
-            P = current_obj._point_P
+        current_obj = copy.deepcopy(self)
+
+        A = current_obj._point_A
+        O = current_obj._point_O
+        P = current_obj._point_P
 
 
 
-            S = (A @ (O ^ P))('S')  #'Srodek' podstawy
+        S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
-            dirPS = P - S
-            dirOS = O - S
-            square_diagonal = 2 * A.distance(S).n(5)
-            #triangle_side =  triangle_height / ((3**(1/2))/2)
+        dirPS = P - S
+        dirOS = O - S
+        square_diagonal = 2 * A.distance(S).n(5)
+        #triangle_side =  triangle_height / ((3**(1/2))/2)
 
-            B = (S + dirPS / (P.distance(S)) * (square_diagonal / 2))('B')
-            D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
-            C = (S + (S - A))('C')
-            triangle_plane = Plane(A, B, C)
+        B = (S + dirPS / (P.distance(S)) * (square_diagonal / 2))('B')
+        D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
+        C = (S + (S - A))('C')
+        triangle_plane = Plane(A, B, C)
 
-            
-            
-            current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            line_a = Line(A, B)('a')
-            line_b = Line(C, A)('b')
-            plane_alpha = Plane(A, O, P)
 
-            plane_beta = HorizontalPlane(P)
-            plane_eta = VerticalPlane(P)
+        current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+        line_a = Line(A, B)('a')
+        line_b = Line(C, A)('b')
+        plane_alpha = Plane(A, O, P)
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-            current_obj.P1 = point_P1
-            line_kk = (P ^ point_P1)('a')            
+        plane_beta = HorizontalPlane(P)
+        plane_eta = VerticalPlane(P)
 
-            
-            current_obj.add_solution_step(
-                f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}. 
-                The {point_P1._label} point has to be found, in order to determine axis position''', [point_P1,
-                                     (P ^ point_P1)('a')])
-            
-            
-            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+        line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
-            line_f = (P ^ point_P2)('f') 
-            
-            
-            current_obj.add_solution_step(
-                f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}''', [point_P2,
-                                     (P ^ point_P2)('f')])
+        point_P1 = plane_beta.intersection(A ^ O)[0]('1')
+        current_obj.P1 = point_P1
+        line_kk = (P ^ point_P1)('a')            
 
-            # it creates next step of solution - lines are presented
-            #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
-            #it sets the step elements
+        current_obj.add_solution_step(
+            f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}. 
+            The {point_P1._label} point has to be found, in order to determine axis position''', [point_P1,
+                                 (P ^ point_P1)('a')])
 
-            elems = self._assumptions
-            projections = []
-            point_0_dict = {}
-            eps_dict = {}
 
-            point_B = B
-            point_C = C
-            point_O = O
+        point_P2 = plane_eta.intersection(A ^ O)[0]('2')
 
-            ##################   plane rotation
+        line_f = (P ^ point_P2)('f') 
 
-            ### Step 2 #####
-            ###  plane of rotation of A ####
-            
-            line_kk = Line(P, (O @ line_k))('k')
 
-            A0 = A.rotate_about(axis=line_k)('A_0')
-            current_obj.A0 = A0
-            
-            A0_e1=A0+((A0@line_k)-A0)/((A0@line_k).distance(A0))*(1.2*((A0@line_k).distance(A0)))
-            A0_e2=(A0@line_k)+((A0@line_k)-A0)/((A0@line_k).distance(A0))*(-1.2*((A0@line_k).distance(A0)))
-            
-            current_obj.add_solution_step('''Plane rotation - it is creating projection of {O._label} on the planes intersection''', [((A0_e1)^A0_e2)('e_A')])
+        current_obj.add_solution_step(
+            f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}''', [point_P2,
+                                 (P ^ point_P2)('f')])
 
-            #### Step 3 ####
-            ### rotated point A0 of A #####
-            
-            current_obj.add_solution_step('Point A rotation by using a rotation plane', [A0])
+        # it creates next step of solution - lines are presented
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
-            B0 = B.rotate_about(axis=line_k)('B_0')
-            current_obj.B0 = B0
-            
-            current_obj.add_solution_step('Creating a point B0 based on triangle geometry', [B0])
+        #it sets the step elements
 
-            #### Step 4 ####
-            ### postion of B0 (based on triangle geometry) #####
+        elems = self._assumptions
+        projections = []
+        point_0_dict = {}
+        eps_dict = {}
 
-            C0 = C.rotate_about(axis=line_k)('C_0')
-            current_obj.C0 = C0
-            current_obj.add_solution_step('Creating a point C0 based on triangle geometry', [C0])
+        point_B = B
+        point_C = C
+        point_O = O
 
-            #### Step 5 ####
-            ### postion of C0 (based on triangle geometry) #####
+        ##################   plane rotation
 
-            D0 = D.rotate_about(axis=line_k)('D_0')
-            current_obj.D0 = D0
-            current_obj.add_solution_step('Creating a point D0 based on triangle geometry', [D0])
+        ### Step 2 #####
+        ###  plane of rotation of A ####
 
-            #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-            current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
-            
-            B0_e1=B0+((B0@line_k)-B0)/((B0@line_k).distance(B0))*(1.2*((B0@line_k).distance(B0)))
-            B0_e2=(B0@line_k)+((B0@line_k)-B0)/((B0@line_k).distance(B0))*(-1.2*((B0@line_k).distance(B0)))
-            
-            current_obj.add_solution_step('Reverse point B0 rotation - getting a point B in the space', [B,((B0_e1)^B0_e2)('e_B')])
-            
-            C0_e1=C0+((C0@line_k)-C0)/((C0@line_k).distance(C0))*(1.2*((C0@line_k).distance(C0)))
-            C0_e2=(C0@line_k)+((C0@line_k)-C0)/((C0@line_k).distance(C0))*(-1.2*((C0@line_k).distance(C0)))
-            
-            current_obj.add_solution_step('Reverse point C0 rotation - getting a point C in the space', [C,((C0_e1)^C0_e2)('e_C')])
-            
-            D0_e1=D0+((D0@line_k)-D0)/((D0@line_k).distance(D0))*(1.2*((D0@line_k).distance(D0)))
-            D0_e2=(D0@line_k)+((D0@line_k)-D0)/((D0@line_k).distance(D0))*(-1.2*((D0@line_k).distance(D0)))
-            
-            current_obj.add_solution_step('Reverse point D0 rotation - getting a point D in the space', [D,((D0_e1)^D0_e2)('e_D')])
-            
-            line_AB=(A^B)('AB')
-            line_BC=(B^C)('BC')
-            line_CD=(C^D)('CD')
-            line_DA=(D^A)('DA')
-            
-            current_obj.add_solution_step('Creating a square', [line_AB,line_BC,line_CD,line_DA])
-            
-            current_obj.add_solution_step('Drawn square', [A,B,C,D])
+        line_kk = Line(P, (O @ line_k))('k')
 
-            self._cached_solution = current_obj
-            current_obj._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
+        A0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.A0 = A0
+
+        A0_e1=A0+((A0@line_k)-A0)/((A0@line_k).distance(A0))*(1.2*((A0@line_k).distance(A0)))
+        A0_e2=(A0@line_k)+((A0@line_k)-A0)/((A0@line_k).distance(A0))*(-1.2*((A0@line_k).distance(A0)))
+
+        current_obj.add_solution_step('''Plane rotation - it is creating projection of {O._label} on the planes intersection''', [((A0_e1)^A0_e2)('e_A')])
+
+        #### Step 3 ####
+        ### rotated point A0 of A #####
+
+        current_obj.add_solution_step('Point A rotation by using a rotation plane', [A0])
+
+        B0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.B0 = B0
+
+        current_obj.add_solution_step('Creating a point B0 based on triangle geometry', [B0])
+
+        #### Step 4 ####
+        ### postion of B0 (based on triangle geometry) #####
+
+        C0 = C.rotate_about(axis=line_k)('C_0')
+        current_obj.C0 = C0
+        current_obj.add_solution_step('Creating a point C0 based on triangle geometry', [C0])
+
+        #### Step 5 ####
+        ### postion of C0 (based on triangle geometry) #####
+
+        D0 = D.rotate_about(axis=line_k)('D_0')
+        current_obj.D0 = D0
+        current_obj.add_solution_step('Creating a point D0 based on triangle geometry', [D0])
+
+        #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+        current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+
+        B0_e1=B0+((B0@line_k)-B0)/((B0@line_k).distance(B0))*(1.2*((B0@line_k).distance(B0)))
+        B0_e2=(B0@line_k)+((B0@line_k)-B0)/((B0@line_k).distance(B0))*(-1.2*((B0@line_k).distance(B0)))
+
+        current_obj.add_solution_step('Reverse point B0 rotation - getting a point B in the space', [B,((B0_e1)^B0_e2)('e_B')])
+
+        C0_e1=C0+((C0@line_k)-C0)/((C0@line_k).distance(C0))*(1.2*((C0@line_k).distance(C0)))
+        C0_e2=(C0@line_k)+((C0@line_k)-C0)/((C0@line_k).distance(C0))*(-1.2*((C0@line_k).distance(C0)))
+
+        current_obj.add_solution_step('Reverse point C0 rotation - getting a point C in the space', [C,((C0_e1)^C0_e2)('e_C')])
+
+        D0_e1=D0+((D0@line_k)-D0)/((D0@line_k).distance(D0))*(1.2*((D0@line_k).distance(D0)))
+        D0_e2=(D0@line_k)+((D0@line_k)-D0)/((D0@line_k).distance(D0))*(-1.2*((D0@line_k).distance(D0)))
+
+        current_obj.add_solution_step('Reverse point D0 rotation - getting a point D in the space', [D,((D0_e1)^D0_e2)('e_D')])
+
+        line_AB=(A^B)('AB')
+        line_BC=(B^C)('BC')
+        line_CD=(C^D)('CD')
+        line_DA=(D^A)('DA')
+
+        current_obj.add_solution_step('Creating a square', [line_AB,line_BC,line_CD,line_DA])
+
+        current_obj.add_solution_step('Drawn square', [A,B,C,D])
+
+
         return current_obj
 
 
