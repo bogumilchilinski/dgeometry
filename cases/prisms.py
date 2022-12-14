@@ -243,132 +243,129 @@ class EquilateralTrianglePrism(GeometricalCase):
         }
 
     def _solution(self):
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+        current_obj = copy.deepcopy(self)
 
-            A = current_obj.point_A
-            O = current_obj.point_O
-            P = current_obj.point_P
+        A = current_obj.point_A
+        O = current_obj.point_O
+        P = current_obj.point_P
 
-            H = current_obj.point_H
+        H = current_obj.point_H
 
-            S = (A @ (O ^ P))('S')  #'Srodek' podstawy
+        S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
-            dirPS = P - S
-            dirOS = O - S
-            triangle_height = A.distance(S)
-            triangle_side = triangle_height / ((3**(1 / 2)) / 2)
+        dirPS = P - S
+        dirOS = O - S
+        triangle_height = A.distance(S)
+        triangle_side = triangle_height / ((3**(1 / 2)) / 2)
 
-            B = (S + dirPS / (P.distance(S)) * (triangle_side / 2))('B')
-            C = (S - dirPS / (P.distance(S)) * (triangle_side / 2))('C')
+        B = (S + dirPS / (P.distance(S)) * (triangle_side / 2))('B')
+        C = (S - dirPS / (P.distance(S)) * (triangle_side / 2))('C')
 
-            triangle_plane = Plane(A, B, C)
+        triangle_plane = Plane(A, B, C)
 
-            current_set = DrawingSet(*current_obj._solution_step[-1])
+        current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            line_a = Line(A, B)('a')
-            line_b = Line(C, A)('b')
-            plane_alpha = Plane(A, O, P)
+        line_a = Line(A, B)('a')
+        line_b = Line(C, A)('b')
+        plane_alpha = Plane(A, O, P)
 
-            plane_beta = HorizontalPlane(P)
-            plane_eta = VerticalPlane(P)
+        plane_beta = HorizontalPlane(P)
+        plane_eta = VerticalPlane(P)
 
-            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+        line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
-            current_obj.P1 = point_P1
-            line_kk = (P ^ point_P1)('a')
-            line_f = (P ^ point_P2)('f')
+        point_P1 = plane_beta.intersection(A ^ O)[0]('1')
+        point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+        current_obj.P1 = point_P1
+        line_kk = (P ^ point_P1)('a')
+        line_f = (P ^ point_P2)('f')
 
-            # it creates next step of solution - lines are presented
-            #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
+        # it creates next step of solution - lines are presented
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
-            #it sets the step elements
-            current_obj.add_solution_step(
-                'Axis of rotation', [(A ^ point_P1)('AO'), point_P1,
-                                     (P ^ point_P1)('a'), point_P2, line_f])
+        #it sets the step elements
+        current_obj.add_solution_step(
+            'Axis of rotation', [(A ^ point_P1)('AO'), point_P1,
+                                 (P ^ point_P1)('a'), point_P2, line_f])
 
-            elems = self._assumptions
-            projections = []
-            point_0_dict = {}
-            eps_dict = {}
+        elems = self._assumptions
+        projections = []
+        point_0_dict = {}
+        eps_dict = {}
 
-            point_B = B
-            point_C = C
-            point_O = O
+        point_B = B
+        point_C = C
+        point_O = O
 
-            ##################   plane rotation
+        ##################   plane rotation
 
-            line_kk = Line(P, (O @ line_k))('k')
+        line_kk = Line(P, (O @ line_k))('k')
 
-            A0 = A.rotate_about(axis=line_k)('A_0')
-            current_obj.point_A_0 = A0
+        A0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.point_A_0 = A0
 
-            ### Step 2 #####
-            ###  plane of rotation of A ####
+        ### Step 2 #####
+        ###  plane of rotation of A ####
 
-            current_obj.add_solution_step('Point A rotation', [A0])
+        current_obj.add_solution_step('Point A rotation', [A0])
 
-            #### Step 3 ####
-            ### rotated point A0 of A #####
+        #### Step 3 ####
+        ### rotated point A0 of A #####
 
-            B0 = B.rotate_about(axis=line_k)('B_0')
-            current_obj.point_B_0 = B0
+        B0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.point_B_0 = B0
 
-            current_obj.add_solution_step('Point B rotation', [B0])
+        current_obj.add_solution_step('Point B rotation', [B0])
 
-            #### Step 4 ####
-            ### postion of B0 (based on triangle geometry) #####
+        #### Step 4 ####
+        ### postion of B0 (based on triangle geometry) #####
 
-            C0 = C.rotate_about(axis=line_k)('C_0')
-            current_obj.point_C_0 = C0
-            current_obj.add_solution_step('Point C rotation', [C0])
+        C0 = C.rotate_about(axis=line_k)('C_0')
+        current_obj.point_C_0 = C0
+        current_obj.add_solution_step('Point C rotation', [C0])
 
-            #### Step 5 ####
-            ### postion of C0 (based on triangle geometry) #####
+        #### Step 5 ####
+        ### postion of C0 (based on triangle geometry) #####
 
-            #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-            current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+        #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+        current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
 
-            current_obj.add_solution_step('Base ABC', [A, B, C])
+        current_obj.add_solution_step('Base ABC', [A, B, C])
 
-            G = (H @ plane_alpha)('G')
+        G = (H @ plane_alpha)('G')
 
-            ############  upper  base
+        ############  upper  base
 
-            dirHG = H - G
-            distance_HG = (H.distance(G)).n(5)
+        dirHG = H - G
+        distance_HG = (H.distance(G)).n(5)
 
-            #D = (A + dirHG/distance_HG*triangle_height)('D')
-            #E = (B + dirHG/distance_HG*triangle_height)('E')
-            #F = (C + dirHG/distance_HG*triangle_height)('F')
+        #D = (A + dirHG/distance_HG*triangle_height)('D')
+        #E = (B + dirHG/distance_HG*triangle_height)('E')
+        #F = (C + dirHG/distance_HG*triangle_height)('F')
 
-            A, B, C, D, E, F = Prism(triangle_plane,
-                                     dirHG)
+        A, B, C, D, E, F = Prism(triangle_plane,
+                                 dirHG)
 
-            current_obj.add_solution_step('Vertices D,E,F', [D, E, F])
+        current_obj.add_solution_step('Vertices D,E,F', [D, E, F])
 
-            elems += [D, E, F, G]
+        elems += [D, E, F, G]
 
-            projections += [
-                G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
-                F @ VPP
-            ]
+        projections += [
+            G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
+            F @ VPP
+        ]
 
-            current_obj._assumptions = DrawingSet(
-                *current_obj.get_projections())('Solution')
-            current_obj._assumptions3d = DrawingSet(*current_obj)
+        current_obj._assumptions = DrawingSet(
+            *current_obj.get_projections())('Solution')
+        current_obj._assumptions3d = DrawingSet(*current_obj)
 
-            current_obj.point_B = B
-            current_obj.point_C = C
-            current_obj.point_D = D
-            current_obj.point_E = E
-            current_obj.point_F = F
-            
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
+        current_obj.point_B = B
+        current_obj.point_C = C
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+
+
         return current_obj
 
     def get_default_data(self):
@@ -712,7 +709,7 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         self._solution_step.append(self._assumptions)
         self._solution3d_step.append(self._assumptions3d)
 
-    def solution(self):
+    def _solution(self):
         current_obj = copy.deepcopy(self)
 
         A = current_obj._point_A
@@ -1327,7 +1324,7 @@ class TruncatedTetragonalPrism(GeometricalCase):
         self._solution_step.append(self._assumptions)
         self.add_solution_step('Assumptions',[point_A, point_B, point_C, point_O])
 
-    def solution(self):
+    def _solution(self):
         current_obj = copy.deepcopy(self)
 
         A = current_obj._point_A
@@ -1523,7 +1520,7 @@ class TetragonalPrism(GeometricalCase):
         self.add_solution_step('Assumptions',
                                [point_A, point_B, point_C, point_O])
 
-    def solution(self):
+    def _solution(self):
         current_obj = copy.deepcopy(self)
 
         A = current_obj._point_A
@@ -1852,65 +1849,62 @@ class TiltedTetragonalPrism(TetragonalPrism):
                                          point_O)('Assumptions')
         self._assumptions = DrawingSet(*projections)
 
-    def solution(self):
+    def _solution(self):
 
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+        current_obj = copy.deepcopy(self)
 
-            A = current_obj._point_A
-            B = current_obj._point_B
-            C = current_obj._point_C
-            Z = current_obj._point_Z
-            O = current_obj._point_O
+        A = current_obj._point_A
+        B = current_obj._point_B
+        C = current_obj._point_C
+        Z = current_obj._point_Z
+        O = current_obj._point_O
 
-            current_set = DrawingSet(*current_obj._solution_step[-1])
+        current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            plane_alpha = Plane(A, B, C)
-            line_z = Line(Z, Z @ HPP)
-            D = line_z.intersection(plane_alpha)[0]('D')
+        plane_alpha = Plane(A, B, C)
+        line_z = Line(Z, Z @ HPP)
+        D = line_z.intersection(plane_alpha)[0]('D')
 
-            #         plane_beta=Plane(O,O+(B-A),O+(C-A))
-            #         E=(A@plane_beta)('E')
-            #         F=(B@plane_beta)('F')
-            #         G=(C@plane_beta)('G')
-            #         H=(D@plane_beta)('H')
-            #         plane_gamma=Plane(E,F,G)
+        #         plane_beta=Plane(O,O+(B-A),O+(C-A))
+        #         E=(A@plane_beta)('E')
+        #         F=(B@plane_beta)('F')
+        #         G=(C@plane_beta)('G')
+        #         H=(D@plane_beta)('H')
+        #         plane_gamma=Plane(E,F,G)
 
-            tetragonal_plane = Tetragon(A, B, C, D)
-            A, B, C, D, E, F, G, H = TetraPrism.right_from_parallel_plane(
-                tetragonal_plane, O)
-            self.add_solution_step('Prism', [A, B, C, Z, O, E, F, G, H])
-            line_ae = Line(A, E)('a')
-            line_bf = Line(B, F)('b')
-            line_cg = Line(C, G)('c')
-            line_dh = Line(D, H)('d')
-            elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
+        tetragonal_plane = Tetragon(A, B, C, D)
+        A, B, C, D, E, F, G, H = TetraPrism.right_from_parallel_plane(
+            tetragonal_plane, O)
+        self.add_solution_step('Prism', [A, B, C, Z, O, E, F, G, H])
+        line_ae = Line(A, E)('a')
+        line_bf = Line(B, F)('b')
+        line_cg = Line(C, G)('c')
+        line_dh = Line(D, H)('d')
+        elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
 
-            projections = [
-                line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
-                line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
-                E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
-                H @ VPP, D @ HPP, D @ VPP
-            ]
+        projections = [
+            line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
+            line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
+            E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
+            H @ VPP, D @ HPP, D @ VPP
+        ]
 
-            current_set += [*elems, *projections]
+        current_set += [*elems, *projections]
 
-            current_obj._solution_step.append(current_set)
+        current_obj._solution_step.append(current_set)
 
-            current_obj.horizontal_line_cross_BC = (HorizontalPlane(A) &
-                                                    (B ^ C))[0]
-            current_obj.frontal_line_cross_BC = (VerticalPlane(A) & (B ^ C))[0]
+        current_obj.horizontal_line_cross_BC = (HorizontalPlane(A) &
+                                                (B ^ C))[0]
+        current_obj.frontal_line_cross_BC = (VerticalPlane(A) & (B ^ C))[0]
 
-            current_obj.point_P = (O @ plane_alpha)('P')
-            current_obj.point_D = D
-            current_obj.point_E = E
-            current_obj.point_F = F
-            current_obj.point_G = G
-            current_obj.point_H = H
-            current_obj._assumptions += [DrawingSet(*elems, *projections)]
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
+        current_obj.point_P = (O @ plane_alpha)('P')
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+        current_obj.point_G = G
+        current_obj.point_H = H
+        current_obj._assumptions += [DrawingSet(*elems, *projections)]
+
         return current_obj
 
     def get_random_parameters(self):
@@ -1994,67 +1988,64 @@ class TiltedTetragonalPrism(TetragonalPrism):
 #                                          point_O)('Assumptions')
 #         self._assumptions = DrawingSet(*projections)
 
-#     def solution(self):
-#         if self._cached_solution is None:
-#             current_obj = copy.deepcopy(self)
+#     def _solution(self):
+#         current_obj = copy.deepcopy(self)
 
-#             A = current_obj._point_A
-#             B = current_obj._point_B
-#             C = current_obj._point_C
-#             O = current_obj._point_O
+#         A = current_obj._point_A
+#         B = current_obj._point_B
+#         C = current_obj._point_C
+#         O = current_obj._point_O
 
-#             plane_alpha = Plane(A, B, C)
+#         plane_alpha = Plane(A, B, C)
 
-#             point_P1 = (HorizontalPlane(A) & (B ^ C))[0]('1')
-#             point_P2 = (VerticalPlane(A) & (B ^ C))[0]('2')
+#         point_P1 = (HorizontalPlane(A) & (B ^ C))[0]('1')
+#         point_P2 = (VerticalPlane(A) & (B ^ C))[0]('2')
 
-#             current_obj.horizontal_line_cross_BC = point_P1
-#             current_obj.frontal_line_cross_BC = point_P2
+#         current_obj.horizontal_line_cross_BC = point_P1
+#         current_obj.frontal_line_cross_BC = point_P2
 
-#             self.add_solution_step('Horizontal and forntal lines',
-#                                    [point_P1, point_P2])
+#         self.add_solution_step('Horizontal and forntal lines',
+#                                [point_P1, point_P2])
 
-#             D = (A + (C - B))('D')
+#         D = (A + (C - B))('D')
 
-#             current_obj.add_solution_step('Vertices A,B,C,D', [A, B, C, D])
+#         current_obj.add_solution_step('Vertices A,B,C,D', [A, B, C, D])
 
-#             tetragonal_plane = Tetragon(A, B, C, D)
-#             A, B, C, D, E, F, G, H = TetraPrism.right_from_parallel_plane(
-#                 tetragonal_plane, O)
+#         tetragonal_plane = Tetragon(A, B, C, D)
+#         A, B, C, D, E, F, G, H = TetraPrism.right_from_parallel_plane(
+#             tetragonal_plane, O)
 
-#             plane_aux = Plane(A, F, A + Point(5, 0, 0))
+#         plane_aux = Plane(A, F, A + Point(5, 0, 0))
 
-#             #point_P3 = (((O - (point_P1 - A)) ^ O)('h_H') & plane_aux)[0]('3')
-#             #point_P4 = (((O - (point_P2 - A)) ^ O)('f_H') & plane_aux)[0]('4')
+#         #point_P3 = (((O - (point_P1 - A)) ^ O)('h_H') & plane_aux)[0]('3')
+#         #point_P4 = (((O - (point_P2 - A)) ^ O)('f_H') & plane_aux)[0]('4')
 
-#             #current_obj.add_solution_step('Piercing point',
-#             #                              [point_P3, point_P4])
+#         #current_obj.add_solution_step('Piercing point',
+#         #                              [point_P3, point_P4])
 
-#             line_ae = Line(A, E)('a')
-#             line_bf = Line(B, F)('b')
-#             line_cg = Line(C, G)('c')
-#             line_dh = Line(D, H)('d')
-#             elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
+#         line_ae = Line(A, E)('a')
+#         line_bf = Line(B, F)('b')
+#         line_cg = Line(C, G)('c')
+#         line_dh = Line(D, H)('d')
+#         elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
 
-#             current_obj.add_solution_step('Verticices E,F,G,H', [E, F, G, H])
+#         current_obj.add_solution_step('Verticices E,F,G,H', [E, F, G, H])
 
-#             projections = [
-#                 line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
-#                 line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
-#                 E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
-#                 H @ VPP, D @ HPP, D @ VPP
-#             ]
+#         projections = [
+#             line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
+#             line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
+#             E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
+#             H @ VPP, D @ HPP, D @ VPP
+#         ]
 
-#             current_obj.point_P = (O @ plane_alpha)('P')
-#             current_obj.point_D = D
-#             current_obj.point_E = E
-#             current_obj.point_F = F
-#             current_obj.point_G = G
-#             current_obj.point_H = H
-#             current_obj._assumptions += [DrawingSet(*elems, *projections)]
-#             self._cached_solution = current_obj
-#         else:
-#             current_obj = copy.deepcopy(self._cached_solution)
+#         current_obj.point_P = (O @ plane_alpha)('P')
+#         current_obj.point_D = D
+#         current_obj.point_E = E
+#         current_obj.point_F = F
+#         current_obj.point_G = G
+#         current_obj.point_H = H
+#         current_obj._assumptions += [DrawingSet(*elems, *projections)]
+
 #         return current_obj
 
 #     def get_default_data(self):
@@ -2225,74 +2216,71 @@ class TruncatedParallelogramPrism(GeometricalCase):
                                          point_O)('Assumptions')
         self._assumptions = DrawingSet(*projections)
 
-    def solution(self):
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+    def _solution(self):
+        current_obj = copy.deepcopy(self)
 
-            A = current_obj._point_A
-            B = current_obj._point_B
-            C = current_obj._point_C
+        A = current_obj._point_A
+        B = current_obj._point_B
+        C = current_obj._point_C
 
-            M = current_obj._point_M
-            N = current_obj._point_N
-            O = current_obj._point_O
+        M = current_obj._point_M
+        N = current_obj._point_N
+        O = current_obj._point_O
 
-            plane_alpha = Plane(A, B, C)
+        plane_alpha = Plane(A, B, C)
 
-            point_P1 = (HorizontalPlane(A) & (B ^ C))[0]('1')
-            point_P2 = (VerticalPlane(A) & (B ^ C))[0]('2')
+        point_P1 = (HorizontalPlane(A) & (B ^ C))[0]('1')
+        point_P2 = (VerticalPlane(A) & (B ^ C))[0]('2')
 
-            current_obj.horizontal_line_cross_BC = point_P1
-            current_obj.frontal_line_cross_BC = point_P2
+        current_obj.horizontal_line_cross_BC = point_P1
+        current_obj.frontal_line_cross_BC = point_P2
 
-            self.add_solution_step('Horizontal and forntal lines',
-                                   [point_P1, point_P2])
+        self.add_solution_step('Horizontal and forntal lines',
+                               [point_P1, point_P2])
 
-            D = (A + (C - B))('D')
+        D = (A + (C - B))('D')
 
-            current_obj.add_solution_step('Vertices A,B,C,D', [A, B, C, D])
+        current_obj.add_solution_step('Vertices A,B,C,D', [A, B, C, D])
 
-            plane_beta = Plane(M, N, O)
+        plane_beta = Plane(M, N, O)
 
-            E = (plane_alpha.perpendicular_line(A) & plane_beta)[0]('E')
-            F = (plane_alpha.perpendicular_line(B) & plane_beta)[0]('F')
-            G = (plane_alpha.perpendicular_line(C) & plane_beta)[0]('G')
-            H = (plane_alpha.perpendicular_line(D) & plane_beta)[0]('H')
+        E = (plane_alpha.perpendicular_line(A) & plane_beta)[0]('E')
+        F = (plane_alpha.perpendicular_line(B) & plane_beta)[0]('F')
+        G = (plane_alpha.perpendicular_line(C) & plane_beta)[0]('G')
+        H = (plane_alpha.perpendicular_line(D) & plane_beta)[0]('H')
 
-            plane_gamma = Plane(E, F, G)
+        plane_gamma = Plane(E, F, G)
 
-            #plane_aux = Plane(A,F,A+Point(5,0,0))
+        #plane_aux = Plane(A,F,A+Point(5,0,0))
 
-            #point_P3 = (   ((O-(point_P1-A))^O)('h_H') & plane_aux  )[0]('3')
-            #point_P4 = (   ((O-(point_P2-A))^O)('f_H') & plane_aux  )[0]('4')
+        #point_P3 = (   ((O-(point_P1-A))^O)('h_H') & plane_aux  )[0]('3')
+        #point_P4 = (   ((O-(point_P2-A))^O)('f_H') & plane_aux  )[0]('4')
 
-            current_obj.add_solution_step('Piercing points', [E, F, G])
+        current_obj.add_solution_step('Piercing points', [E, F, G])
 
-            line_ae = Line(A, E)('a')
-            line_bf = Line(B, F)('b')
-            line_cg = Line(C, G)('c')
-            line_dh = Line(D, H)('d')
-            elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
+        line_ae = Line(A, E)('a')
+        line_bf = Line(B, F)('b')
+        line_cg = Line(C, G)('c')
+        line_dh = Line(D, H)('d')
+        elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
 
-            current_obj.add_solution_step('Verticices E,F,G,H', [E, F, G, H])
+        current_obj.add_solution_step('Verticices E,F,G,H', [E, F, G, H])
 
-            projections = [
-                line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
-                line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
-                E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
-                H @ VPP, D @ HPP, D @ VPP
-            ]
+        projections = [
+            line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
+            line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
+            E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
+            H @ VPP, D @ HPP, D @ VPP
+        ]
 
-            current_obj.point_P = (O @ plane_alpha)('P')
-            current_obj.point_D = D
-            current_obj.point_E = E
-            current_obj.point_F = F
-            current_obj.point_G = G
-            current_obj.point_H = H
-            current_obj._assumptions += [DrawingSet(*elems, *projections)]
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
+        current_obj.point_P = (O @ plane_alpha)('P')
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+        current_obj.point_G = G
+        current_obj.point_H = H
+        current_obj._assumptions += [DrawingSet(*elems, *projections)]
+
         return current_obj
 
     def get_default_data(self):
@@ -2384,160 +2372,155 @@ class GivenHeightIsoscelesRightTrianglePrism(GeometricalCase):
             'H': point_H
         }
 
-    def solution(self):
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+    def _solution(self):
+        current_obj = copy.deepcopy(self)
 
-            A = current_obj.point_A
-            O = current_obj.point_O
-            P = current_obj.point_P
+        A = current_obj.point_A
+        O = current_obj.point_O
+        P = current_obj.point_P
 
-            H = current_obj.point_H
+        H = current_obj.point_H
 
-            S = (A @ (O ^ P))('S')  #'Srodek' podstawy
+        S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
-            dirPS = P - S
-            dirOS = O - S
-            triangle_height = A.distance(S).n(5)
-            #triangle_side =  triangle_height / ((3**(1/2))/2)
+        dirPS = P - S
+        dirOS = O - S
+        triangle_height = A.distance(S).n(5)
+        #triangle_side =  triangle_height / ((3**(1/2))/2)
 
-            B = (S + dirPS / (P.distance(S)) * (triangle_height))('B')
-            C = (S - dirPS / (P.distance(S)) * (triangle_height))('C')
-            triangle_plane = Plane(A, B, C)
+        B = (S + dirPS / (P.distance(S)) * (triangle_height))('B')
+        C = (S - dirPS / (P.distance(S)) * (triangle_height))('C')
+        triangle_plane = Plane(A, B, C)
 
-            current_set = DrawingSet(*current_obj._solution_step[-1])
+        current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            line_a = Line(A, B)('AB')
-            line_b = Line(C, A)('BC')
-            plane_alpha = Plane(A, O, P)
+        line_a = Line(A, B)('AB')
+        line_b = Line(C, A)('BC')
+        plane_alpha = Plane(A, O, P)
 
-            plane_beta = HorizontalPlane(P)
-            plane_eta = VerticalPlane(P)
+        plane_beta = HorizontalPlane(P)
+        plane_eta = VerticalPlane(P)
 
-            
-            line_a = plane_alpha.intersection(plane_beta)[0]('a')
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('P1')
-            point_P2 = plane_eta.intersection(A ^ O)[0]('P2')
-            current_obj.P1 = point_P1
-            line_p = (P ^ point_P1)('p')
-            line_l = (P ^ point_P2)('l')
-            line_k = (A ^ point_P1)('k')
+        line_a = plane_alpha.intersection(plane_beta)[0]('a')
 
-           
-            current_obj.add_solution_step("", [A, B, C])
-            #current_obj.add_solution_step('Base ABC', [A, B, C])
-            
-            # it creates next step of solution - lines are presented
-            #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
+        point_P1 = plane_beta.intersection(A ^ O)[0]('P1')
+        point_P2 = plane_eta.intersection(A ^ O)[0]('P2')
+        current_obj.P1 = point_P1
+        line_p = (P ^ point_P1)('p')
+        line_l = (P ^ point_P2)('l')
+        line_k = (A ^ point_P1)('k')
 
-            #it sets the step elements
-            current_obj.add_solution_step(
-                '', [point_P2, point_P1,
-                                     line_k, line_p, line_l])
+        
+        current_obj.add_solution_step("", [A, B, C])
+        #current_obj.add_solution_step('Base ABC', [A, B, C])
+        
+        # it creates next step of solution - lines are presented
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
-            
-            elems = self._assumptions
-            projections = []
-            point_0_dict = {}
-            eps_dict = {}
+        #it sets the step elements
+        current_obj.add_solution_step(
+            '', [point_P2, point_P1,
+                                 line_k, line_p, line_l])
 
-            point_B = B
-            point_C = C
-            point_O = O
-            
-            ##################   plane rotation
+        
+        elems = self._assumptions
+        projections = []
+        point_0_dict = {}
+        eps_dict = {}
 
-            #line_kk = Line(P, (O @ line_k))('k')
+        point_B = B
+        point_C = C
+        point_O = O
+        
+        ##################   plane rotation
 
-            A0 = A.rotate_about(axis=line_a)('A_0')
-            current_obj.A0 = A0
+        #line_kk = Line(P, (O @ line_k))('k')
 
-            ### Step 2 #####
-            ###  plane of rotation of A ####
+        A0 = A.rotate_about(axis=line_a)('A_0')
+        current_obj.A0 = A0
 
-            current_obj.add_solution_step('', [A0])
+        ### Step 2 #####
+        ###  plane of rotation of A ####
 
-            #### Step 3 ####
-            ### rotated point A0 of A #####
+        current_obj.add_solution_step('', [A0])
 
-            B0 = B.rotate_about(axis=line_a)('B_0')
-            current_obj.B0 = B0
+        #### Step 3 ####
+        ### rotated point A0 of A #####
 
-            current_obj.add_solution_step('', [B0])
+        B0 = B.rotate_about(axis=line_a)('B_0')
+        current_obj.B0 = B0
 
-            #### Step 4 ####
-            ### postion of B0 (based on triangle geometry) #####
+        current_obj.add_solution_step('', [B0])
 
-            #current_obj.add_solution_step(
-                #'Point B rotation - plane of rotation',
-                #[(B0 ^ (B0 @ line_k))('eps_B')])
+        #### Step 4 ####
+        ### postion of B0 (based on triangle geometry) #####
 
-            C0 = C.rotate_about(axis=line_a)('C_0')
-            current_obj.C0 = C0
-            current_obj.add_solution_step('', [C0])
+        #current_obj.add_solution_step(
+            #'Point B rotation - plane of rotation',
+            #[(B0 ^ (B0 @ line_k))('eps_B')])
 
-            #### Step 5 ####
-            ### postion of C0 (based on triangle geometry) #####
+        C0 = C.rotate_about(axis=line_a)('C_0')
+        current_obj.C0 = C0
+        current_obj.add_solution_step('', [C0])
 
-            #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-            current_obj.O0 = O.rotate_about(axis=line_a)('O_0')
+        #### Step 5 ####
+        ### postion of C0 (based on triangle geometry) #####
 
-            current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
-            current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
-            current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
+        #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+        current_obj.O0 = O.rotate_about(axis=line_a)('O_0')
 
-            current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')   
+        current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
 
-            G = (H @ plane_alpha)('G')
+        current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')   
 
-            ############  upper  base
+        G = (H @ plane_alpha)('G')
 
-            dirHG = H - G
-            distance_HG = (H.distance(G)).n(5)
+        ############  upper  base
 
-            #D = (A + dirHG/distance_HG*triangle_height)('D')
-            #E = (B + dirHG/distance_HG*triangle_height)('E')
-            #F = (C + dirHG/distance_HG*triangle_height)('F')
+        dirHG = H - G
+        distance_HG = (H.distance(G)).n(5)
 
-            A, B, C, D, E, F = Prism(triangle_plane,
-                                     dirHG / distance_HG * triangle_height)
+        #D = (A + dirHG/distance_HG*triangle_height)('D')
+        #E = (B + dirHG/distance_HG*triangle_height)('E')
+        #F = (C + dirHG/distance_HG*triangle_height)('F')
 
-            current_obj.add_solution_step('', [D, E, F])
+        A, B, C, D, E, F = Prism(triangle_plane,
+                                 dirHG / distance_HG * triangle_height)
 
-            line_ab=Line(A,B)('|AB|')
-            line_bc=Line(B,C)('|BC|')
-            line_ca=Line(C,A)('|CA|')
-            line_eb=Line(E,B)('|EB|')
-            line_da=Line(D,A)('|DA|')
-            line_fc=Line(F,C)('|FC|')
-            line_de=Line(D,E)('|DE|')
-            line_ef=Line(E,F)('|EF|')
-            #line_fd=Line(F,D)('|FD|')
-            line_fd = (F ^ D)('|FD|')
-            current_obj.add_solution_step('', [line_ab, line_bc, line_ca, line_eb, line_da, line_fc, line_de, line_ef, line_fd])
-            
-            elems += [D, E, F, G]
+        current_obj.add_solution_step('', [D, E, F])
 
-            projections += [
-                G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
-                F @ VPP
-            ]
+        line_ab=Line(A,B)('|AB|')
+        line_bc=Line(B,C)('|BC|')
+        line_ca=Line(C,A)('|CA|')
+        line_eb=Line(E,B)('|EB|')
+        line_da=Line(D,A)('|DA|')
+        line_fc=Line(F,C)('|FC|')
+        line_de=Line(D,E)('|DE|')
+        line_ef=Line(E,F)('|EF|')
+        #line_fd=Line(F,D)('|FD|')
+        line_fd = (F ^ D)('|FD|')
+        current_obj.add_solution_step('', [line_ab, line_bc, line_ca, line_eb, line_da, line_fc, line_de, line_ef, line_fd])
+        
+        elems += [D, E, F, G]
 
-            current_obj._assumptions = DrawingSet(
-                *current_obj.get_projections())('Solution')
-            current_obj._assumptions3d = DrawingSet(*current_obj)
+        projections += [
+            G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
+            F @ VPP
+        ]
 
-            current_obj.point_B = B
-            current_obj.point_C = C
-            current_obj.point_D = D
-            current_obj.point_E = E
-            current_obj.point_F = F
-            self._cached_solution = current_obj
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
-        return current_obj
+        current_obj._assumptions = DrawingSet(
+            *current_obj.get_projections())('Solution')
+        current_obj._assumptions3d = DrawingSet(*current_obj)
+
+        current_obj.point_B = B
+        current_obj.point_C = C
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+
 
         return current_obj
 
@@ -2819,69 +2802,65 @@ class VerticalTiltedTetragonalPrism(TetragonalPrism):
 
     def _solution(self):
 
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+        current_obj = copy.deepcopy(self)
 
-            A = current_obj._point_A
-            B = current_obj._point_B
-            C = current_obj._point_C
-            Z = current_obj._point_Z
-            O = current_obj._point_O
+        A = current_obj._point_A
+        B = current_obj._point_B
+        C = current_obj._point_C
+        Z = current_obj._point_Z
+        O = current_obj._point_O
 
-            current_set = DrawingSet(*current_obj._solution_step[-1])
+        current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            plane_alpha = Plane(A, B, C)
-            line_z = Line(Z, Z @ HPP)
-            D = (A + (C-B)) ('D')
+        plane_alpha = Plane(A, B, C)
+        line_z = Line(Z, Z @ HPP)
+        D = (A + (C-B)) ('D')
 
-            #         plane_beta=Plane(O,O+(B-A),O+(C-A))
-            #         E=(A@plane_beta)('E')
-            #         F=(B@plane_beta)('F')
-            #         G=(C@plane_beta)('G')
-            #         H=(D@plane_beta)('H')
-            #         plane_gamma=Plane(E,F,G)
+        #         plane_beta=Plane(O,O+(B-A),O+(C-A))
+        #         E=(A@plane_beta)('E')
+        #         F=(B@plane_beta)('F')
+        #         G=(C@plane_beta)('G')
+        #         H=(D@plane_beta)('H')
+        #         plane_gamma=Plane(E,F,G)
 
-            tetragonal_plane = Tetragon(A, B, C, D)
-            A, B, C, D, E, F, G, H = TetraPrism.right_from_parallel_plane(
-                tetragonal_plane, O)
-            current_obj.add_solution_step('Prism', [A, B, C, D, O, E, F, G, H])
-            line_ae = Line(A, E)('a')
-            line_bf = Line(B, F)('b')
-            line_cg = Line(C, G)('c')
-            line_dh = Line(D, H)('d')
-            elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
+        tetragonal_plane = Tetragon(A, B, C, D)
+        A, B, C, D, E, F, G, H = TetraPrism.right_from_parallel_plane(
+            tetragonal_plane, O)
+        current_obj.add_solution_step('Prism', [A, B, C, D, O, E, F, G, H])
+        line_ae = Line(A, E)('a')
+        line_bf = Line(B, F)('b')
+        line_cg = Line(C, G)('c')
+        line_dh = Line(D, H)('d')
+        elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
 
-            projections = [
-                line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
-                line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
-                E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
-                H @ VPP, D @ HPP, D @ VPP
-            ]
+        projections = [
+            line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
+            line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
+            E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
+            H @ VPP, D @ HPP, D @ VPP
+        ]
 
-            current_set += [*elems, *projections]
+        current_set += [*elems, *projections]
 
-            current_obj._solution_step.append(current_set)
+        current_obj._solution_step.append(current_set)
 
-            current_obj.horizontal_line_cross_BC = (HorizontalPlane(A) &
-                                                    (B ^ C))[0]('I')
-            current_obj.frontal_line_cross_BC = (VerticalPlane(A) & (B ^ C))[0]('J')
-            I = current_obj.horizontal_line_cross_BC
-            J = current_obj.frontal_line_cross_BC
-            current_obj.add_solution_step('Frontal & Horizontal', [I, J])
-            current_obj.point_P = (O @ plane_alpha)('P')
-            current_obj.point_D = D
-            current_obj.point_E = E
-            current_obj.point_F = F
-            current_obj.point_G = G
-            current_obj.point_H = H
+        current_obj.horizontal_line_cross_BC = (HorizontalPlane(A) &
+                                                (B ^ C))[0]('I')
+        current_obj.frontal_line_cross_BC = (VerticalPlane(A) & (B ^ C))[0]('J')
+        I = current_obj.horizontal_line_cross_BC
+        J = current_obj.frontal_line_cross_BC
+        current_obj.add_solution_step('Frontal & Horizontal', [I, J])
+        current_obj.point_P = (O @ plane_alpha)('P')
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+        current_obj.point_G = G
+        current_obj.point_H = H
 
-            current_obj._assumptions = DrawingSet(
-                *current_obj.get_projections())('Solution')
-            current_obj._assumptions3d = DrawingSet(*current_obj)
+        current_obj._assumptions = DrawingSet(
+            *current_obj.get_projections())('Solution')
+        current_obj._assumptions3d = DrawingSet(*current_obj)
 
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
         return current_obj
 
     def get_random_parameters(self):
@@ -2970,91 +2949,89 @@ class HorizontalTiltedTetragonalPrism(TetragonalPrism):
                                          point_O)('Assumptions')
         self._assumptions = DrawingSet(*projections)
 
-    def solution(self):
+    def _solution(self):
 
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
 
-            A = current_obj._point_A
-            B = current_obj._point_B
-            C = current_obj._point_C
-            Z = current_obj._point_Z
-            O = current_obj._point_O
+        current_obj = copy.deepcopy(self)
 
-            current_set = DrawingSet(*current_obj._solution_step[-1])
+        A = current_obj._point_A
+        B = current_obj._point_B
+        C = current_obj._point_C
+        Z = current_obj._point_Z
+        O = current_obj._point_O
 
-            plane_alpha = Plane(A, B, C)
-            line_z = Line(Z, Z @ HPP)
-            #D=line_z.intersection(plane_alpha)[0]('D')
-            D = Z('D')
+        current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            #         plane_beta=Plane(O,O+(B-A),O+(C-A))
-            #         E=(A@plane_beta)('E')
-            #         F=(B@plane_beta)('F')
-            #         G=(C@plane_beta)('G')
-            #         H=(D@plane_beta)('H')
-            #         plane_gamma=Plane(E,F,G)
+        plane_alpha = Plane(A, B, C)
+        line_z = Line(Z, Z @ HPP)
+        #D=line_z.intersection(plane_alpha)[0]('D')
+        D = Z('D')
 
-            tetragonal_plane = Plane(A, B, C)
-            #GeometryScene()
-            #current_set.plot_hp().plot_vp()
-            #A,B,C,D,E,F,G,H = TetraPrism.right_from_parallel_plane(tetragonal_plane, O)
+        #         plane_beta=Plane(O,O+(B-A),O+(C-A))
+        #         E=(A@plane_beta)('E')
+        #         F=(B@plane_beta)('F')
+        #         G=(C@plane_beta)('G')
+        #         H=(D@plane_beta)('H')
+        #         plane_gamma=Plane(E,F,G)
 
-            T = (O @ tetragonal_plane)('T')
+        tetragonal_plane = Plane(A, B, C)
+        #GeometryScene()
+        #current_set.plot_hp().plot_vp()
+        #A,B,C,D,E,F,G,H = TetraPrism.right_from_parallel_plane(tetragonal_plane, O)
 
-            ############  upper  base
+        T = (O @ tetragonal_plane)('T')
 
-            dirRT = O - T
+        ############  upper  base
 
-            #D = (A + dirHG/distance_HG*triangle_height)('D')
-            #E = (B + dirHG/distance_HG*triangle_height)('E')
-            #F = (C + dirHG/distance_HG*triangle_height)('F')
+        dirRT = O - T
 
-            A, B, C, E, F, G = Prism(tetragonal_plane, dirRT)
+        #D = (A + dirHG/distance_HG*triangle_height)('D')
+        #E = (B + dirHG/distance_HG*triangle_height)('E')
+        #F = (C + dirHG/distance_HG*triangle_height)('F')
 
-            E = E('E')
-            F = F('F')
-            G = G('G')
-            H = (D + (E - A))('H')
+        A, B, C, E, F, G = Prism(tetragonal_plane, dirRT)
 
-            current_obj.add_solution_step('Prism', [A, B, C, Z, O, E, F, G, H])
-            line_ae = Line(A, E)('a')
-            line_bf = Line(B, F)('b')
-            line_cg = Line(C, G)('c')
-            line_dh = Line(D, H)('d')
-            elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
+        E = E('E')
+        F = F('F')
+        G = G('G')
+        H = (D + (E - A))('H')
 
-            projections = [
-                line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
-                line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
-                E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
-                H @ VPP, D @ HPP, D @ VPP
-            ]
+        current_obj.add_solution_step('Prism', [A, B, C, Z, O, E, F, G, H])
+        line_ae = Line(A, E)('a')
+        line_bf = Line(B, F)('b')
+        line_cg = Line(C, G)('c')
+        line_dh = Line(D, H)('d')
+        elems = [E, F, G, H, line_ae, line_bf, line_cg, line_dh]
 
-            current_set += [*elems, *projections]
+        projections = [
+            line_ae @ HPP, line_ae @ VPP, line_bf @ HPP, line_bf @ VPP,
+            line_cg @ HPP, line_cg @ VPP, line_dh @ HPP, line_dh @ VPP,
+            E @ HPP, E @ VPP, F @ HPP, F @ VPP, G @ HPP, G @ VPP, H @ HPP,
+            H @ VPP, D @ HPP, D @ VPP
+        ]
 
-            current_obj._solution_step.append(current_set)
+        current_set += [*elems, *projections]
 
-            current_obj.horizontal_line_cross_BC = (HorizontalPlane(A) &
-                                                    (B ^ C))[0]
-            current_obj.frontal_line_cross_BC = (VerticalPlane(A) & (B ^ C))[0]
-            I = current_obj.horizontal_line_cross_BC
-            J = current_obj.frontal_line_cross_BC
-            current_obj.add_solution_step('Frontal & Horizontal', [I, J])
-            current_obj.point_P = (O @ plane_alpha)('P')
-            current_obj.point_D = D
-            current_obj.point_E = E
-            current_obj.point_F = F
-            current_obj.point_G = G
-            current_obj.point_H = H
+        current_obj._solution_step.append(current_set)
 
-            current_obj._assumptions = DrawingSet(
-                *current_obj.get_projections())('Solution')
-            current_obj._assumptions3d = DrawingSet(*current_obj)
+        current_obj.horizontal_line_cross_BC = (HorizontalPlane(A) &
+                                                (B ^ C))[0]
+        current_obj.frontal_line_cross_BC = (VerticalPlane(A) & (B ^ C))[0]
+        I = current_obj.horizontal_line_cross_BC
+        J = current_obj.frontal_line_cross_BC
+        current_obj.add_solution_step('Frontal & Horizontal', [I, J])
+        current_obj.point_P = (O @ plane_alpha)('P')
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+        current_obj.point_G = G
+        current_obj.point_H = H
 
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
+        current_obj._assumptions = DrawingSet(
+            *current_obj.get_projections())('Solution')
+        current_obj._assumptions3d = DrawingSet(*current_obj)
+
+
         return current_obj
 
     def get_random_parameters(self):
@@ -3139,145 +3116,140 @@ class GivenHeightEquilateralTrianglePrism(GeometricalCase):
             'H': point_H
         }
 
-    def solution(self):
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+    def _solution(self):
+        current_obj = copy.deepcopy(self)
 
-            A = current_obj._point_A
-            O = current_obj._point_O
-            P = current_obj._point_P
+        A = current_obj._point_A
+        O = current_obj._point_O
+        P = current_obj._point_P
 
-            H = current_obj._point_H
+        H = current_obj._point_H
 
-            S = (A @ (O ^ P))('S')  #'Srodek' podstawy
+        S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
-            dirPS = P - S
-            dirOS = O - S
-            triangle_height = A.distance(S)
-            triangle_side = triangle_height / ((3**(1 / 2)) / 2)
+        dirPS = P - S
+        dirOS = O - S
+        triangle_height = A.distance(S)
+        triangle_side = triangle_height / ((3**(1 / 2)) / 2)
 
-            B = (S + dirPS / (P.distance(S)) * (triangle_side / 2))('B')
-            C = (S - dirPS / (P.distance(S)) * (triangle_side / 2))('C')
+        B = (S + dirPS / (P.distance(S)) * (triangle_side / 2))('B')
+        C = (S - dirPS / (P.distance(S)) * (triangle_side / 2))('C')
 
-            triangle_plane = Plane(A, B, C)
+        triangle_plane = Plane(A, B, C)
 
-            current_set = DrawingSet(*current_obj._solution_step[-1])
+        current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            line_a = Line(A, B)('a')
-            line_b = Line(C, A)('b')
-            plane_alpha = Plane(A, O, P)
+        line_a = Line(A, B)('a')
+        line_b = Line(C, A)('b')
+        plane_alpha = Plane(A, O, P)
 
-            plane_beta = HorizontalPlane(P)
-            plane_eta = VerticalPlane(P)
+        plane_beta = HorizontalPlane(P)
+        plane_eta = VerticalPlane(P)
 
-            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+        line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
-            current_obj.P1 = point_P1
-            line_kk = (P ^ point_P1)('a')
-            line_f = (P ^ point_P2)('f')
+        point_P1 = plane_beta.intersection(A ^ O)[0]('1')
+        point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+        current_obj.P1 = point_P1
+        line_kk = (P ^ point_P1)('a')
+        line_f = (P ^ point_P2)('f')
 
-            # it creates next step of solution - lines are presented
-            #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
+        # it creates next step of solution - lines are presented
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
-            #it sets the step elements
-            current_obj.add_solution_step(
-                'Axis of rotation', [(A ^ point_P1)('AO'), point_P1,
-                                     (P ^ point_P1)('a'), point_P2, line_f])
+        #it sets the step elements
+        current_obj.add_solution_step(
+            'Axis of rotation', [(A ^ point_P1)('AO'), point_P1,
+                                 (P ^ point_P1)('a'), point_P2, line_f])
 
-            elems = self._assumptions
-            projections = []
-            point_0_dict = {}
-            eps_dict = {}
+        elems = self._assumptions
+        projections = []
+        point_0_dict = {}
+        eps_dict = {}
 
-            point_B = B
-            point_C = C
-            point_O = O
+        point_B = B
+        point_C = C
+        point_O = O
 
-            ##################   plane rotation
+        ##################   plane rotation
 
-            line_kk = Line(P, (O @ line_k))('k')
+        line_kk = Line(P, (O @ line_k))('k')
 
-            A0 = A.rotate_about(axis=line_k)('A_0')
-            current_obj.A0 = A0
+        A0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.A0 = A0
 
-            ### Step 2 #####
-            ###  plane of rotation of A ####
+        ### Step 2 #####
+        ###  plane of rotation of A ####
 
-            current_obj.add_solution_step('Point A rotation', [A0])
+        current_obj.add_solution_step('Point A rotation', [A0])
 
-            #### Step 3 ####
-            ### rotated point A0 of A #####
+        #### Step 3 ####
+        ### rotated point A0 of A #####
 
-            B0 = B.rotate_about(axis=line_k)('B_0')
-            current_obj.B0 = B0
+        B0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.B0 = B0
 
-            current_obj.add_solution_step('Point B rotation', [B0])
+        current_obj.add_solution_step('Point B rotation', [B0])
 
-            #### Step 4 ####
-            ### postion of B0 (based on triangle geometry) #####
+        #### Step 4 ####
+        ### postion of B0 (based on triangle geometry) #####
 
-            C0 = C.rotate_about(axis=line_k)('C_0')
-            current_obj.C0 = C0
-            current_obj.add_solution_step('Point C rotation', [C0])
+        C0 = C.rotate_about(axis=line_k)('C_0')
+        current_obj.C0 = C0
+        current_obj.add_solution_step('Point C rotation', [C0])
 
-            #### Step 5 ####
-            ### postion of C0 (based on triangle geometry) #####
+        #### Step 5 ####
+        ### postion of C0 (based on triangle geometry) #####
 
-            #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-            current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+        #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+        current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
 
-            current_obj.add_solution_step('Base ABC', [A, B, C])
+        current_obj.add_solution_step('Base ABC', [A, B, C])
 
-            G = (H @ plane_alpha)('G')
+        G = (H @ plane_alpha)('G')
 
-            ############  upper  base
+        ############  upper  base
 
-            dirHG = H - G
-            distance_HG = (H.distance(G)).n(5)
+        dirHG = H - G
+        distance_HG = (H.distance(G)).n(5)
 
-            #D = (A + dirHG/distance_HG*triangle_height)('D')S
-            #E = (B + dirHG/distance_HG*triangle_height)('E')
-            #F = (C + dirHG/distance_HG*triangle_height)('F')
+        #D = (A + dirHG/distance_HG*triangle_height)('D')S
+        #E = (B + dirHG/distance_HG*triangle_height)('E')
+        #F = (C + dirHG/distance_HG*triangle_height)('F')
 
-            A, B, C, D, E, F = Prism(triangle_plane,
-                                     dirHG / distance_HG * triangle_height)
+        A, B, C, D, E, F = Prism(triangle_plane,
+                                 dirHG / distance_HG * triangle_height)
 
-            current_obj.add_solution_step('Vertices D,E,F', [D, E, F])
+        current_obj.add_solution_step('Vertices D,E,F', [D, E, F])
 
-            elems += [D, E, F, G]
+        elems += [D, E, F, G]
 
-            projections += [
-                G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
-                F @ VPP
-            ]
+        projections += [
+            G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
+            F @ VPP
+        ]
 
-            line_ab=Line(A,B)('|AB|')
-            line_bc=Line(B,C)('|BC|')
-            line_ca=Line(C,A)('|CA|')
-            line_eb=Line(E,B)('|EB|')
-            line_da=Line(D,A)('|DA|')
-            line_fc=Line(F,C)('|FC|')
-            line_de=Line(D,E)('|DE|')
-            line_ef=Line(E,F)('|EF|')
-            line_fd=Line(F,D)('|FD|')
-            current_obj.add_solution_step('Lines implementation', [line_ab, line_bc, line_ca, like_eb, line_da, line_fc])
-            
-            
-            current_obj._assumptions = DrawingSet(
-                *current_obj.get_projections())('Solution')
-            current_obj._assumptions3d = DrawingSet(*current_obj)
+        line_ab=Line(A,B)('|AB|')
+        line_bc=Line(B,C)('|BC|')
+        line_ca=Line(C,A)('|CA|')
+        line_eb=Line(E,B)('|EB|')
+        line_da=Line(D,A)('|DA|')
+        line_fc=Line(F,C)('|FC|')
+        line_de=Line(D,E)('|DE|')
+        line_ef=Line(E,F)('|EF|')
+        line_fd=Line(F,D)('|FD|')
+        current_obj.add_solution_step('Lines implementation', [line_ab, line_bc, line_ca, like_eb, line_da, line_fc])
+        
+        
+        current_obj._assumptions = DrawingSet(
+            *current_obj.get_projections())('Solution')
+        current_obj._assumptions3d = DrawingSet(*current_obj)
 
-            current_obj._point_B = B
-            current_obj._point_C = C
-            current_obj.point_D = D
-            current_obj.point_E = E
-            current_obj.point_F = F
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
-        return current_obj
+        current_obj._point_B = B
+        current_obj._point_C = C
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
 
         return current_obj
 
@@ -3420,168 +3392,165 @@ class GivenHeightSquarePrism(GeometricalCase):
         }
 
     def _solution(self):
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+        current_obj = copy.deepcopy(self)
 
-            A = current_obj.point_A
-            O = current_obj.point_O
-            P = current_obj.point_P
+        A = current_obj.point_A
+        O = current_obj.point_O
+        P = current_obj.point_P
 
-            H = current_obj.point_H
+        H = current_obj.point_H
 
-            S = (A @ (O ^ P))('S')  #'Srodek' podstawy
+        S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
-            dirPS = P - S
-            dirOS = O - S
-            square_diagonal = 2 * A.distance(S).n(5)
-            #triangle_side =  triangle_height / ((3**(1/2))/2)
+        dirPS = P - S
+        dirOS = O - S
+        square_diagonal = 2 * A.distance(S).n(5)
+        #triangle_side =  triangle_height / ((3**(1/2))/2)
 
-            B = (S + dirPS / (P.distance(S)) * (square_diagonal / 2))('B')
-            D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
-            C = (S + (S - A))('C')
-            triangle_plane = Plane(A, B, C)
+        B = (S + dirPS / (P.distance(S)) * (square_diagonal / 2))('B')
+        D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
+        C = (S + (S - A))('C')
+        triangle_plane = Plane(A, B, C)
 
-            current_set = DrawingSet(*current_obj._solution_step[-1])
+        current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            line_a = Line(A, B)('a')
-            line_b = Line(C, A)('b')
-            plane_alpha = Plane(A, O, P)
+        line_a = Line(A, B)('a')
+        line_b = Line(C, A)('b')
+        plane_alpha = Plane(A, O, P)
 
-            plane_beta = HorizontalPlane(P)
-            plane_eta = VerticalPlane(P)
+        plane_beta = HorizontalPlane(P)
+        plane_eta = VerticalPlane(P)
 
-            line_a = plane_alpha.intersection(plane_beta)[0]('a')
+        line_a = plane_alpha.intersection(plane_beta)[0]('a')
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('P1')
-            point_P2 = plane_eta.intersection(A ^ O)[0]('P2')
-            current_obj.P1 = point_P1
-            #line_kk = (P ^ point_P1)('a')
-            #line_f = (P ^ point_P2)('f')
-            line_p = (P ^ point_P1)('p')
-            line_l = (P ^ point_P2)('l')
-            line_k = (A ^ point_P1)('k')
+        point_P1 = plane_beta.intersection(A ^ O)[0]('P1')
+        point_P2 = plane_eta.intersection(A ^ O)[0]('P2')
+        current_obj.P1 = point_P1
+        #line_kk = (P ^ point_P1)('a')
+        #line_f = (P ^ point_P2)('f')
+        line_p = (P ^ point_P1)('p')
+        line_l = (P ^ point_P2)('l')
+        line_k = (A ^ point_P1)('k')
 
-            current_obj.add_solution_step("", [A, B, C, D])
-            # it creates next step of solution - lines are presented
-            #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
+        current_obj.add_solution_step("", [A, B, C, D])
+        # it creates next step of solution - lines are presented
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
-            #it sets the step elements
-            current_obj.add_solution_step(
-                '', [point_P1, point_P2,
-                                     line_k, line_p, line_l])
+        #it sets the step elements
+        current_obj.add_solution_step(
+            '', [point_P1, point_P2,
+                                 line_k, line_p, line_l])
 
-            elems = self._assumptions
-            projections = []
-            point_0_dict = {}
-            eps_dict = {}
+        elems = self._assumptions
+        projections = []
+        point_0_dict = {}
+        eps_dict = {}
 
-            point_B = B
-            point_C = C
-            point_O = O
+        point_B = B
+        point_C = C
+        point_O = O
 
-            ##################   plane rotation
+        ##################   plane rotation
 
-            #line_kk = Line(P, (O @ line_k))('k')
+        #line_kk = Line(P, (O @ line_k))('k')
 
-            A0 = A.rotate_about(axis=line_a)('A_0')
-            current_obj.A0 = A0
+        A0 = A.rotate_about(axis=line_a)('A_0')
+        current_obj.A0 = A0
 
-            ### Step 2 #####
-            ###  plane of rotation of A ####
+        ### Step 2 #####
+        ###  plane of rotation of A ####
 
-            current_obj.add_solution_step('', [A0])
+        current_obj.add_solution_step('', [A0])
 
-            #### Step 3 ####
-            ### rotated point A0 of A #####
+        #### Step 3 ####
+        ### rotated point A0 of A #####
 
-            B0 = B.rotate_about(axis=line_a)('B_0')
-            current_obj.B0 = B0
+        B0 = B.rotate_about(axis=line_a)('B_0')
+        current_obj.B0 = B0
 
-            current_obj.add_solution_step('', [B0])
+        current_obj.add_solution_step('', [B0])
 
-            #### Step 4 ####
-            ### postion of B0 (based on triangle geometry) #####
+        #### Step 4 ####
+        ### postion of B0 (based on triangle geometry) #####
 
-            C0 = C.rotate_about(axis=line_a)('C_0')
-            current_obj.C0 = C0
-            current_obj.add_solution_step('', [C0])
+        C0 = C.rotate_about(axis=line_a)('C_0')
+        current_obj.C0 = C0
+        current_obj.add_solution_step('', [C0])
 
-            #### Step 5 ####
-            ### postion of C0 (based on triangle geometry) #####
+        #### Step 5 ####
+        ### postion of C0 (based on triangle geometry) #####
 
-            D0 = D.rotate_about(axis=line_a)('D_0')
-            current_obj.D0 = D0
-            current_obj.add_solution_step('', [D0])
+        D0 = D.rotate_about(axis=line_a)('D_0')
+        current_obj.D0 = D0
+        current_obj.add_solution_step('', [D0])
 
-            #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-            current_obj.O0 = O.rotate_about(axis=line_a)('O_0')
+        #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+        current_obj.O0 = O.rotate_about(axis=line_a)('O_0')
 
-            current_obj.add_solution_step('', [A, B, C, D])
+        current_obj.add_solution_step('', [A, B, C, D])
 
-            current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
-            current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
-            current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
-            current_obj.point_D_0 = D.rotate_about(axis=line_k)('D_0')        
-            current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')   
-            
-            T = (H @ plane_alpha)('T')
+        current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
+        current_obj.point_D_0 = D.rotate_about(axis=line_k)('D_0')        
+        current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')   
+        
+        T = (H @ plane_alpha)('T')
 
-            ############  upper  base
+        ############  upper  base
 
-            dirHT = H - T
-            distance_HT = (T.distance(H)).n(5)
+        dirHT = H - T
+        distance_HT = (T.distance(H)).n(5)
 
-            #D = (A + dirHG/distance_HG*triangle_height)('D')
-            #E = (B + dirHG/distance_HG*triangle_height)('E')
-            #F = (C + dirHG/distance_HG*triangle_height)('F')
+        #D = (A + dirHG/distance_HG*triangle_height)('D')
+        #E = (B + dirHG/distance_HG*triangle_height)('E')
+        #F = (C + dirHG/distance_HG*triangle_height)('F')
 
-            A, B, C, E, F, G = Prism(triangle_plane,
-                                     dirHT / distance_HT * B.distance(C))
+        A, B, C, E, F, G = Prism(triangle_plane,
+                                 dirHT / distance_HT * B.distance(C))
 
-            E = E('E')
-            F = F('F')
-            G = G('G')
-            I = (D + (E - A))('I')
+        E = E('E')
+        F = F('F')
+        G = G('G')
+        I = (D + (E - A))('I')
 
-            current_obj.add_solution_step('', [E, F, G, I])
+        current_obj.add_solution_step('', [E, F, G, I])
 
-            elems += [D, E, F, G]
+        elems += [D, E, F, G]
 
-            projections += [
-                G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
-                F @ VPP
-            ]
+        projections += [
+            G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
+            F @ VPP
+        ]
 
-            
-            
-            line_ab=Line(A,B)('|AB|')
-            line_bc=Line(B,C)('|BC|')
-            line_cd=Line(C,D)('|CD|')
-            line_da=Line(D,A)('|DA|')
-            line_ae=Line(A,E)('|AE|')
-            line_bf=Line(B,F)('|BF|')
-            line_cg=Line(C,G)('|CG|')
-            line_di=Line(D,I)('|DI|')
-            line_ef=Line(E,F)('|EF|')
-            line_fg=Line(F,G)('|FG|')
-            line_gi=Line(G,I)('|GI|')
-            line_ie=Line(I,E)('|IE|')
-            current_obj.add_solution_step('', [line_ab, line_bc, line_cd, line_da, line_ae, line_bf, line_cg, line_di, line_ef, line_fg, line_gi, line_ie])
-            
-            current_obj._assumptions = DrawingSet(
-                *current_obj.get_projections())('Solution')
-            current_obj._assumptions3d = DrawingSet(*current_obj)
+        
+        
+        line_ab=Line(A,B)('|AB|')
+        line_bc=Line(B,C)('|BC|')
+        line_cd=Line(C,D)('|CD|')
+        line_da=Line(D,A)('|DA|')
+        line_ae=Line(A,E)('|AE|')
+        line_bf=Line(B,F)('|BF|')
+        line_cg=Line(C,G)('|CG|')
+        line_di=Line(D,I)('|DI|')
+        line_ef=Line(E,F)('|EF|')
+        line_fg=Line(F,G)('|FG|')
+        line_gi=Line(G,I)('|GI|')
+        line_ie=Line(I,E)('|IE|')
+        current_obj.add_solution_step('', [line_ab, line_bc, line_cd, line_da, line_ae, line_bf, line_cg, line_di, line_ef, line_fg, line_gi, line_ie])
+        
+        current_obj._assumptions = DrawingSet(
+            *current_obj.get_projections())('Solution')
+        current_obj._assumptions3d = DrawingSet(*current_obj)
 
-            current_obj.point_B = B
-            current_obj.point_C = C
-            current_obj.point_D = D
-            current_obj.point_E = E
-            current_obj.point_F = F
-            current_obj.point_G = G
-            current_obj.point_I = I
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
+        current_obj.point_B = B
+        current_obj.point_C = C
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+        current_obj.point_G = G
+        current_obj.point_I = I
+
         return current_obj
 
     def present_solution(self):
@@ -3651,6 +3620,20 @@ class GivenHeightSquarePrism(GeometricalCase):
 
         for point in symbols('A P O H'):
             parameters_dict[point] = parameters_dict[point] + shift
+
+        return parameters_dict
+
+    
+class GivenHeightEdgeSquarePrism(GivenHeightSquarePrism):
+  
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_P = parameters_dict[Symbol('P')]
+        point_O = parameters_dict[Symbol('O')]
+
+        parameters_dict[Symbol('A')] = (point_P + point_O) * 0.5 + Point(0, 0, 5)
 
         return parameters_dict
 
@@ -3728,144 +3711,140 @@ class GivenHeightRhomboidPrism(GeometricalCase):
             'R': point_R
         }
 
-    def solution(self):
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+    def _solution(self):
 
-            A = current_obj._point_A
-            O = current_obj._point_O
-            P = current_obj._point_P
+        current_obj = copy.deepcopy(self)
 
-            R = current_obj._point_R
+        A = current_obj._point_A
+        O = current_obj._point_O
+        P = current_obj._point_P
 
-            S = (A @ (O ^ P))('S')  #'Srodek' podstawy
+        R = current_obj._point_R
 
-            dirPS = P - S
-            dirOS = O - S
-            square_diagonal = 2 * A.distance(S).n(5)
-            #triangle_side =  triangle_height / ((3**(1/2))/2)
+        S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
-            B = (S + dirPS / (P.distance(S)) * (square_diagonal / 4))('B')
-            D = (S - dirPS / (P.distance(S)) * (square_diagonal / 4))('D')
-            C = (S + (S - A))('C')
-            triangle_plane = Plane(A, B, C)
+        dirPS = P - S
+        dirOS = O - S
+        square_diagonal = 2 * A.distance(S).n(5)
+        #triangle_side =  triangle_height / ((3**(1/2))/2)
 
-            current_set = DrawingSet(*current_obj._solution_step[-1])
+        B = (S + dirPS / (P.distance(S)) * (square_diagonal / 4))('B')
+        D = (S - dirPS / (P.distance(S)) * (square_diagonal / 4))('D')
+        C = (S + (S - A))('C')
+        triangle_plane = Plane(A, B, C)
 
-            line_a = Line(A, B)('a')
-            line_b = Line(C, A)('b')
-            plane_alpha = Plane(A, O, P)
+        current_set = DrawingSet(*current_obj._solution_step[-1])
 
-            plane_beta = HorizontalPlane(P)
-            plane_eta = VerticalPlane(P)
+        line_a = Line(A, B)('a')
+        line_b = Line(C, A)('b')
+        plane_alpha = Plane(A, O, P)
 
-            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+        plane_beta = HorizontalPlane(P)
+        plane_eta = VerticalPlane(P)
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
-            current_obj.P1 = point_P1
-            line_kk = (P ^ point_P1)('a')
-            line_f = (P ^ point_P2)('f')
+        line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
-            # it creates next step of solution - lines are presented
-            #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
+        point_P1 = plane_beta.intersection(A ^ O)[0]('1')
+        point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+        current_obj.P1 = point_P1
+        line_kk = (P ^ point_P1)('a')
+        line_f = (P ^ point_P2)('f')
 
-            #it sets the step elements
-            current_obj.add_solution_step(
-                'Axis of rotation', [(A ^ point_P1)('AO'), point_P1,
-                                     (P ^ point_P1)('a'), point_P2, line_f])
+        # it creates next step of solution - lines are presented
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
-            elems = self._assumptions
-            projections = []
-            point_0_dict = {}
-            eps_dict = {}
+        #it sets the step elements
+        current_obj.add_solution_step(
+            'Axis of rotation', [(A ^ point_P1)('AO'), point_P1,
+                                 (P ^ point_P1)('a'), point_P2, line_f])
 
-            point_B = B
-            point_C = C
-            point_O = O
+        elems = self._assumptions
+        projections = []
+        point_0_dict = {}
+        eps_dict = {}
 
-            ##################   plane rotation
+        point_B = B
+        point_C = C
+        point_O = O
 
-            line_kk = Line(P, (O @ line_k))('k')
+        ##################   plane rotation
 
-            A0 = A.rotate_about(axis=line_k)('A_0')
-            current_obj.A0 = A0
+        line_kk = Line(P, (O @ line_k))('k')
 
-            ### Step 2 #####
-            ###  plane of rotation of A ####
+        A0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.A0 = A0
 
-            current_obj.add_solution_step('Point A rotation', [A0])
+        ### Step 2 #####
+        ###  plane of rotation of A ####
 
-            #### Step 3 ####
-            ### rotated point A0 of A #####
+        current_obj.add_solution_step('Point A rotation', [A0])
 
-            B0 = B.rotate_about(axis=line_k)('B_0')
-            current_obj.B0 = B0
+        #### Step 3 ####
+        ### rotated point A0 of A #####
 
-            current_obj.add_solution_step('Point B rotation', [B0])
+        B0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.B0 = B0
 
-            #### Step 4 ####
-            ### postion of B0 (based on triangle geometry) #####
+        current_obj.add_solution_step('Point B rotation', [B0])
 
-            C0 = C.rotate_about(axis=line_k)('C_0')
-            current_obj.C0 = C0
-            current_obj.add_solution_step('Point C rotation', [C0])
+        #### Step 4 ####
+        ### postion of B0 (based on triangle geometry) #####
 
-            #### Step 5 ####
-            ### postion of C0 (based on triangle geometry) #####
+        C0 = C.rotate_about(axis=line_k)('C_0')
+        current_obj.C0 = C0
+        current_obj.add_solution_step('Point C rotation', [C0])
 
-            D0 = D.rotate_about(axis=line_k)('D_0')
-            current_obj.D0 = D0
-            current_obj.add_solution_step('Point D rotation', [D0])
+        #### Step 5 ####
+        ### postion of C0 (based on triangle geometry) #####
 
-            #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-            current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+        D0 = D.rotate_about(axis=line_k)('D_0')
+        current_obj.D0 = D0
+        current_obj.add_solution_step('Point D rotation', [D0])
 
-            current_obj.add_solution_step('Base ABCD', [A, B, C, D])
+        #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+        current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
 
-            T = (R @ plane_alpha)('T')
+        current_obj.add_solution_step('Base ABCD', [A, B, C, D])
 
-            ############  upper  base
+        T = (R @ plane_alpha)('T')
 
-            dirRT = R - T
-            distance_RT = (T.distance(R)).n(5)
+        ############  upper  base
 
-            #D = (A + dirHG/distance_HG*triangle_height)('D')
-            #E = (B + dirHG/distance_HG*triangle_height)('E')
-            #F = (C + dirHG/distance_HG*triangle_height)('F')
+        dirRT = R - T
+        distance_RT = (T.distance(R)).n(5)
 
-            A, B, C, E, F, G = Prism(triangle_plane,
-                                     dirRT / distance_RT * B.distance(C))
+        #D = (A + dirHG/distance_HG*triangle_height)('D')
+        #E = (B + dirHG/distance_HG*triangle_height)('E')
+        #F = (C + dirHG/distance_HG*triangle_height)('F')
 
-            E = E('E')
-            F = F('F')
-            G = G('G')
-            H = (D + (E - A))('H')
+        A, B, C, E, F, G = Prism(triangle_plane,
+                                 dirRT / distance_RT * B.distance(C))
 
-            current_obj.add_solution_step('Vertices E,F,G,H', [E, F, G, H])
+        E = E('E')
+        F = F('F')
+        G = G('G')
+        H = (D + (E - A))('H')
 
-            elems += [D, E, F, G]
+        current_obj.add_solution_step('Vertices E,F,G,H', [E, F, G, H])
 
-            projections += [
-                G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
-                F @ VPP
-            ]
+        elems += [D, E, F, G]
 
-            current_obj._assumptions = DrawingSet(
-                *current_obj.get_projections())('Solution')
-            current_obj._assumptions3d = DrawingSet(*current_obj)
+        projections += [
+            G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
+            F @ VPP
+        ]
 
-            current_obj._point_B = B
-            current_obj._point_C = C
-            current_obj._point_D = D
-            current_obj.point_E = E
-            current_obj.point_F = F
-            current_obj.point_G = G
-            current_obj.point_H = H
-            self._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
-        return current_obj
+        current_obj._assumptions = DrawingSet(
+            *current_obj.get_projections())('Solution')
+        current_obj._assumptions3d = DrawingSet(*current_obj)
+
+        current_obj._point_B = B
+        current_obj._point_C = C
+        current_obj._point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+        current_obj.point_G = G
+        current_obj.point_H = H
 
         return current_obj
 

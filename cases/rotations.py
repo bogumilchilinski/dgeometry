@@ -43,7 +43,7 @@ class PointRotation(GeometricalCase):
         
 
         
-    def solution(self):
+    def _solution(self):
         
         
         current_obj=copy.deepcopy(self)
@@ -268,9 +268,12 @@ class PlaneRotation(GeometricalCase):
         self._given_data={'A':point_A,'B':point_B,'C':point_C}
         
         self._solution_step.append(self._assumptions)
-
+        self.add_solution_step('Assumptions',[point_A,point_B,point_C])
         
     def _solution(self):
+        
+        print("Raotation solution"*100)
+        
         current_obj=copy.deepcopy(self)
         
         A=current_obj.point_A
@@ -318,9 +321,6 @@ class PlaneRotation(GeometricalCase):
         current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
 
 
-            
-        #line_kk=Line(C,S_I)
-        #print(point_0_dict)
         elems+=[line_a,line_b,#,E,F,G,H,line_s1,line_s2,line_s3,line_s4
               ]
 
@@ -841,104 +841,103 @@ class ShapeOnPlane(GeometricalCase):
         return base_plane
         
         
-    def solution(self):
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+    def _solution(self):
 
-            A = current_obj._point_A
-            O = current_obj._point_O
-            P = current_obj._point_P
+        current_obj = copy.deepcopy(self)
+
+        A = current_obj._point_A
+        O = current_obj._point_O
+        P = current_obj._point_P
 
 
 
-            plane_alpha = Plane(A, O, P)
+        plane_alpha = Plane(A, O, P)
 
-            plane_beta = HorizontalPlane(P)
-            plane_eta = VerticalPlane(P)
+        plane_beta = HorizontalPlane(P)
+        plane_eta = VerticalPlane(P)
 
-            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+        line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-            current_obj.P1 = point_P1
-            line_kk = (P ^ point_P1)('a')            
+        point_P1 = plane_beta.intersection(A ^ O)[0]('1')
+        current_obj.P1 = point_P1
+        line_kk = (P ^ point_P1)('a')            
 
+        
+        current_obj.add_solution_step(
+            f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}. 
+            The {point_P1._label} point has to be found, in order to determine axis position''', [point_P1,
+                                 (P ^ point_P1)('a')])
+        
+        
+        point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+
+        line_f = (P ^ point_P2)('f') 
+        
+        
+        current_obj.add_solution_step(
+            f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}''', [point_P2,
+                                 (P ^ point_P2)('f')])
+
+
+        point_O = O
+        
+        
+        
+
+        ##################   plane rotation
+
+        ### Step 2 #####
+        ###  plane of rotation of A ####
+        
+        line_kk = Line(P, (O @ line_k))('k')
+
+        A0 = A.rotate_about(axis=line_k)('A_0')
+        current_obj.A0 = A0
+        
+        A0_e1=A0+((A0@line_k)-A0)/((A0@line_k).distance(A0))*(1.2*((A0@line_k).distance(A0)))
+        A0_e2=(A0@line_k)+((A0@line_k)-A0)/((A0@line_k).distance(A0))*(-1.2*((A0@line_k).distance(A0)))
+        
+        current_obj.add_solution_step(f'''Plane rotation - it is creating projection of {O._label} on the planes intersection''', [((A0_e1)^A0_e2)('e_A')])
+
+        #### Step 3 ####
+        ### rotated point A0 of A #####
+        
+        current_obj.add_solution_step('Point A rotation by using a rotation plane', [A0])
+
+        
+        points_of_base=current_obj._base_shape([A,P,O])
+        
+        
+        rotated_base = []
+        
+        for base_point  in points_of_base:
             
-            current_obj.add_solution_step(
-                f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}. 
-                The {point_P1._label} point has to be found, in order to determine axis position''', [point_P1,
-                                     (P ^ point_P1)('a')])
-            
-            
-            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+        
+            point0 = base_point.rotate_about(axis=line_k)(f'{base_point._label}_0')
+            rotated_base += [point0]
 
-            line_f = (P ^ point_P2)('f') 
-            
-            
-            current_obj.add_solution_step(
-                f'''Axis of rotation - it is common part between given plane and horizontal plane which contains point {P._label}''', [point_P2,
-                                     (P ^ point_P2)('f')])
+            current_obj.add_solution_step(f'Creating a point {point0._label} based on triangle geometry', [point0])
 
+        #### Step 4 ####
+        ### postion of B0 (based on triangle geometry) #####
 
-            point_O = O
+        for rotated_point,base_point  in zip(rotated_base,points_of_base):
+        
+            rotP = rotated_point
             
             
-            
+            if ((rotP@line_k).distance(rotP)) != 0:
+                rotP_e1=rotP+((rotP@line_k)-rotP)/((rotP@line_k).distance(rotP))*(1.2*((rotP@line_k).distance(rotP)))
+                rotP_e2=(rotP@line_k)+((rotP@line_k)-rotP)/((rotP@line_k).distance(rotP))*(-1.2*((rotP@line_k).distance(rotP)))
 
-            ##################   plane rotation
-
-            ### Step 2 #####
-            ###  plane of rotation of A ####
-            
-            line_kk = Line(P, (O @ line_k))('k')
-
-            A0 = A.rotate_about(axis=line_k)('A_0')
-            current_obj.A0 = A0
-            
-            A0_e1=A0+((A0@line_k)-A0)/((A0@line_k).distance(A0))*(1.2*((A0@line_k).distance(A0)))
-            A0_e2=(A0@line_k)+((A0@line_k)-A0)/((A0@line_k).distance(A0))*(-1.2*((A0@line_k).distance(A0)))
-            
-            current_obj.add_solution_step(f'''Plane rotation - it is creating projection of {O._label} on the planes intersection''', [((A0_e1)^A0_e2)('e_A')])
-
-            #### Step 3 ####
-            ### rotated point A0 of A #####
-            
-            current_obj.add_solution_step('Point A rotation by using a rotation plane', [A0])
-
-            
-            points_of_base=current_obj._base_shape([A,P,O])
-            
-            
-            rotated_base = []
-            
-            for base_point  in points_of_base:
-                
-            
-                point0 = base_point.rotate_about(axis=line_k)(f'{base_point._label}_0')
-                rotated_base += [point0]
-
-                current_obj.add_solution_step(f'Creating a point {point0._label} based on triangle geometry', [point0])
-
-            #### Step 4 ####
-            ### postion of B0 (based on triangle geometry) #####
-
-            for rotated_point,base_point  in zip(rotated_base,points_of_base):
-            
-                rotP = rotated_point
-                
-                
-                if ((rotP@line_k).distance(rotP)) != 0:
-                    rotP_e1=rotP+((rotP@line_k)-rotP)/((rotP@line_k).distance(rotP))*(1.2*((rotP@line_k).distance(rotP)))
-                    rotP_e2=(rotP@line_k)+((rotP@line_k)-rotP)/((rotP@line_k).distance(rotP))*(-1.2*((rotP@line_k).distance(rotP)))
-
-                    current_obj.add_solution_step('Reverse point B0 rotation - plane of rotation of B0 point', [((rotP_e1)^rotP_e2)('e_B')])
-                    current_obj.add_solution_step('Reverse point B0 rotation - getting a point B in the space', [base_point])
+                current_obj.add_solution_step('Reverse point B0 rotation - plane of rotation of B0 point', [((rotP_e1)^rotP_e2)('e_B')])
+                current_obj.add_solution_step('Reverse point B0 rotation - getting a point B in the space', [base_point])
 
 
 
-            self._cached_solution = current_obj
-            current_obj._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
+#        self._cached_solution = current_obj
+#        current_obj._cached_solution = current_obj
+
         return current_obj
 
 

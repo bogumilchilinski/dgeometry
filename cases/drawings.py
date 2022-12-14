@@ -133,15 +133,10 @@ class DrawingSheets(GeometricalCase):
 
         return papers[self._extra_paper]
 
-    def solution(self, solved_case=None):
+    def _solution(self, solved_case=None):
 
-        if self._cached_solution is None:
 
-            new_obj = copy.deepcopy(self)
-            self._cached_solution = new_obj
-
-        else:
-            new_obj = self._cached_solution
+        new_obj = copy.deepcopy(self)
 
         return new_obj
 

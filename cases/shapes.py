@@ -113,62 +113,59 @@ class ShapeOnPlane(GeometricalCase):
         return A,O,P
         
         
-    def solution(self):
-        if self._cached_solution is None:
-            current_obj = copy.deepcopy(self)
+    def _solution(self):
 
-            A = current_obj._point_A
-            O = current_obj._point_O
-            P = current_obj._point_P
+        current_obj = copy.deepcopy(self)
 
-            plane_alpha = Plane(A, O, P)
+        A = current_obj._point_A
+        O = current_obj._point_O
+        P = current_obj._point_P
 
-            plane_beta = HorizontalPlane(P)
-            plane_eta = VerticalPlane(P)
+        plane_alpha = Plane(A, O, P)
 
-            line_k = plane_alpha.intersection(plane_beta)[0]('a')
+        plane_beta = HorizontalPlane(P)
+        plane_eta = VerticalPlane(P)
 
-            point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-            current_obj.P1 = point_P1
-            line_kk = (P ^ point_P1)('a')            
+        line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
+        point_P1 = plane_beta.intersection(A ^ O)[0]('1')
+        current_obj.P1 = point_P1
+        line_kk = (P ^ point_P1)('a')            
+
+        
+        
+        point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+
+        line_f = (P ^ point_P2)('f') 
+
+        current_obj.add_solution_step(
+            f'''Axis of rotation - it is common part between given plane $\\alpha({A._label},{O._label},{P._label})$  and horizontal plane $\\gamma$ which contains point {P._label}''', [point_P2,
+                                 (P ^ point_P2)('f')])
+
+
+        point_O = O
+
+        line_k = Line(P, (O @ line_k))('k')
+        current_obj._axis = line_k
+        current_obj._hor_plane =plane_beta
+
+        A0,O0,P0 = current_obj._rotation_of_given_plane()
             
+        current_obj.A0 = A0
+        current_obj.P0 = P0
+        current_obj.O0 = O0
             
-            point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+        #### Step 4 ####
+        ### postion of B0 (based on triangle geometry) #####
 
-            line_f = (P ^ point_P2)('f') 
-
-            current_obj.add_solution_step(
-                f'''Axis of rotation - it is common part between given plane $\\alpha({A._label},{O._label},{P._label})$  and horizontal plane $\\gamma$ which contains point {P._label}''', [point_P2,
-                                     (P ^ point_P2)('f')])
-
-
-            point_O = O
-
-            line_k = Line(P, (O @ line_k))('k')
-            current_obj._axis = line_k
-            current_obj._hor_plane =plane_beta
-
-            A0,O0,P0 = current_obj._rotation_of_given_plane()
-                
-            current_obj.A0 = A0
-            current_obj.P0 = P0
-            current_obj.O0 = O0
-                
-            #### Step 4 ####
-            ### postion of B0 (based on triangle geometry) #####
-
-            for base_point  in current_obj._rotation_of_base():
-            
-                shape_unrotation_case = UnrotatedPoint(base_point,(P^O)('PO'),axis=line_k)
-                current_obj._append_case(shape_unrotation_case)
+        for base_point  in current_obj._rotation_of_base():
+        
+            shape_unrotation_case = UnrotatedPoint(base_point,(P^O)('PO'),axis=line_k)
+            current_obj._append_case(shape_unrotation_case)
 
 
-            current_obj._shape_points()
-                
-            current_obj._cached_solution = current_obj
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
+        current_obj._shape_points()
+
             
         print(list(current_obj))
             

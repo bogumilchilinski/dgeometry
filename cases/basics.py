@@ -42,7 +42,7 @@ class SegmentMidpoint(GeometricalCase):
 
 
 
-    def solution(self):
+    def _solution(self):
         
         current_obj=copy.deepcopy(self)
         
@@ -105,7 +105,7 @@ class PointOnLine(GeometricalCase):
 
 
 
-    def solution(self):
+    def _solution(self):
         
         current_obj=copy.deepcopy(self)
         
@@ -181,7 +181,7 @@ class PlanesIntersection(GeometricalCase):
 
 
 
-    def solution(self):
+    def _solution(self):
         
         A=self._point_A
         B=self._point_B
@@ -231,7 +231,7 @@ class VerticalLineOnPlane(GeometricalCase):
         
         self._solution_step.append(self._assumptions)
 
-    def solution(self):
+    def _solution(self):
         
         current_obj=copy.deepcopy(self)
         
@@ -283,7 +283,7 @@ class FrontalLineOnPlane(GeometricalCase):
         self._given_data={'A':point_A,'B':point_B,'O':point_O}
 
         self._solution_step.append(self._assumptions)
-    def solution(self):
+    def _solution(self):
         current_obj=copy.deepcopy(self)
         O=current_obj._point_O
         A=current_obj._point_A
@@ -332,7 +332,7 @@ class HorizontalLineOnPlane(GeometricalCase):
         self._given_data={'A':point_A,'B':point_B,'O':point_O}
 
         self._solution_step.append(self._assumptions)
-    def solution(self):
+    def _solution(self):
         current_obj=copy.deepcopy(self)
         O=current_obj._point_O
         A=current_obj._point_A
@@ -432,7 +432,7 @@ class LineOnPlane(GeometricalCase):
 #         current_obj.point_C = midpoint
 
 #         return current_obj
-    def solution(self):
+    def _solution(self):
 
         current_obj=copy.deepcopy(self)
         
@@ -606,7 +606,7 @@ class PointOnPlane(GeometricalCase):
         self._solution_step.append(self._assumptions)
 
         
-    def solution(self):
+    def _solution(self):
 #         self._line=Line(self._point_N1,self._point_N2)
         current_obj=copy.deepcopy(self)
         
@@ -729,7 +729,7 @@ class TriangleOnPlane(GeometricalCase):
         self._solution_step.append(self._assumptions)
 
         
-    def solution(self):
+    def _solution(self):
 #         self._line=Line(self._point_N1,self._point_N2)
         current_obj=copy.deepcopy(self)
         
@@ -852,7 +852,7 @@ class LineAndPlaneIntersection(GeometricalCase):
         self._solution_step.append(self._assumptions)
 
         
-    def solution(self):
+    def _solution(self):
 #         self._line=Line(self._point_N1,self._point_N2)
         current_obj=copy.deepcopy(self)
         
@@ -1002,16 +1002,11 @@ class TwoPlanesIntersection(GeometricalCase):
         self._solution_step.append(self._assumptions)
 
         
-    def solution(self):
+    def _solution(self):
 
-        if self._cached_solution is None:
-            current_obj = self._solve()
-        
-        else:
-            current_obj = copy.deepcopy(self._cached_solution)
-            
-            
-        return current_obj        
+        current_obj = self._solve()
+
+        return current_obj
 
     def _solve(self):
     
@@ -1235,7 +1230,7 @@ class LinePerpendicularToPlaneIntersection(GeometricalCase):
         self._solution_step.append(self._assumptions)
 
         
-    def solution(self):
+    def _solution(self):
 #         self._line=Line(self._point_N1,self._point_N2)
         current_obj=copy.deepcopy(self)
         
@@ -1389,7 +1384,7 @@ class PlanePerpendicularToLineIntersection(GeometricalCase):
         self._solution_step.append(self._assumptions)
 
         
-    def solution(self):
+    def _solution(self):
 #         self._line=Line(self._point_N1,self._point_N2)
         current_obj=copy.deepcopy(self)
         
@@ -1486,7 +1481,7 @@ class PlanePerpendicularToPlaneIntersection(GeometricalCase):
         self._solution_step.append(self._assumptions)
 
         
-    def solution(self):
+    def _solution(self):
 #         self._line=Line(self._point_N1,self._point_N2)
         current_obj=copy.deepcopy(self)
         
@@ -1918,3 +1913,173 @@ class PerpendicularLineAndParallelEdgePlaneIntersection(PerpendicularLineAndPara
 
         return parameters_dict
     
+class IntersectionOfLineAndParallelPlane(GeometricalCase):
+
+    point_A = [
+        Point(x, y, z) for x in [1, 1.5, 2, 2.5]
+        for y in [2, 2.5, 3, 3.5, 4, 4.5, 5] for z in range(0, 1)
+    ]
+
+    point_B = [
+        Point(x, y, z) for x in range(0, 2) for y in range(7, 10)
+        for z in range(2, 3)
+    ]
+
+    point_C = [
+        Point(x, y, z) for x in range(4, 6) for y in [11.5, 12, 12.5, 13]
+        for z in range(7, 8)
+    ]
+
+    point_O = [
+        Point(x, y, z) for x in range(5, 7) for y in [1, 1.5, 2, 2.5]
+        for z in range(5, 7)
+    ]
+
+    point_M = [
+        Point(x, y, z) for x in [4, 5, 6] for y in [7, 7.5, 8.5, 9, 9.5]
+        for z in [6, 7, 8]
+    ]
+
+    point_N = [
+        Point(x, y, z) for x in [7, 7.5, 8, 8.5, 9]
+        for y in [9, 10, 19.5, 11, 11.5] for z in range(2, 5)
+    ]
+
+    shift = [
+        Point(x, y, z) for x in [-1, -0.5, 0, 0.5, 1]
+        for y in [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
+        for z in [-1, -0.5, 0, 0.5, 1]
+    ]
+
+    def __init__(self,
+                 point_A=None,
+                 point_B=None,
+                 point_C=None,
+                 point_M=None,
+                 point_N=None,
+                 point_O=None,
+                 *args,
+                 **kwargs):
+
+        super().__init__()
+
+        if point_A and point_B and point_O and point_C and point_M and point_N:
+            projections = (point_A @ HPP, point_A @ VPP,
+                           point_B @ HPP, point_B @ VPP,
+                           Line(point_A @ HPP, point_B @ HPP),
+                           Line(point_A @ VPP, point_B @ VPP),
+                           Line(point_B @ HPP, point_C @ HPP),
+                           Line(point_B @ VPP, point_C @ VPP),
+                           Line(point_C @ HPP, point_A @ HPP),
+                           Line(point_C @ VPP, point_A @ VPP),
+                           Line(point_M @ HPP, point_N @ HPP),
+                           Line(point_M @ VPP, point_N @ VPP),
+                           point_C @ HPP, point_C @ VPP,
+                           point_M @ HPP, point_M @ VPP,
+                           point_N @ HPP, point_N @ VPP,
+                           point_O @ HPP, point_O @ VPP)
+        else:
+            projections = []
+
+        self._assumptions = DrawingSet(*projections)
+
+        self._point_A = point_A
+        self._point_B = point_B
+        self._point_C = point_C
+        self._point_M = point_M
+        self._point_N = point_N
+        self._point_O = point_O
+
+        self._given_data = {
+            'A': point_A,
+            'B': point_B,
+            'C': point_C,
+            'M': point_M,
+            'N': point_N,
+            'O': point_O
+        }
+
+
+        self._assumptions3d = DrawingSet(point_A, point_B, point_C,
+                                         point_O)('Assumptions')
+        self._assumptions = DrawingSet(*projections)
+
+        self.add_solution_step('Assumptions',
+                               [point_A, point_B, point_C, point_O])
+
+    def _solution(self):
+
+        current_obj = copy.deepcopy(self)
+        current_set = DrawingSet(*current_obj._solution_step[-1])
+        A = current_obj._point_A
+        B = current_obj._point_B
+        C = current_obj._point_C
+
+        M = current_obj._point_M
+        N = current_obj._point_N
+        O = current_obj._point_O
+
+        plane_alpha = Plane(A, B, C)
+
+        dAO = O - A
+
+        D = O('D')
+        E = (B + dAO)('E')
+        F = (C + dAO)('F')
+
+        current_obj.add_solution_step('Points D, E, F, O', [D, E, F, O], [D, E, F, O])
+
+        line_mn=Line(M, N)('m')
+        line_de=Line(D, E)('d')
+        line_ef=Line(E, F)('e')
+        line_df=Line(D, F)('f')
+
+        current_obj.add_solution_step('Lines', [line_mn, line_de, line_ef, line_df], [line_mn, line_de, line_ef, line_df])
+
+        plane_beta = Plane(D, E, F)
+
+        G = (plane_beta & line_mn)[0]('G')
+
+        current_obj.add_solution_step('Piercing point G', [G], [G])
+
+        elems = [D, E, F, G, line_mn, line_de, line_ef, line_df]
+
+        projections = [
+            line_mn @ HPP, line_mn @ VPP, line_de @ HPP, line_de @ VPP,
+            line_ef @ HPP, line_ef @ VPP, line_df @ HPP, line_df @ VPP,
+            D @ HPP, D @ VPP, E @ HPP, E @ VPP, G @ HPP, G @ VPP, F @ HPP,
+            F @ VPP
+        ]
+
+        current_set += [*elems, *projections]
+        current_obj._solution_step.append(current_set)
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+        current_obj.point_G = G
+
+        current_obj._assumptions += [DrawingSet(*elems, *projections)]
+        
+        return current_obj
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        point_B = self.__class__.point_B
+        point_C = self.__class__.point_C
+        point_M = self.__class__.point_M
+        point_N = self.__class__.point_N
+        point_O = self.__class__.point_O
+        shift = self.shift
+
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('B'): point_B,
+            Symbol('C'): point_C,
+            Symbol('M'): point_M,
+            Symbol('N'): point_N,
+            Symbol('O'): point_O,
+            'shift': shift,
+        }
+        return default_data_dict
+
