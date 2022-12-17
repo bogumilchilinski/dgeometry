@@ -1207,7 +1207,7 @@ class GeometricalCase(DrawingSet):
 
         return self._path
 
-    def preview(self, example=False):
+    def preview(self, example=False,force=False):
         
 
 #        print('preview')
@@ -1217,16 +1217,26 @@ class GeometricalCase(DrawingSet):
 
         print(self._assumptions3d)
         
-        if self._path:
+        set_to_plot = self._assumptions
+        set_to_plot_3d = self._assumptions3d
+        
+        if len(set_to_plot) == 0:
+            set_to_plot = DrawingSet(*self)(self._label)
+        
+        if self._path and force == False:
             path = self._path
             
         else:
             GeometrySceneDG()
 
-            self._assumptions3d.plot()
-            self._assumptions.plot_hp()
-            self._assumptions.plot_vp()
+            set_to_plot_3d.plot()
+            set_to_plot.plot_hp()
+            set_to_plot.plot_vp()
 
+            #self._assumptions3d.plot()
+            #self._assumptions.plot_hp()
+            #self._assumptions.plot_vp()
+            
             path = __file__.replace('dgeometry.py',
                                     'images/') + self.__class__.__name__ + str(
                                         next(self.__class__._case_no)) + '.png'

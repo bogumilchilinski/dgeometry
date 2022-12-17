@@ -557,7 +557,8 @@ class SquareRotation(GeometricalCase):
         
         self._given_data={'A':point_A,'P':point_P,'O':point_O}
         
-        self._solution_step.append(self._assumptions)
+
+        self.add_solution_step('Assumptions', [point_A,point_P,point_O])
 
     def _solution(self):
         current_obj=copy.deepcopy(self)
@@ -619,19 +620,23 @@ class SquareRotation(GeometricalCase):
         elems+=[line_a,line_b,#,E,F,G,H,line_s1,line_s2,line_s3,line_s4
               ]
 
-        projections+=[current_obj.point_D_0@HPP,current_obj.point_D_0@VPP,D@HPP,D@VPP,
-            current_obj.point_A_0@HPP,current_obj.point_A_0@VPP,current_obj.point_B_0@HPP,current_obj.point_B_0@VPP,
-                      current_obj.point_C_0@HPP,current_obj.point_C_0@VPP,B@HPP,B@VPP,C@HPP,C@VPP,line_a@HPP,line_a@VPP,line_b@HPP,line_b@VPP,
-                      line_kk@HPP,line_kk@VPP,#line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
-                     #line_s4@HPP,line_s4@VPP
-                    ]
-        current_set+=[*elems,*projections]
+#         projections+=[current_obj.point_D_0@HPP,current_obj.point_D_0@VPP,D@HPP,D@VPP,
+#             current_obj.point_A_0@HPP,current_obj.point_A_0@VPP,current_obj.point_B_0@HPP,current_obj.point_B_0@VPP,
+#                       current_obj.point_C_0@HPP,current_obj.point_C_0@VPP,B@HPP,B@VPP,C@HPP,C@VPP,line_a@HPP,line_a@VPP,line_b@HPP,line_b@VPP,
+#                       line_kk@HPP,line_kk@VPP,#line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
+#                      #line_s4@HPP,line_s4@VPP
+#                     ]
+#         current_set+=[*elems,*projections]
 
-        current_obj._solution_step.append(current_set)
-        current_obj._assumptions=DrawingSet(*elems,*projections)
+
+
+
         current_obj.point_B=B
         current_obj.point_C=C
         current_obj.point_D=D
+        
+        current_obj.add_solution_step('Drawn square', [B,C,D])
+        
         return current_obj
 
     def get_default_data(self):
