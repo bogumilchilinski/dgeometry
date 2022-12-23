@@ -417,21 +417,11 @@ class LineOnPlane(GeometricalCase):
 
 
         
-        self._solution_step.append(self._assumptions)
+        #self._solution_step.append(self._assumptions)
+        self.add_solution_step('Assumptions - given plane', [point_A, point_B, point_O])
+        self.add_solution_step('Assumptions - given line', [point_E, point_F])
         
-#     def solution(self):
 
-        
-#         midpoint=(A+ (B-A)*0.5)('C')
-#         current_set += [midpoint]
-        
-#         current_obj._solution_step.append(current_set)
-        
-        
-#         current_obj.midpoint = midpoint
-#         current_obj.point_C = midpoint
-
-#         return current_obj
     def _solution(self):
 
         current_obj=copy.deepcopy(self)
@@ -455,7 +445,7 @@ class LineOnPlane(GeometricalCase):
 
 
 
-        current_obj._solution_step.append(current_set)
+
 
         
         
@@ -464,15 +454,16 @@ class LineOnPlane(GeometricalCase):
         lineE=E^(E+Point(15,0,0))
         lineF=F^(F+Point(15,0,0))
 
-        
+        current_obj.add_solution_step('Line EF', [(E^F)('e')])
         
         current_obj.point_C = plane_v.intersection(lineE)[0]
         current_obj.point_D = plane_v.intersection(lineF)[0]
         
-        elems=[lineE,lineF]
-        projections=[lineE@HPP,lineF@HPP,lineE@VPP,lineF@VPP]
-        current_set+=[*elems,*projections]
+  
         
+        
+        current_obj.add_solution_step('Point C', [current_obj.point_C])
+        current_obj.add_solution_step('Point D', [current_obj.point_D])
         
         return current_obj
     
@@ -497,17 +488,6 @@ class LineOnPlane(GeometricalCase):
         point_F = self.__class__.point_F
 
 
-        
-#         point_A = [Point(x,y,z) for x in range(1,5) for y in range(1,7) for z in range(1,5) ]
-#         distance_AO = [Point(2,3,2),Point(2,4,2),Point(2,4,2),Point(3,3,4)]
-        
-#         point_O = [pt + dist  for pt,dist   in  it.product(point_A,distance_AO)]
-#         distance_OB = [Point(-4,2,-4),Point(-5,3,-4),Point(-4,4,-6),Point(-5,3,-7)]
-        
-#         point_B=[pt + dist  for pt,dist   in  it.product(point_O,distance_OB)]
-        
-#         distance_AC  = [Point(2,1,1),Point(2,2,1),Point(2,1,2),Point(1,2,3)]
-#         distance_AD = [Point(2,5,1),Point(2,6,1),Point(2,6,2),Point(1,5,3)]
 
         default_data_dict = {
             Symbol('A'): point_A,
@@ -891,24 +871,12 @@ class LineAndPlaneIntersection(GeometricalCase):
     def get_default_data(self):
 
         point_A = self.__class__.point_A
-        #distance_AO = self.__class__.distance_AO
-        
         point_O = self.__class__.point_O 
-        #distance_OB = self.__class__.distance_OB
-        
         point_B=self.__class__.point_B
-        
-
-        #distance_AD = self.__class__.distance_AD
-        #distance_OE = self.__class__.distance_OE
-        #distance_BF = self.__class__.distance_BF
-        
-        
         point_D=self.__class__.point_D
         point_E = self.__class__.point_E
 
 
-        
         default_data_dict = {
             Symbol('A'): point_A,
             Symbol('B'): point_B,
@@ -1916,22 +1884,22 @@ class PerpendicularLineAndParallelEdgePlaneIntersection(PerpendicularLineAndPara
 class IntersectionOfLineAndParallelPlane(GeometricalCase):
 
     point_A = [
-        Point(x, y, z) for x in [1, 1.5, 2, 2.5]
-        for y in [2, 2.5, 3, 3.5, 4, 4.5, 5] for z in range(0, 1)
+        Point(x, y, z) for x in [1.5, 2, 2.5]
+        for y in [2, 2.5, 3, 3.5, 4, 4.5, 5] for z in range(2, 3)
     ]
 
     point_B = [
-        Point(x, y, z) for x in range(0, 2) for y in range(7, 10)
+        Point(x, y, z) for x in range(2, 3) for y in range(7, 10)
         for z in range(2, 3)
     ]
 
     point_C = [
-        Point(x, y, z) for x in range(4, 6) for y in [11.5, 12, 12.5, 13]
+        Point(x, y, z) for x in range(4, 6) for y in [10, 10.5, 11, 11.5, 12, 12.5, 13]
         for z in range(7, 8)
     ]
 
     point_O = [
-        Point(x, y, z) for x in range(5, 7) for y in [1, 1.5, 2, 2.5]
+        Point(x, y, z) for x in range(5, 7) for y in [1.5, 2, 2.5]
         for z in range(5, 7)
     ]
 
@@ -1942,7 +1910,7 @@ class IntersectionOfLineAndParallelPlane(GeometricalCase):
 
     point_N = [
         Point(x, y, z) for x in [7, 7.5, 8, 8.5, 9]
-        for y in [9, 10, 19.5, 11, 11.5] for z in range(2, 5)
+        for y in [9, 9.5] for z in range(2, 5)
     ]
 
     shift = [

@@ -303,11 +303,14 @@ class EquilateralTrianglePrism(GeometricalCase):
 
         A0 = A.rotate_about(axis=line_k)('A_0')
         current_obj.point_A_0 = A0
-
+        current_obj.add_solution_step('Point A rotation', [A0])
+        elems=[current_obj.point_A_0]
+        projections=[current_obj.point_A_0@HPP,current_obj.point_A_0@VPP]
+        current_set+=[*elems,*projections]
         ### Step 2 #####
         ###  plane of rotation of A ####
 
-        current_obj.add_solution_step('Point A rotation', [A0])
+        
 
         #### Step 3 ####
         ### rotated point A0 of A #####
@@ -488,6 +491,7 @@ class SquarePrism(GeometricalCase):
         B = (S + dirPS / (P.distance(S)) * (square_diagonal / 2))('B')
         D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
         C = (A + 2 * dirAS)('C')
+
         #         line_AD=A^D
         #         line_AB=A^B
         #         line_BC=line_AD.parallel_line(P)
@@ -622,6 +626,7 @@ class SquarePrism(GeometricalCase):
         current_obj.point_F = F
         current_obj.point_G = G
         current_obj.point_H = H
+        current_obj.add_solution_step('', [current_obj.point_B,current_obj.point_C,current_obj.point_D,current_obj.A0,current_obj.B0,current_obj.C0,current_obj.D0,current_obj.point_E,current_obj.point_F,current_obj.point_G])
         return current_obj
 
     def get_default_data(self):
@@ -3108,10 +3113,16 @@ class GivenHeightEdgeIsoscelesRightTrianglePrism(GivenHeightIsoscelesRightTriang
 class GivenHeightIsoscelesRightTrianglePrismSwappedProjections(GivenHeightIsoscelesRightTrianglePrism):
 
     shift = [
-        Point(x, y, z) for x in [-11, -10.5, -10, -9.5, -9, -8.5, -8]
-        for y in [0] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+        Point(x, y, z) for x in [ -9.5, -9, -8.5, -8,-7]
+        for y in [-1,-0.5,0,0.5] for z in [-15,-14,-13, -12, -11]
     ]
 
+class GivenHeightEdgeIsoscelesRightTrianglePrismSwappedProjections(GivenHeightEdgeIsoscelesRightTrianglePrism):
+
+    shift = [
+        Point(x, y, z) for x in [ -9.5, -9, -8.5, -8,-7]
+        for y in [-1,-0.5,0,0.5] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+    ]
     
     
 
@@ -3205,17 +3216,17 @@ class GivenHeightHFLinesIsoscelesRightTrianglePrism2(
 class GivenHeightSquarePrism(GeometricalCase):
 
     point_A = [
-        Point(x, y, z) for x in [6, 6.5] for y in [7, 7.5, 8]
+        Point(x, y, z) for x in [6, 6.5] for y in [6.5,7, 7.5]
         for z in [8, 8.5]
     ]
 
     point_O = [
-        Point(x, y, z) for x in [3, 3.5, 4, 4.5] for y in [3, 4, 5]
+        Point(x, y, z) for x in [3, 3.5, 4, 4.5] for y in [4.5, 5, 5.5]
         for z in [2, 2.5, 3, 4, 5]
     ]
 
     point_P = [
-        Point(x, y, z) for x in [2, 2.5] for y in [10, 10.5, 11]
+        Point(x, y, z) for x in [2, 2.5] for y in [8.5,9,9.5]
         for z in [4, 5, 6]
     ]
 
@@ -3225,7 +3236,7 @@ class GivenHeightSquarePrism(GeometricalCase):
     ]
 
     shift = [
-        Point(x, y, z) for x in [-1, 0, 0.5, 1, 1.5, 2] for y in [1, 2, 3]
+        Point(x, y, z) for x in [-3,-2,-1] for y in [-1,-1.5, -2,]
         for z in [-2, -1.5, -1, -0.5, 0]
     ]
 
@@ -3253,7 +3264,7 @@ class GivenHeightSquarePrism(GeometricalCase):
         self._assumptions3d = DrawingSet(point_A, point_O, point_P,
                                          point_R)('')
         self._assumptions = DrawingSet(*projections)
-        #self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_H)('Assumptions')
+        self._assumptions3d=DrawingSet(point_A,point_O,point_P,point_R)('Assumptions')
 
         #self += [point_A,point_O,point_P,point_H]
 
@@ -3308,7 +3319,7 @@ class GivenHeightSquarePrism(GeometricalCase):
 #         #line_f = (P ^ point_P2)('f')
 #         line_p = (P ^ point_P1)('p')
 #         line_l = (P ^ point_P2)('l')
-        line_k = (A ^ point_P1)('k')
+        line_k = (P ^ point_P1)('k')
 
         current_obj.add_solution_step("", [A, B, C, D])
         # it creates next step of solution - lines are presented
@@ -3431,40 +3442,40 @@ class GivenHeightSquarePrism(GeometricalCase):
 
         return current_obj
 
-    def present_solution(self):
+#     def present_solution(self):
 
-        doc_model = Document(f'{self.__class__.__name__} solution')
+#         doc_model = Document(f'{self.__class__.__name__} solution')
 
-        doc_model.packages.append(Package('booktabs'))
-        doc_model.packages.append(Package('float'))
-        doc_model.packages.append(Package('standalone'))
-        doc_model.packages.append(Package('siunitx'))
+#         doc_model.packages.append(Package('booktabs'))
+#         doc_model.packages.append(Package('float'))
+#         doc_model.packages.append(Package('standalone'))
+#         doc_model.packages.append(Package('siunitx'))
 
-        #ReportText.set_container(doc_model)
-        #ReportText.set_directory('./SDAresults')
+#         #ReportText.set_container(doc_model)
+#         #ReportText.set_directory('./SDAresults')
 
-        for no, step3d in enumerate(self._solution3d_step):
-            GeometrySceneDG()
+#         for no, step3d in enumerate(self._solution3d_step):
+#             GeometrySceneDG()
 
-            for elem in range(no):
-                self._solution3d_step[elem].plot(color='k')
-                self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
+#             for elem in range(no):
+#                 self._solution3d_step[elem].plot(color='k')
+#                 self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
 
-            self._solution3d_step[no].plot(color='r')
-            self._solution_step[no].plot_vp(color='r').plot_hp(color='g')
+#             self._solution3d_step[no].plot(color='r')
+#             self._solution_step[no].plot_vp(color='r').plot_hp(color='g')
 
-            with doc_model.create(Figure(position='H')) as fig:
-                #path=f'./images/image{no}.png'
-                #plt.savefig(path)
-                #fig.add_image(path)
-                fig.add_plot(width=NoEscape(r'1.4\textwidth'))
+#             with doc_model.create(Figure(position='H')) as fig:
+#                 #path=f'./images/image{no}.png'
+#                 #plt.savefig(path)
+#                 #fig.add_image(path)
+#                 fig.add_plot(width=NoEscape(r'1.4\textwidth'))
 
-                if step3d._label is not None:
-                    fig.add_caption(step3d._label)
+#                 if step3d._label is not None:
+#                     fig.add_caption(step3d._label)
 
-            plt.show()
+#             plt.show()
 
-        return doc_model
+#         return doc_model
 
     def get_default_data(self):
 
@@ -3518,7 +3529,7 @@ class GivenHeightEdgeSquarePrism(GivenHeightSquarePrism):
 class GivenHeightHorizontalSquarePrism(GivenHeightSquarePrism):
   
     shift = [
-        Point(x, y, z) for x in [-1, 0, 0.5, 1, 1.5, 2] for y in [-2,-1.5,-1,0,0.5,1]
+        Point(x, y, z) for x in [-3,-2,-1, 0] for y in [-2,-1.5,-1,0,0.5,1]
         for z in [-1,-.5,0,0.5,1]
     ]
 

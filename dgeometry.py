@@ -1434,7 +1434,7 @@ class GeometricalCase(DrawingSet):
         #ReportText.set_directory('./SDAresults')
 
         for no, step3d in enumerate(self._solution3d_step):
-            GeometryScene()
+            GeometrySceneDG()
 
             for elem in range(no):
                 self._solution3d_step[elem].plot(color='k')

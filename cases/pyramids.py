@@ -2218,7 +2218,7 @@ class TriangularPyramid(GeometricalCase):
     
     shift = [
         Point(x, y, z) for x in [-1, -0.5, 0, 0.5, 1]
-        for y in [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
+        for y in [ -1.5, -1, -0.5]
         for z in [-1, -0.5, 0, 0.5, 1]
     ]
     
@@ -2421,11 +2421,20 @@ class TriangularPyramidSwappedProjections(TriangularPyramid):
 
     shift = [
         Point(x, y, z) for x in [-11, -10.5, -10, -9.5, -9, -8.5, -8]
-        for y in [0] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+        for y in [ -1.5, -1, -0.5] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
     ]
 
-    
-    
+class EdgeTriangularPyramid(TriangularPyramid):
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_A = parameters_dict[Symbol('A')]
+        point_C = parameters_dict[Symbol('C')]
+
+        parameters_dict[Symbol('B')] = (point_A + point_C) * 0.5 + Point(0, 0, 3)
+
+        return parameters_dict
     
 class TriangularPyramidHFLines(TriangularPyramid):
     point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [4,4.5,5] for z in [2,2.5,3,3.5]  ]
@@ -2460,3 +2469,226 @@ class TriangularPyramidHFLines(TriangularPyramid):
         parameters_dict[Symbol('B')]=Point(point_B.x,point_B.y,point_A.z)
 
         return parameters_dict
+
+
+    
+class ParallelogramPyramid(GeometricalCase):
+
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [2,2.5,3,3.5]  ]
+
+    point_B=  [Point(x,y,z) for x in range(4,6) for y in range(8,12) for z in [2,2.5,3,3.5] ]
+    
+    point_C = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [13,13.5,14,14.5,15] for z in [6,6.5,7] ]
+    
+    point_O = [Point(x,y,z) for x in range(7,10) for y in [6,6.5,7,7.5,8.5] for z in range(6,9) ]
+    
+    shift = [
+        Point(x, y, z) for x in [-1, -0.5, 0, 0.5, 1]
+        for y in [ -1.5, -1, -0.5]
+        for z in [-1, -0.5, 0, 0.5, 1]
+    ]
+    
+    def __init__(self,
+                 point_A=None,
+                 point_B=None,
+                 point_C=None,
+                 point_O=None,
+                 **kwargs):
+
+        super().__init__()
+
+        if point_A and point_B and point_C and point_O:
+            projections = (
+                point_A @ HPP,
+                point_B @ HPP,
+                point_C @ HPP,
+                point_O @ HPP,
+                point_A @ VPP,
+                point_B @ VPP,
+                point_C @ VPP,
+                point_O @ VPP,
+                #Plane(point_A@HPP,point_B@HPP,point_C@HPP),Plane(point_A@VPP,point_B@VPP,point_C@VPP),
+            )
+        else:
+            projections = []
+
+        self._assumptions = DrawingSet(*projections)
+
+        self._point_A = point_A
+        self._point_B = point_B
+        self._point_C = point_C
+        self._point_O = point_O
+
+        self._given_data = {
+            'A': point_A,
+            'B': point_B,
+            'C': point_C,
+            'O': point_O,
+        }
+
+        self.add_solution_step('Assumptions',
+                               [point_A, point_B, point_C, point_O])
+        self._assumptions3d = DrawingSet(point_A, point_B, point_C,
+                                         point_O)('Assumptions')
+        self._assumptions = DrawingSet(*projections)
+
+    def _solution(self):
+        current_obj = copy.deepcopy(self)
+
+        A = current_obj._point_A
+        B = current_obj._point_B
+        C = current_obj._point_C
+        O = current_obj._point_O
+
+        current_set = DrawingSet(*current_obj._solution_step[-1])
+
+        plane_alpha = Plane(A, B, C)
+
+        point_P1 = (HorizontalPlane(A) & (B ^ C))[0]('1')
+        point_P2 = (VerticalPlane(A) & (B ^ C))[0]('2')
+
+        current_obj.horizontal_line_cross_BC = point_P1
+        current_obj.frontal_line_cross_BC = point_P2
+
+        current_obj.add_solution_step('Horizontal and forntal lines',
+                               [point_P1, point_P2,point_P1^A, point_P2^A])
+        
+        #         plane_beta=Plane(O,O+(B-A),O-(C-A))
+        #         D=(A@plane_beta)('D')
+        #         E=(B@plane_beta)('E')
+        #         F=(C@plane_beta)('F')
+        #         plane_gamma=Plane(D,E,F)
+
+        triangle_plane = Plane(A, B, C)
+        
+        D = Point((A + (C - B)).coordinates)('D')
+        
+        A, B, C, E, F, G = Prism.right_from_parallel_plane(triangle_plane, O)
+
+        plane_gamma = Plane(D,E,F)
+        
+        line_ad = Line(A, D)('a')
+#         line_be = Line(B, E)('b')
+#         line_cf = Line(C, F)('c')
+
+        plane_aux = Plane(A, D, A + Point(5, 0, 0))
+
+        #point_P3 = (((O - (point_P1 - A)) ^ O)('h_H') & plane_aux)[0]('3')
+        #point_P4 = (((O - (point_P2 - A)) ^ O)('f_H') & plane_aux)[0]('4')
+
+        #current_obj.add_solution_step('Piercing point',
+        #                              [point_P3, point_P4])
+
+
+        elems = [D, E, F, plane_alpha, plane_gamma, line_ad,# line_be, line_cf
+                ]
+
+        projections = [
+            line_ad @ HPP,
+            line_ad @ VPP,
+            #line_be @ HPP,
+            #line_be @ VPP,
+            #line_cf @ HPP,
+            #line_cf @ VPP,
+            D @ HPP,
+            D @ VPP,
+#             E @ HPP,
+#             E @ VPP,
+#             F @ HPP,
+#             F @ VPP,
+        ]
+
+        current_set += [*elems, *projections]
+
+        current_obj._solution_step.append(current_set)
+        current_obj.point_D = D
+        current_obj.point_E = E
+        #current_obj.point_F = F
+        current_obj._assumptions = DrawingSet(
+            *current_obj.get_projections())('Solution')
+        current_obj._assumptions3d = DrawingSet(*current_obj)
+
+        current_obj.add_solution_step('D vertex', [D])
+        
+        return current_obj
+
+
+    def get_default_data(self):
+
+        point_A = self.__class__.point_A
+        point_B = self.__class__.point_B
+        point_C = self.__class__.point_C
+        point_O = self.__class__.point_O
+        shift = self.shift
+
+        default_data_dict = {
+            Symbol('A'): point_A,
+            Symbol('B'): point_B,
+            Symbol('C'): point_C,
+            Symbol('O'): point_O,
+            'shift': shift,
+        }
+        return default_data_dict
+    
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_B = parameters_dict[Symbol('B')]
+        point_O = parameters_dict[Symbol('O')]
+        point_A = parameters_dict[Symbol('A')]
+        point_C = parameters_dict[Symbol('C')]
+
+        shift = parameters_dict['shift']
+        parameters_dict.pop('shift')
+
+        for point in symbols('A B C O'):
+            parameters_dict[point] = parameters_dict[point] + shift
+
+        return parameters_dict
+
+    
+    
+    
+    def present_solution(self):
+
+        doc_model = Document(f'{self.__class__.__name__} solution')
+
+        doc_model.packages.append(Package('booktabs'))
+        doc_model.packages.append(Package('float'))
+        doc_model.packages.append(Package('standalone'))
+        doc_model.packages.append(Package('siunitx'))
+
+        #ReportText.set_container(doc_model)
+        #ReportText.set_directory('./SDAresults')
+
+        for no, step3d in enumerate(self._solution3d_step):
+            GeometryScene()
+
+            for elem in range(no):
+                self._solution3d_step[elem].plot(color='k')
+                self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
+
+            self._solution3d_step[no].plot(color='r')
+            self._solution_step[no].plot_vp(color='r').plot_hp(color='r')
+
+            with doc_model.create(Figure(position='H')) as fig:
+                #path=f'./images/image{no}.png'
+                #plt.savefig(path)
+                #fig.add_image(path)
+                fig.add_plot(width=NoEscape(r'1.4\textwidth'))
+
+                if step3d._label is not None:
+                    fig.add_caption(step3d._label)
+
+            plt.show()
+
+        return doc_model
+    
+class ParallelogramPyramidSwappedProjections(ParallelogramPyramid):
+
+    shift = [
+        Point(x, y, z) for x in [-11, -10.5, -10, -9.5, -9, -8.5, -8]
+        for y in [ -1.5, -1, -0.5] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+    ]    
+    
