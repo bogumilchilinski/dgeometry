@@ -809,62 +809,76 @@ class LineAndPlaneIntersection(GeometricalCase):
         super().__init__()
 
         if point_A and point_B and point_O and point_D and point_E:
-            projections=(point_A@HPP,point_B@HPP,Line(point_A@HPP,point_O@HPP),Line(point_A@VPP,point_O@VPP),
-                         Line(point_B@HPP,point_O@HPP),Line(point_B@VPP,point_O@VPP),point_A@VPP,point_B@VPP,
-                         point_O@HPP,point_O@VPP,point_D@HPP,point_D@VPP,point_E@HPP,point_E@VPP)
+            elems=[Plane(point_A, point_B, point_O),point_A, point_B, point_O, Line(point_D,point_E), point_D,point_E]
+            
+            self._given_data={'A':point_A,'B':point_B,'O':point_A,'D':point_D,'E':point_E}
         else:
-            projections=[]
+            elems=[]
+            self._given_data={}
 
-        self._assumptions=DrawingSet(*projections)
-
-
-
-
-        self._point_A=point_A
-        self._point_B=point_B
-        self._point_O=point_O
-        self._point_D=point_D
-        self._point_E=point_E
-
-
-        self._given_data={'A':point_A,'B':point_B,'O':point_A,'D':point_D,'E':point_E}
         
-        self._solution_step.append(self._assumptions)
+
+
+
+
+
+        self.point_A=point_A
+        self.point_B=point_B
+        self.point_O=point_O
+        self.point_D=point_D
+        self.point_E=point_E
+
+
+        
+        
+        self.add_solution_step('Assumptions',
+                               elems)
 
         
     def _solution(self):
-#         self._line=Line(self._point_N1,self._point_N2)
+
         current_obj=copy.deepcopy(self)
         
-        A=current_obj._point_A
-        B=current_obj._point_B
-        O=current_obj._point_O
-        D=current_obj._point_D
-        E=current_obj._point_E
+        A=current_obj.point_A
+        B=current_obj.point_B
+        O=current_obj.point_O
+        D=current_obj.point_D
+        E=current_obj.point_E
 
         
-        current_set=DrawingSet(*current_obj._solution_step[-1])
 
         base_plane=Plane(A,B,O)('base')
         line_a=Line(A,O)('a')
         line_b=Line(B,O)('b')
 
         line_d=Line(D,E)
+        
+        aux_plane = Plane(D,E,0.5*(D+E) +Point(0,0,3) )('$\gamma$')
+        
+        
+        current_obj.add_solution_step(f'Auxiliary plane',
+                               [aux_plane],
+                                      projections=[aux_plane@HPP]
+                                     )
+        
+        intersection_linea_lined=(line_a@HPP).intersection(line_d@HPP)[0]('1')
+        current_obj.add_solution_step(f'Common point {intersection_linea_lined._label}',
+                               [intersection_linea_lined])
+        intersection_lineb_lined=(line_b@HPP).intersection(line_d@HPP)[0]('2')
+        current_obj.add_solution_step(f'Common point {intersection_lineb_lined._label}',
+                               [intersection_lineb_lined])
         intersection_ABO_DE=base_plane.intersection(line_d)[0]('P')
         P=intersection_ABO_DE
         
 
         
-        elems=[line_a,line_b,line_d,intersection_ABO_DE]
 
-        
-        projections=[line_a@HPP,line_b@HPP,line_a@VPP,line_b@VPP,intersection_ABO_DE@HPP,intersection_ABO_DE@VPP,line_d@HPP,line_d@VPP]
-        current_set+=[*elems,*projections]
+        current_obj.add_solution_step(f'Intersection point {P._label}',
+                               [P])
 
-        current_obj._solution_step.append(current_set)
         # to remove
         current_obj.point_P=P
-        current_obj._assumptions=DrawingSet(*elems,*projections)
+
 
         return current_obj
 
@@ -873,7 +887,7 @@ class LineAndPlaneIntersection(GeometricalCase):
         point_A = self.__class__.point_A
         point_O = self.__class__.point_O 
         point_B=self.__class__.point_B
-        point_D=self.__class__.point_D
+        point_D= self.__class__.point_D
         point_E = self.__class__.point_E
 
 
