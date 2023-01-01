@@ -298,10 +298,11 @@ class Entity:
         to the points in the plane
         """
         obj = copy.deepcopy(self)
+#         if label is not None:
+#             if obj.display is None:
+#                 obj._label = label
         if label is not None:
-            if obj.display is None:
-                obj._label = label
-                
+            obj._label = label                
                     
 
         if color is not None:
@@ -1466,8 +1467,10 @@ class GeometricalCase(DrawingSet):
 
                 if caption is not None:
                     fig.add_caption(caption)
+                    
 
             print(f"it's given  caption - {caption}")
+            print(f"it's given  caption - {step3d._label}")
             print('\n +++++++++++++++++++++++++++ \n')
             plt.show()
 

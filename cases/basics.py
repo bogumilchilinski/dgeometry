@@ -848,7 +848,7 @@ class LineAndPlaneIntersection(GeometricalCase):
         
 
         base_plane=Plane(A,B,O)('base')
-        line_a=Line(A,O)('a')
+        line_a=Line(A,B)('a')
         line_b=Line(B,O)('b')
 
         line_d=Line(D,E)
@@ -861,12 +861,34 @@ class LineAndPlaneIntersection(GeometricalCase):
                                       projections=[aux_plane@HPP]
                                      )
         
-        intersection_linea_lined=(line_a@HPP).intersection(line_d@HPP)[0]('1')
-        current_obj.add_solution_step(f'Common point {intersection_linea_lined._label}',
-                               [intersection_linea_lined])
-        intersection_lineb_lined=(line_b@HPP).intersection(line_d@HPP)[0]('2')
-        current_obj.add_solution_step(f'Common point {intersection_lineb_lined._label}',
-                               [intersection_lineb_lined])
+        
+        # auxiliary point (termed 1) where a line pierces aux_plane
+        intersection_point_1=aux_plane.intersection(line_a)[0]('1')
+        
+        
+        
+        # solution description for 1 point obtaining
+        current_obj.add_solution_step(f'1 - horizontal projection - where visible projection of edge plane is pierced by line',
+                               [intersection_point_1],
+                                      projections=[intersection_point_1@VPP]
+                                     )
+        current_obj.add_solution_step(f'1 - other projection',
+                               [intersection_point_1],
+                                      projections=[intersection_point_1@HPP]
+                                     )
+
+        
+        intersection_point_2=aux_plane.intersection(line_b)[0]
+        current_obj.add_solution_step(f'2 - horizontal projection - where visible projection of edge plane is pierced by line',
+                               [intersection_point_2],
+                                      projections=[intersection_point_2@VPP]
+                                     )
+        current_obj.add_solution_step(f'2 - other projection',
+                               [intersection_point_2],
+                                      projections=[intersection_point_2@HPP]
+                                     )
+        
+        
         intersection_ABO_DE=base_plane.intersection(line_d)[0]('P')
         P=intersection_ABO_DE
         
@@ -885,7 +907,7 @@ class LineAndPlaneIntersection(GeometricalCase):
     def get_default_data(self):
 
         point_A = self.__class__.point_A
-        point_O = self.__class__.point_O 
+        point_O = self.__class__.point_O
         point_B=self.__class__.point_B
         point_D= self.__class__.point_D
         point_E = self.__class__.point_E
