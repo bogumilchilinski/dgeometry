@@ -55,7 +55,11 @@ class ShaftPreview:
                                  alpha=self.data[i][3],
                                  color=self.data[i][4],
                                  edgecolor="black")
+            self.ax.scatter(0, 0, 0)
+            self.ax.scatter(10, 10, 10,marker='None')
 
+       
+            
     def shaft_steps_sides(self, begin_cords, radius, zlength, transparency):
 
         # Draw a circle on the x axis 'wall'
@@ -715,7 +719,8 @@ class Cone(Solid):
 class Cylinder(Solid):
     """This object represents cylinder solid.
     
-    The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
+    The cylinder object has predefined numbers of lines and dimensions that are needed 
+    make a engineering drawing. Also it stores information about height and diameter.
     
     Parameters
     ==========
@@ -1072,7 +1077,8 @@ class Plate(Cylinder):
 class Hole(Solid):
     """This object represents hole that can be made inside solid.
     
-    The hole object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height and diameter.
+    The hole object has predefined numbers of lines and dimensions that are needed to make a engineering 
+    drawing in view, section and half-section. It also stores information about height and diameter.
     
     Parameters
     ==========
