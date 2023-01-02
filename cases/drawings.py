@@ -513,7 +513,10 @@ class ShaftSketch(GeometricalCase):
                                   ],
                                   step_modificator=step_mod_inc_chamfer,origin=0) 
             
+            d_end=shaft[-1].diameter
+            
             shaft +=create_random_profile(steps['max'],steps['min'],
+                                  initial_diameter=[d_end+8, d_end+10 ],
                                   increase_values=[
                                       -4,
                                       -5,
@@ -651,7 +654,16 @@ class ShaftSketch(GeometricalCase):
 
         return new_obj
 
+class SimpleShaftSketch(ShaftSketch):
 
+
+
+    steps_no = {'max': 2, 'min': 0}
+
+    
+    shafts=None
+    
+    
 class SleeveSketch(ShaftSketch
                    #GeometricalCase
                    ):
@@ -680,7 +692,10 @@ class SleeveSketch(ShaftSketch
                                   ],
                                   step_modificator=step_mod_inc_chamfer,origin=0) 
             
+            d_end=shaft[-1].diameter
+            
             shaft +=create_random_profile(steps['max'],steps['min'],
+                                  initial_diameter=[d_end+8, d_end+10 ],
                                   increase_values=[
                                       -4,
                                       -5,
@@ -702,6 +717,15 @@ class SleeveSketch(ShaftSketch
             shafts.append(shaft)
         return shafts
 
+    
+class SimpleSleeveSketch(SleeveSketch
+                   #GeometricalCase
+                   ):
+
+    steps_no = {'max': 2, 'min': 0}
+    holes_no = {'max': 2, 'min': 1}
+    
+    
 class SleeveWithThreadsSketch(ShaftSketch
                               #GeometricalCase
                               ):
@@ -1709,6 +1733,8 @@ class BodyBlockRoundedView(ShaftSketch
 class ShaftWithKeyseats(ShaftSketch
                               #GeometricalCase
                               ):
+    
+
 
 
     @classmethod
@@ -1745,7 +1771,7 @@ class ShaftWithKeyseats(ShaftSketch
 #             shafts.append(shaft)
             
         for i in range(50):
-            shaft = [sol.ChamferedCylinder(60, 40)]
+            shaft = [sol.CylinderWithKeyseat(60, 40)]
             shaft[0]._origin = 0
             
 
@@ -1766,8 +1792,7 @@ class ShaftWithKeyseats(ShaftSketch
                                   ],
                                   step_modificator=step_mod_dec_keyseat,origin = shaft[-1].end)
             
-            shaft += create_random_profile(3,
-                                  0,
+            shaft += create_random_profile(holes['max'],holes['min'],
                                   initial_diameter=[30,25,20],
                                   increase_values=[
                                       -2,
@@ -1785,9 +1810,12 @@ class ShaftWithKeyseats(ShaftSketch
 
         return shafts            
             
-            
-            
-        return shafts
+class SimpleShaftWithKeyseats(ShaftWithKeyseats
+                              #GeometricalCase
+                              ):
+    
+    steps_no = {'max': 2, 'min': 0}
+    holes_no = {'max': 1, 'min': 0}
     
 class BodyBlockSimpleView(ShaftSketch
                               #GeometricalCase

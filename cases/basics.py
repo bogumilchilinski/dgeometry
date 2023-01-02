@@ -854,13 +854,12 @@ class LineAndPlaneIntersection(GeometricalCase):
         line_d=Line(D,E)
         
         aux_plane = Plane(D,E,0.5*(D+E) +Point(0,0,3) )('$\gamma$')
-        
+        edge_line=aux_plane.intersection(base_plane)[0]
         
         current_obj.add_solution_step(f'Auxiliary plane',
                                [aux_plane],
                                       projections=[aux_plane@HPP]
                                      )
-        
         
         # auxiliary point (termed 1) where a line pierces aux_plane
         intersection_point_1=aux_plane.intersection(line_a)[0]('1')
@@ -868,25 +867,35 @@ class LineAndPlaneIntersection(GeometricalCase):
         
         
         # solution description for 1 point obtaining
-        current_obj.add_solution_step(f'1 - horizontal projection - where visible projection of edge plane is pierced by line',
-                               [intersection_point_1],
-                                      projections=[intersection_point_1@VPP]
-                                     )
-        current_obj.add_solution_step(f'1 - other projection',
-                               [intersection_point_1],
-                                      projections=[intersection_point_1@HPP]
-                                     )
 
         
         intersection_point_2=aux_plane.intersection(line_b)[0]
-        current_obj.add_solution_step(f'2 - horizontal projection - where visible projection of edge plane is pierced by line',
-                               [intersection_point_2],
-                                      projections=[intersection_point_2@VPP]
+        edge_line=Line(intersection_point_1,intersection_point_2)('k')
+
+        current_obj.add_solution_step(f'Edge between base plane and auxiliary plane - horizontal projection',
+                               [edge_line],
+                                      projections=[edge_line@HPP]
                                      )
-        current_obj.add_solution_step(f'2 - other projection',
+        current_obj.add_solution_step(f'1 - horizontal projection - where visible projection of edge plane is pierced by line',
+                               [intersection_point_1],
+                                      projections=[intersection_point_1@HPP]
+                                     )
+        current_obj.add_solution_step(f'1 - other projection',
+                               [intersection_point_1],
+                                      projections=[intersection_point_1@VPP]
+                                     )
+
+        current_obj.add_solution_step(f'2 - horizontal projection - where visible projection of edge plane is pierced by line',
                                [intersection_point_2],
                                       projections=[intersection_point_2@HPP]
                                      )
+        current_obj.add_solution_step(f'2 - other projection',
+                               [intersection_point_2],
+                                      projections=[intersection_point_2@VPP]
+                                     )
+        current_obj.add_solution_step(f'Edge between base plane and auxiliary plane - vertical projection',
+                               [edge_line],
+                                      projections=[edge_line@VPP])
         
         
         intersection_ABO_DE=base_plane.intersection(line_d)[0]('P')
