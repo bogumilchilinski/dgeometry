@@ -809,7 +809,7 @@ class LineAndPlaneIntersection(GeometricalCase):
         super().__init__()
 
         if point_A and point_B and point_O and point_D and point_E:
-            elems=[Plane(point_A, point_B, point_O),point_A, point_B, point_O, Line(point_D,point_E), point_D,point_E]
+            elems=[Plane(point_A, point_B, point_O)('$\\alpha$'),point_A, point_B, point_O, Line(point_D,point_E)('d'), point_D,point_E]
             
             self._given_data={'A':point_A,'B':point_B,'O':point_A,'D':point_D,'E':point_E}
         else:
@@ -847,14 +847,13 @@ class LineAndPlaneIntersection(GeometricalCase):
 
         
 
-        base_plane=Plane(A,B,O)('base')
+        base_plane=Plane(A,B,O)('$\alpha$')
         line_a=Line(A,B)('a')
         line_b=Line(B,O)('b')
 
-        line_d=Line(D,E)
+        line_d=Line(D,E)('d')
         
         aux_plane = Plane(D,E,0.5*(D+E) +Point(0,0,3) )('$\gamma$')
-        edge_line=aux_plane.intersection(base_plane)[0]
         
         current_obj.add_solution_step(f'Auxiliary plane',
                                [aux_plane],
@@ -869,7 +868,7 @@ class LineAndPlaneIntersection(GeometricalCase):
         # solution description for 1 point obtaining
 
         
-        intersection_point_2=aux_plane.intersection(line_b)[0]
+        intersection_point_2=aux_plane.intersection(line_b)[0]('2')
         edge_line=Line(intersection_point_1,intersection_point_2)('k')
 
         current_obj.add_solution_step(f'Edge between base plane and auxiliary plane - horizontal projection',
