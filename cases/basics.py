@@ -13,7 +13,7 @@ import base64
 import random
 import IPython as IP
 import numpy as np
-from sympy import Symbol, symbols
+from sympy import Symbol, 
 import copy
 
 
