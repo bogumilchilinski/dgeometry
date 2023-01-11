@@ -816,20 +816,12 @@ class LineAndPlaneIntersection(GeometricalCase):
             elems=[]
             self._given_data={}
 
-        
-
-
-
-
-
         self.point_A=point_A
         self.point_B=point_B
         self.point_O=point_O
         self.point_D=point_D
         self.point_E=point_E
 
-
-        
         
         self.add_solution_step('Assumptions',
                                elems)
