@@ -679,7 +679,7 @@ class SleeveSketch(ShaftSketch
         
         steps = cls.steps_no
         holes = cls.holes_no
-        
+
 
 
         shafts =  []
@@ -691,9 +691,9 @@ class SleeveSketch(ShaftSketch
                                       6,
                                   ],
                                   step_modificator=step_mod_inc_chamfer,origin=0) 
-            
+
             d_end=shaft[-1].diameter
-            
+
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   initial_diameter=[d_end+8, d_end+10 ],
                                   increase_values=[
@@ -702,7 +702,7 @@ class SleeveSketch(ShaftSketch
                                       -6,
                                   ],
                                   step_modificator=step_mod_dec_chamfer,origin = shaft[-1].end)
-            
+
             shaft +=create_random_profile(holes['max'],holes['min'],
                                        initial_diameter=[25, 30],
                                        increase_values=[
@@ -713,19 +713,19 @@ class SleeveSketch(ShaftSketch
                                        step_lengths=[62, 65],
                                        step_type=sol.Hole,origin=0)
 
-            
+
             shafts.append(shaft)
         return shafts
 
-    
+
 class SimpleSleeveSketch(SleeveSketch
                    #GeometricalCase
                    ):
 
     steps_no = {'max': 2, 'min': 0}
     holes_no = {'max': 2, 'min': 1}
-    
-    
+
+
 class SleeveWithThreadsSketch(ShaftSketch
                               #GeometricalCase
                               ):
@@ -734,10 +734,10 @@ class SleeveWithThreadsSketch(ShaftSketch
 
     @classmethod
     def _structure_generator(cls):
-        
+
         steps = cls.steps_no
         holes = cls.holes_no
-        
+
         shafts  = []
         for i in range(50):
             shaft = create_random_profile(steps['max'],steps['min'],
@@ -764,10 +764,15 @@ class SleeveWithThreadsSketch(ShaftSketch
                                   step_lengths=[62, 65],
                                   step_modificator=step_mod_dec_hole_chamfer,
                                   step_type=sol.Hole, origin=0)
-            
+
             shafts.append(shaft)
         return shafts
 
+class SimpleSleeveWithThreadsSketch(SleeveWithThreadsSketch):
+
+    steps_no = {'max': 2, 'min': 0}
+    holes_no = {'max': 2, 'min': 1}
+    
 class SleeveWithFlangeSketch(ShaftSketch
                               #GeometricalCase
                               ):
@@ -776,10 +781,10 @@ class SleeveWithFlangeSketch(ShaftSketch
 
     @classmethod
     def _structure_generator(cls):
-        
+
         steps = cls.steps_no
         holes = cls.holes_no
-        
+
         shafts  = []
         for i in range(50):
             shaft = create_random_profile(steps['max'],steps['min'],
@@ -810,7 +815,11 @@ class SleeveWithFlangeSketch(ShaftSketch
             
             shafts.append(shaft)
         return shafts
-    
+
+class SimpleSleeveWithFlangeSketch(SleeveWithFlangeSketch):
+
+    steps_no = {'max': 2, 'min': 0}
+    holes_no = {'max': 2, 'min': 1}
     
 class SleeveWithThreadedHoleSketch(ShaftSketch
                                    #GeometricalCase
