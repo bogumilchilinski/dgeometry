@@ -315,6 +315,7 @@ class FrontalLineOnPlane(GeometricalCase):
             Symbol('O'): [Point(5,4,7),Point(4,8,2),],
         }
         return default_data_dict
+    
 class HorizontalLineOnPlane(GeometricalCase):
     
     def __init__(self,point_A=None,point_B=None,point_O=None,**kwargs):
@@ -1214,8 +1215,10 @@ class LinePerpendicularToPlaneIntersection(GeometricalCase):
             projections=(point_A@HPP,point_B@HPP,Line(point_A@HPP,point_O@HPP),Line(point_A@VPP,point_O@VPP),
                          Line(point_B@HPP,point_O@HPP),Line(point_B@VPP,point_O@VPP),point_A@VPP,point_B@VPP,
                          point_O@HPP,point_O@VPP,point_D@HPP,point_D@VPP)
+            elems=[Plane(point_A, point_B, point_O)('$\\alpha$'),point_A, point_B, point_O, point_D]
         else:
             projections=[]
+            elems=[]
 
         self._assumptions=DrawingSet(*projections)
 
@@ -1231,7 +1234,10 @@ class LinePerpendicularToPlaneIntersection(GeometricalCase):
 
         self._given_data={'A':point_A,'B':point_B,'O':point_A,'D':point_D}
         
-        self._solution_step.append(self._assumptions)
+        
+        
+        self.add_solution_step('Assumptions',
+                       elems)
 
         
     def _solution(self):

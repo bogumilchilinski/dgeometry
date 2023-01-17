@@ -450,14 +450,15 @@ class SquarePrism(GeometricalCase):
 
         super().__init__()
 
-        if point_A and point_O and point_P and point_K:
-            projections = (point_A @ HPP, point_O @ HPP, point_O @ VPP,
-                           point_P @ VPP, point_P @ HPP, point_A @ VPP,
-                           point_K @ VPP, point_K @ HPP)
+        if point_A and point_P and point_O and point_K:
+            elems=[point_A, point_P, point_O, point_K]
+            
+            self._given_data={'A':point_A,'P':point_P,'O':point_O,'K':point_K}
         else:
-            projections = []
+            elems=[]
+            self._given_data={}
 
-        self._assumptions = DrawingSet(*projections)
+#         self._assumptions = DrawingSet(*projections)
 
         self.point_A = point_A
         self.point_P = point_P
@@ -471,8 +472,7 @@ class SquarePrism(GeometricalCase):
             'K': point_K
         }
 
-        self._solution_step.append(self._assumptions)
-
+        self.add_solution_step('Assumptions',elems)
     def _solution(self):
         current_obj = copy.deepcopy(self)
 
@@ -534,11 +534,7 @@ class SquarePrism(GeometricalCase):
         #             elems += [I_o]
         #             projections+=[I_o@HPP,I_o@VPP]
 
-        current_obj.A0 = A.rotate_about(axis=line_k)('A_0')
-        current_obj.B0 = B.rotate_about(axis=line_k)('B_0')
-        current_obj.C0 = C.rotate_about(axis=line_k)('C_0')
-        current_obj.D0 = D.rotate_about(axis=line_k)('D_0')
-        current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+
 
         line_kk = Line(P, S_I)('k')
 
@@ -552,7 +548,13 @@ class SquarePrism(GeometricalCase):
         current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
         current_obj.point_D_0 = D.rotate_about(axis=line_k)('D_0')        
         current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')    
-    
+
+        current_obj.A0 = current_obj.point_A_0
+        current_obj.B0 = current_obj.point_B_0
+        current_obj.C0 = current_obj.point_C_0
+        current_obj.D0 = current_obj.point_D_0
+        current_obj.O0 = current_obj.point_O_0
+        
         #plane_beta=Plane(H,H+(B-A),H-(C-A))
         #         plane_beta=Plane(K,K+(A-P),K-(O-P))
         #         E=(A@plane_beta)('E')

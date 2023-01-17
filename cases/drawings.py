@@ -1498,8 +1498,8 @@ class BodyBlockView(ShaftSketch
                                        sol.BodyBlockShapeT,
                                        sol.HeavyBodyBlockShapeT,
                                        sol.MediumBodyBlockShapeT,
-                                       sol.BodyBlockShapeC,
-                                       sol.BodyBlockCutType,
+                                       #sol.BodyBlockShapeC,
+                                       #sol.BodyBlockCutType,
                                       ])
             
             shaft = [body_type(body_height,body_length,body_width,axis_pos)]
