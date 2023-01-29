@@ -20,6 +20,10 @@ import itertools as it
 from ..dgeometry import *
 
 
+
+
+
+
 class TriangularPrism(GeometricalCase):
 
     point_A = [
@@ -170,6 +174,8 @@ class TriangularPrism(GeometricalCase):
         }
         return default_data_dict
 
+
+    
 
 
 class EquilateralTrianglePrism(GeometricalCase):
@@ -420,6 +426,63 @@ class EquilateralTrianglePrism(GeometricalCase):
 
         return doc_model
 
+## START –> odtąd KOPIOWAĆ
+class EquilateralTrianglePrism(EquilateralTrianglePrism):
+
+    def _solution(self):
+        current_obj = copy.deepcopy(self)
+
+        A = current_obj.point_A
+        O = current_obj.point_O
+        P = current_obj.point_P
+
+        H = current_obj.point_H
+
+
+        current_obj.point_A_0 = A0
+        current_obj.point_B_0 = B0
+        current_obj.point_C_0 = C0
+
+
+        G = (H @ plane_alpha)('G')
+
+        ############  upper  base
+
+        dirHG = H - G
+        distance_HG = (H.distance(G)).n(5)
+
+
+
+        A, B, C, D, E, F = Prism(triangle_plane,
+                                 dirHG)
+
+        current_obj.add_solution_step('Vertices D,E,F', [D, E, F])
+
+        elems += [D, E, F, G]
+
+        projections += [
+            G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
+            F @ VPP
+        ]
+
+        current_obj._assumptions = DrawingSet(
+            *current_obj.get_projections())('Solution')
+        current_obj._assumptions3d = DrawingSet(*current_obj)
+
+        current_obj.point_B = B
+        current_obj.point_C = C
+        current_obj.point_D = D
+        current_obj.point_E = E
+        current_obj.point_F = F
+
+
+        return current_obj
+    
+## KONIEC –> dotąd KOPIOWAĆ
+
+
+
+
 class SquarePrism(GeometricalCase):
 
     point_A = [
@@ -489,7 +552,7 @@ class SquarePrism(GeometricalCase):
         #square_side =  square_diagonal / (((3)**(1/2))/2)
         print(square_diagonal)
         B = (S + dirPS / (P.distance(S)) * (square_diagonal / 2))('B')
-        D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
+        D = (S - dirPS / (P.distance(S)) * s(square_diagonal / 2))('D')
         C = (A + 2 * dirAS)('C')
 
         #         line_AD=A^D

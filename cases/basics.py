@@ -900,6 +900,8 @@ class LineAndPlaneIntersection(GeometricalCase):
                                [P])
 
         # to remove
+        current_obj.point_P1 =  intersection_point_1
+        current_obj.point_P2 =  intersection_point_2
         current_obj.point_P=P
 
 
