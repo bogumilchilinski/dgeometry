@@ -1077,8 +1077,9 @@ class Plate(Cylinder):
 class Hole(Solid):
     """This object represents hole that can be made inside solid.
     
-    The hole object has predefined numbers of lines and dimensions that are needed to make a engineering 
-    drawing in view, section and half-section. It also stores information about height and diameter.
+    The hole object has predefined numbers of lines and dimensions that are needed 
+    to make a engineering drawing in view, section and half-section.It also stores 
+    information about height and diameter.
     
     Parameters
     ==========
@@ -1639,7 +1640,9 @@ class ChamferedOpenHoleWithKeyway(ChamferedHole):
 class ChamferedCylinder(Solid):
     """This object represents chamfered cylinder solid.
     
-    The chamfered cylinder object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height, diameter, chamfer length, angle and position.
+    The chamfered cylinder object has predefined numbers of lines and dimensions 
+    that are needed to make a engineering drawing in view, section and half-section. 
+    It also stores information about height, diameter, chamfer length, angle and position.
     
     Parameters
     ==========
@@ -3375,7 +3378,9 @@ class ThreadOfScrew(Thread):
 class BodyBlock(Solid):
     """This object represents cylinder solid.
     
-    The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
+    The cylinder object has predefined numbers of lines and dimensions that 
+    are needed make a engineering drawing. Also it stores information about 
+    height and diameter.
     
     Parameters
     ==========
