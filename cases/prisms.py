@@ -18,7 +18,7 @@ import copy
 
 import itertools as it
 from ..dgeometry import *
-
+from .shapes import *
 
 
 
@@ -429,6 +429,10 @@ class EquilateralTrianglePrism(GeometricalCase):
 ## START –> odtąd KOPIOWAĆ
 class EquilateralTrianglePrism(EquilateralTrianglePrism):
 
+    @propert
+    def base_generating_class:
+        return EquilateralTriangleOnPlane
+    
     def _solution(self):
         current_obj = copy.deepcopy(self)
 
@@ -438,11 +442,21 @@ class EquilateralTrianglePrism(EquilateralTrianglePrism):
 
         H = current_obj.point_H
 
+        # PASTE –> odtąd KOPIOWAĆ
+        # ALWAYS (A,O,P)
+        plane_alpha = Plane(A,O,P)
+        base = self.base_generating_class(A,O,P)
+        
 
-        current_obj.point_A_0 = A0
-        current_obj.point_B_0 = B0
-        current_obj.point_C_0 = C0
+        current_obj.point_A_0 = base.point_A_0
+        current_obj.point_B_0 = base.point_B_0
+        current_obj.point_C_0 = base.point_C_0
 
+        current_obj.point_A = base.point_A
+        current_obj.point_B = base.point_B
+        current_obj.point_C = base.point_C
+        
+        
 
         G = (H @ plane_alpha)('G')
 
@@ -482,6 +496,25 @@ class EquilateralTrianglePrism(EquilateralTrianglePrism):
 
 
 
+## START –> odtąd KOPIOWAĆ
+class SquarePrism(EquilateralTrianglePrism):
+
+    @propert
+    def base_generating_class:
+        return SquareOnPlane
+    
+
+    
+## KONIEC –> dotąd KOPIOWAĆ
+
+
+## PONIZEJ KOPIE
+
+
+
+
+
+#_____________________
 
 class SquarePrism(GeometricalCase):
 
