@@ -824,8 +824,7 @@ class LineAndPlaneIntersection(GeometricalCase):
         self.point_E=point_E
 
         
-        self.add_solution_step('Assumptions',
-                               elems)
+        self.add_solution_step('Assumptions for Line And Plane Intersection',elems)
 
         
     def _solution(self):

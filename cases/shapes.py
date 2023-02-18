@@ -38,6 +38,12 @@ class ShapeOnPlane(GeometricalCase):
         Point(x, y, z) for x in [1, 1.5, 2, 2.5] for y in [2, 2.5, 3, 3.5]
         for z in [1, 1.5, 2, 2.5]
     ]
+    
+    shift = [
+        Point(x, y, z) for x in [0] for y in [0]
+        for z in [0]
+    ]
+    
 
     def __init__(self, point_A=None, point_P=None, point_O=None, **kwargs):
 
@@ -57,9 +63,9 @@ class ShapeOnPlane(GeometricalCase):
 
         self._assumptions = DrawingSet(*projections)
 
-        self._point_A = point_A
-        self._point_P = point_P
-        self._point_O = point_O
+        self.point_A = point_A
+        self.point_P = point_P
+        self.point_O = point_O
 
         self.add_solution_step(f'''Assumptions''', [point_A, point_P, point_O])
 
@@ -175,14 +181,35 @@ class ShapeOnPlane(GeometricalCase):
         point_A = self.__class__.point_A
         point_O = self.__class__.point_O
         point_P = self.__class__.point_P
+        shift = self.__class__.shift
 
         default_data_dict = {
             Symbol('A'): point_A,
             Symbol('P'): point_P,
             Symbol('O'): point_O,
+            'shift': shift,
         }
         return default_data_dict
 
+    
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        #point_H = parameters_dict[Symbol('H')]
+        point_O = parameters_dict[Symbol('O')]
+        point_A = parameters_dict[Symbol('A')]
+        point_P = parameters_dict[Symbol('P')]
+
+        shift = parameters_dict['shift']
+        parameters_dict.pop('shift')
+
+        for point in symbols('A P O'):
+            parameters_dict[point] = parameters_dict[point] + shift
+
+        return parameters_dict
+    
+    
 class Shape(GeometricalCase):
 
     point_A = [
@@ -297,59 +324,6 @@ class Shape(GeometricalCase):
 
         return A, B, C, Z
 
-#     def _solution(self):
-
-#         current_obj = copy.deepcopy(self)
-
-#         A = current_obj._point_A
-#         O = current_obj._point_O
-#         P = current_obj._point_P
-
-#         plane_alpha = Plane(A, O, P)
-
-#         plane_beta = HorizontalPlane(P)
-#         plane_eta = VerticalPlane(P)
-
-#         line_k = plane_alpha.intersection(plane_beta)[0]('a')
-
-#         point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-#         current_obj.P1 = point_P1
-#         line_kk = (P ^ point_P1)('a')
-
-#         point_P2 = plane_eta.intersection(A ^ O)[0]('2')
-
-#         line_f = (P ^ point_P2)('f')
-
-#         current_obj.add_solution_step(
-#             f'''Axis of rotation - it is common part between given plane $\\alpha({A._label},{O._label},{P._label})$  and horizontal plane $\\gamma$ which contains point {P._label}''',
-#             [point_P2, (P ^ point_P2)('f')])
-
-#         point_O = O
-
-#         line_k = Line(P, (O @ line_k))('k')
-#         current_obj._axis = line_k
-#         current_obj._hor_plane = plane_beta
-
-#         A0, O0, P0 = current_obj._rotation_of_given_plane()
-
-#         current_obj.A0 = A0
-#         current_obj.P0 = P0
-#         current_obj.O0 = O0
-
-#         #### Step 4 ####
-#         ### postion of B0 (based on triangle geometry) #####
-
-#         for base_point in current_obj._rotation_of_base():
-
-#             shape_unrotation_case = UnrotatedPoint(base_point, (P ^ O)('PO'),
-#                                                    axis=line_k)
-#             current_obj._append_case(shape_unrotation_case)
-
-#         current_obj._shape_points()
-
-#         print(list(current_obj))
-
-#         return current_obj
 
     def get_default_data(self):
 
@@ -453,6 +427,21 @@ class Shape(GeometricalCase):
 
 class EquilateralTriangleOnPlane(ShapeOnPlane):
 
+    point_A = [
+        Point(x, y, z) for x in [8] for y in [5, 5.5, 6, 6.5]
+        for z in [8]
+    ]
+
+    point_O = [
+        Point(x, y, z) for x in [5, 5.5, 6, 6.5] for y in [8, 8.5, 9, 9.5, 10]
+        for z in [4, 4.5, 5, 5.5]
+    ]
+
+    point_P = [
+        Point(x, y, z) for x in [1, 1.5, 2, 2.5] for y in [2, 2.5, 3, 3.5]
+        for z in [1, 1.5, 2, 2.5]]
+    
+    
     def _solution(self):
         current_obj = copy.deepcopy(self)
 
@@ -495,7 +484,10 @@ class EquilateralTriangleOnPlane(ShapeOnPlane):
         #it sets the step elements
         current_obj.add_solution_step('Axis of rotation',
                                       [(A ^ point_P1)('AO'), point_P1,
-                                       (P ^ point_P1)('a'), point_P2, line_f])
+                                       (P ^ point_P1)('a'), 
+                                       point_P2,
+                                       #line_f,
+                                      ])
 
         elems = self._assumptions
         projections = []
@@ -511,8 +503,10 @@ class EquilateralTriangleOnPlane(ShapeOnPlane):
         line_kk = Line(P, (O @ line_k))('k')
 
         A0 = A.rotate_about(axis=line_k)('A_0')
+        O0 =current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
         current_obj.point_A_0 = A0
         current_obj.add_solution_step('Point A rotation', [A0])
+        current_obj.add_solution_step('Point O rotation', [O0])
         elems = [current_obj.point_A_0]
         projections = [
             current_obj.point_A_0 @ HPP, current_obj.point_A_0 @ VPP
@@ -540,7 +534,7 @@ class EquilateralTriangleOnPlane(ShapeOnPlane):
         ### postion of C0 (based on triangle geometry) #####
 
         #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
-        current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+
 
         current_obj.add_solution_step('Base ABC', [A, B, C])
 
@@ -631,25 +625,41 @@ class SquareOnPlane(ShapeOnPlane):
         return current_obj
 
 
-class IsoscelesRightTriangleOnShape(ShapeOnPlane):
+class IsoscelesRightTriangleOnPlane(ShapeOnPlane):
 
+    point_A = [
+        Point(x, y, z) for x in [8] for y in [5, 5.5, 6, 6.5]
+        for z in [8]
+    ]
+
+    point_O = [
+        Point(x, y, z) for x in [5, 5.5, 6, 6.5] for y in [8, 8.5, 9, 9.5, 10]
+        for z in [4, 4.5, 5, 5.5]
+    ]
+
+    point_P = [
+        Point(x, y, z) for x in [1, 1.5, 2, 2.5] for y in [2, 2.5, 3, 3.5]
+        for z in [1, 1.5, 2, 2.5]]
+    
+    
     def _solution(self):
         current_obj = copy.deepcopy(self)
 
         A = current_obj.point_A
         O = current_obj.point_O
         P = current_obj.point_P
-        
 
         S = (A @ (O ^ P))('S')  #'Srodek' podstawy
 
         dirPS = P - S
         dirOS = O - S
         triangle_height = A.distance(S)
-        #triangle_side =  triangle_height / ((3**(1/2))/2)
+        #triangle_side = triangle_height / ((3**(1 / 2)) / 2)
 
-        B = (S + dirPS / (P.distance(S)) * (triangle_height))('B')
+        B = S('B')
         C = (S - dirPS / (P.distance(S)) * (triangle_height))('C')
+
+        triangle_plane = Plane(A, B, C)
 
         current_set = DrawingSet(*current_obj._solution_step[-1])
 
@@ -658,238 +668,81 @@ class IsoscelesRightTriangleOnShape(ShapeOnPlane):
         plane_alpha = Plane(A, O, P)
 
         plane_beta = HorizontalPlane(P)
+        plane_eta = VerticalPlane(P)
 
         line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
         point_P1 = plane_beta.intersection(A ^ O)[0]('1')
+        point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+        current_obj.P1 = point_P1
         line_kk = (P ^ point_P1)('a')
+        line_f = (P ^ point_P2)('f')
 
-        
-        current_step3d = [(A ^ point_P1)('AO'), point_P1, (P ^ point_P1)('a')]
+        # it creates next step of solution - lines are presented
+        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
 
-        current_obj._solution3d_step.append(
-            DrawingSet(*current_step3d)('Step 1 - axis of rotation'))
-        current_obj._solution_step.append(
-            DrawingSet(
-                *([obj @ HPP for obj in current_step3d] +
-                  [obj @ VPP
-                   for obj in current_step3d]))('Step 1 - axis of rotation'))
+        #it sets the step elements
+        current_obj.add_solution_step('Axis of rotation',
+                                      [(A ^ point_P1)('AO'), point_P1,
+                                       (P ^ point_P1)('a'), 
+                                       point_P2,
+                                       #line_f,
+                                      ])
 
         elems = self._assumptions
         projections = []
         point_0_dict = {}
         eps_dict = {}
 
+        point_B = B
+        point_C = C
+        point_O = O
 
+        ##################   plane rotation
 
+        line_kk = Line(P, (O @ line_k))('k')
 
-        current_obj.point_A_0 = A.rotate_about(axis=line_k)('A_0')
-        current_obj.point_B_0 = B.rotate_about(axis=line_k)('B_0')
-        current_obj.point_C_0 = C.rotate_about(axis=line_k)('C_0')
-
-        current_obj.point_O_0 = O.rotate_about(axis=line_k)('O_0')
-        
-        current_obj.A0 = current_obj.point_A_0
-        current_obj.B0 = current_obj.point_B_0
-        current_obj.C0 = current_obj.point_C_0
-        current_obj.O0 = current_obj.point_O_0
-
-        A0 = current_obj.A0
-        O0 = current_obj.O0
-
-        
-        ##IS THIS NECCESSARY???
-        eps_dict['A'] = A
-        eps_dict['O'] = O
-        print(eps_dict)
-        current_step3d = [eps_dict['A'], eps_dict['O']]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(
-                *current_step3d)('Step 2 - planes of rotation for A and O'))
-        current_obj._solution_step.append(
-            DrawingSet(*([obj @ HPP for obj in current_step3d] +
-                         [obj @ VPP for obj in current_step3d]
-                         ))('Step 2 - planes of rotation for A and O'))
-
-        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[A0,O0]
-        current_step3d = [A0, O0]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(*current_step3d)('Step 3 - rotated A0 and O0'))
-        current_obj._solution_step.append(
-            DrawingSet(
-                *([obj @ HPP for obj in current_step3d] +
-                  [obj @ VPP
-                   for obj in current_step3d]))('Step 3 - rotated A0 and O0'))
-
-        current_step3d = [(P ^ O0)('PO0')]
-        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(P^O0)('PO0')]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(*current_step3d)('Step 4 - P0O0 line'))
-        current_obj._solution_step.append(
-            DrawingSet(*([obj @ HPP for obj in current_step3d] +
-                         [obj @ VPP
-                          for obj in current_step3d]))('Step 4 - P0O0 line'))
-
-        B0 = current_obj.B0
-        C0 = current_obj.C0
-
-        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[B0,C0]
-        current_step3d = [B0, C0]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(
-                *current_step3d)('Step 5 - triangle vertices B0 and C0'))
-        current_obj._solution_step.append(
-            DrawingSet(*([obj @ HPP for obj in current_step3d] +
-                         [obj @ VPP for obj in current_step3d]
-                         ))('Step 5 - triangle vertices B0 and C0'))
-
-        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[eps_dict['B'],eps_dict['C']]
-        eps_dict['B'] = B
-        eps_dict['C'] = C
-        current_step3d = [eps_dict['B'], eps_dict['C']]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(
-                *current_step3d)('Step 6 - planes of rotation for B and C'))
-        current_obj._solution_step.append(
-            DrawingSet(*([obj @ HPP for obj in current_step3d] +
-                         [obj @ VPP for obj in current_step3d]
-                         ))('Step 6 - planes of rotation for B and C'))
-
-        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[C,B]
-        current_step3d = [C, B]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(*current_step3d)('Step 7 - triangle vertices B and C'))
-        current_obj._solution_step.append(
-            DrawingSet(*([obj @ HPP for obj in current_step3d] +
-                         [obj @ VPP for obj in current_step3d]
-                         ))('Step 7 - triangle vertices B and C'))
-
-        plane_beta = Plane(H, H + (A - P), H - (O - P))
-
-        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[((H+(A-P))^H)('e'),(H+(O-P)^H)('f')]
-        current_step3d = [((H + (A - P)) ^ H)('e'), (H + (O - P) ^ H)('f')]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(*current_step3d)('Step 8 - parallel plane'))
-        current_obj._solution_step.append(
-            DrawingSet(
-                *([obj @ HPP for obj in current_step3d] +
-                  [obj @ VPP
-                   for obj in current_step3d]))('Step 8 - parallel plane'))
-
-        #         D=(A@plane_beta)('D')
-        #         E=(B@plane_beta)('E')
-        #         F=(C@plane_beta)('F')
-
-        triangle_plane = Plane(A, B, C)
-
-        A, B, C, D, E, F = Prism.right_from_parallel_plane(triangle_plane, H)
-
-        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(B^E)('n')]
-        current_step3d = [(B ^ E)('n')]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(
-                *current_step3d)('Step 9 - perpendicular line (prism height)'))
-        current_obj._solution_step.append(
-            DrawingSet(*([obj @ HPP for obj in current_step3d] +
-                         [obj @ VPP for obj in current_step3d]
-                         ))('Step 9 - perpendicular line (prism height)'))
-
-        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[D,E,F]
-        current_step3d = [D, E, F]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(*current_step3d)('Step 10 - prims vertices'))
-        current_obj._solution_step.append(
-            DrawingSet(
-                *([obj @ HPP for obj in current_step3d] +
-                  [obj @ VPP
-                   for obj in current_step3d]))('Step 10 - prims vertices'))
-
-        line_ad = Line(A, D)('a')
-        line_be = Line(B, E)('b')
-        line_cf = Line(C, F)('c')
-
-        #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[line_ad,line_be,line_cf,(A^B)('_'),(B^C)('_'),(A^C)('_'), (D^E)('_'),(E^F)('_'),(F^D)('_')]
-        current_step3d = [
-            line_ad, line_be, line_cf, (A ^ B)('_'), (B ^ C)('_'),
-            (A ^ C)('_'), (D ^ E)('_'), (E ^ F)('_'), (F ^ D)('_')
-        ]
-
-        current_obj._solution3d_step.append(
-            DrawingSet(*current_step3d)('Step 11 - solid'))
-        current_obj._solution_step.append(
-            DrawingSet(*([obj @ HPP for obj in current_step3d] +
-                         [obj @ VPP
-                          for obj in current_step3d]))('Step 11 - solid'))
-
-        elems += [D, E, F, plane_alpha, line_ad, line_be, line_cf]
-
-        projections += [
-            line_ad @ HPP,
-            line_ad @ VPP,
-            line_be @ HPP,
-            line_be @ VPP,
-            line_cf @ HPP,
-            line_cf @ VPP,
-            D @ HPP,
-            D @ VPP,
-            E @ HPP,
-            E @ VPP,
-            F @ HPP,
-            F @ VPP,
-        ]
-
-        #print(point_0_dict)
-        elems += [
-            line_a,
-            line_b,  #,E,F,G,H,line_s1,line_s2,line_s3,line_s4
-        ]
-
-        projections += [
-            current_obj.A0 @ HPP,
-            current_obj.A0 @ VPP,
-            current_obj.B0 @ HPP,
-            current_obj.B0 @ VPP,
-            current_obj.C0 @ HPP,
-            current_obj.C0 @ VPP,
-            B @ HPP,
-            B @ VPP,
-            C @ HPP,
-            C @ VPP,
-            line_a @ HPP,
-            line_a @ VPP,
-            line_b @ HPP,
-            line_b @ VPP,
-            line_kk @ HPP,
-            line_kk
-            @ VPP,  #line_s1@HPP,line_s1@VPP,line_s2@HPP,line_s2@VPP,line_s3@HPP,line_s3@VPP,
-            #line_s4@HPP,line_s4@VPP
+        A0 = A.rotate_about(axis=line_k)('A_0')
+        O0 =current_obj.O0 = O.rotate_about(axis=line_k)('O_0')
+        current_obj.point_A_0 = A0
+        current_obj.add_solution_step('Point A rotation', [A0])
+        current_obj.add_solution_step('Point O rotation', [O0])
+        elems = [current_obj.point_A_0]
+        projections = [
+            current_obj.point_A_0 @ HPP, current_obj.point_A_0 @ VPP
         ]
         current_set += [*elems, *projections]
+        ### Step 2 #####
+        ###  plane of rotation of A ####
 
-        current_obj._solution_step.append(current_set)
-        current_obj._assumptions = DrawingSet(*elems, *projections)
+        #### Step 3 ####
+        ### rotated point A0 of A #####
+
+        B0 = B.rotate_about(axis=line_k)('B_0')
+        current_obj.point_B_0 = B0
+
+        current_obj.add_solution_step('Point B rotation', [B0])
+
+        #### Step 4 ####
+        ### postion of B0 (based on triangle geometry) #####
+
+        C0 = C.rotate_about(axis=line_k)('C_0')
+        current_obj.point_C_0 = C0
+        current_obj.add_solution_step('Point C rotation', [C0])
+
+        #### Step 5 ####
+        ### postion of C0 (based on triangle geometry) #####
+
+        #current_obj.D0=D.rotate_about(axis=line_k)('D_0')
+
+
+        current_obj.add_solution_step('Base ABC', [A, B, C])
+
         current_obj.point_B = B
         current_obj.point_C = C
-        current_obj.point_D = D
-        current_obj.point_E = E
-        current_obj.point_F = F
-
-        current_obj.add_solution_step('', [
-            current_obj.point_B, current_obj.point_D, current_obj.point_E,
-            current_obj.point_F
-        ])
 
         return current_obj
-
+    
 
 class Triangular(Shape):
 

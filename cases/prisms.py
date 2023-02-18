@@ -20,6 +20,7 @@ import itertools as it
 from ..dgeometry import *
 from .shapes import *
 
+from .basics import LineAndPlaneIntersection
 
 
 
@@ -46,6 +47,13 @@ class TriangularPrism(GeometricalCase):
         for z in range(6, 9)
     ]
 
+    
+    shift = [
+        Point(x, y, z) for x in [0] for y in [0]
+        for z in [0]
+    ]
+    
+    
     def __init__(self,
                  point_A=None,
                  point_B=None,
@@ -55,27 +63,14 @@ class TriangularPrism(GeometricalCase):
 
         super().__init__()
 
-        if point_A and point_B and point_C and point_O:
-            projections = (
-                point_A @ HPP,
-                point_B @ HPP,
-                point_C @ HPP,
-                point_O @ HPP,
-                point_A @ VPP,
-                point_B @ VPP,
-                point_C @ VPP,
-                point_O @ VPP,
-                #Plane(point_A@HPP,point_B@HPP,point_C@HPP),Plane(point_A@VPP,point_B@VPP,point_C@VPP),
-            )
-        else:
-            projections = []
 
-        self._assumptions = DrawingSet(*projections)
 
-        self._point_A = point_A
-        self._point_B = point_B
-        self._point_C = point_C
-        self._point_O = point_O
+        #self._assumptions = DrawingSet(*projections)
+
+        self.point_A = point_A
+        self.point_B = point_B
+        self.point_C = point_C
+        self.point_O = point_O
 
         self._given_data = {
             'A': point_A,
@@ -84,7 +79,7 @@ class TriangularPrism(GeometricalCase):
             'O': point_O,
         }
 
-        self._solution_step.append(self._assumptions)
+
         self.add_solution_step('Assumptions',
                         [point_A, point_B, point_C, point_O])
 
@@ -102,60 +97,79 @@ class TriangularPrism(GeometricalCase):
     def _solution(self):
         current_obj = copy.deepcopy(self)
 
-        A = current_obj._point_A
-        B = current_obj._point_B
-        C = current_obj._point_C
-        O = current_obj._point_O
+        A = current_obj.point_A
+        B = current_obj.point_B
+        C = current_obj.point_C
+        O = current_obj.point_O
 
-        current_set = DrawingSet(*current_obj._solution_step[-1])
+
 
         plane_alpha = Plane(A, B, C)
 
-        #         plane_beta=Plane(O,O+(B-A),O-(C-A))
-        #         D=(A@plane_beta)('D')
-        #         E=(B@plane_beta)('E')
-        #         F=(C@plane_beta)('F')
-        #         plane_gamma=Plane(D,E,F)
 
-        triangle_plane = Plane(A, B, C)
-        A, B, C, D, E, F = Prism.right_from_parallel_plane(triangle_plane, O)
+
+        plane_beta = HorizontalPlane(B)
+        plane_eta = VerticalPlane(B)
+
+
+        point_P1 = plane_beta.intersection(A ^ C)[0]('1')
+        current_obj.P1 = point_P1
+        line_h = (B ^ point_P1)('h')
+
+        point_P2 = plane_eta.intersection(A ^ C)[0]('2')
+
+        line_f = (B ^ point_P2)('f')
+
+        beta_p1 = O-(point_P1-B)
+        beta_p0 = O
+        beta_p2 = O-(point_P2-B)
+
+        plane_beta=Plane(beta_p0,beta_p1,beta_p2)
+        
+        
+        #minus controls position (side) of parallel plane
+        current_obj.add_solution_step('Parallel plane',[Line(beta_p0,beta_p1)('e') , Line(beta_p0,beta_p2)('f') ])
+        
+        D=(A@plane_beta)('D')
+        E=(B@plane_beta)('E')
+        F=(C@plane_beta)('F')
+        
+        #aux_point = A+(D-A)*2
+        
+        aux_point = D
+        
+        
+        height_A = Line(A,aux_point)('hA')
+        current_obj.add_solution_step('Perpendicular line - height',[height_A])
+        
         plane_gamma=Plane(D,E,F)
+
+        
+        intersec_case  = LineAndPlaneIntersection(beta_p1,beta_p0,beta_p2 , A,aux_point ).solution()
+        current_obj._append_case(intersec_case)
+        
+        # triangle_plane = Plane(A, B, C)
+        # A, B, C, D, E, F = Prism.right_from_parallel_plane(triangle_plane, O)
+        # plane_gamma=Plane(D,E,F)
 
         line_ad = Line(A, D)('a')
         line_be = Line(B, E)('b')
         line_cf = Line(C, F)('c')
 
-        elems = [D, E, F, plane_alpha, plane_gamma, line_ad, line_be, line_cf]
 
-        projections = [
-            line_ad @ HPP,
-            line_ad @ VPP,
-            line_be @ HPP,
-            line_be @ VPP,
-            line_cf @ HPP,
-            line_cf @ VPP,
-            D @ HPP,
-            D @ VPP,
-            E @ HPP,
-            E @ VPP,
-            F @ HPP,
-            F @ VPP,
-        ]
 
-        current_set += [*elems, *projections]
 
-        current_obj._solution_step.append(current_set)
+
         current_obj.point_D = D
         current_obj.point_E = E
         current_obj.point_F = F
-        current_obj._assumptions = DrawingSet(
-            *current_obj.get_projections())('Solution')
-        current_obj._assumptions3d = DrawingSet(*current_obj)
-        current_obj.add_solution_step('Vertices',
-                        [D,E,F])
 
-        current_obj += DrawingSet(*[D,E,F])
-        current_obj._assumptions  = DrawingSet(*[A,B,C,D,E,F])
+        
+        current_obj.add_solution_step('Vertices',
+                        [D,E,F,plane_gamma])
+
+        current_obj.add_solution_step('Prism',
+                        [plane_alpha,plane_gamma,line_ad,line_be,line_cf])
         
         return current_obj
 
@@ -207,6 +221,11 @@ class EquilateralTrianglePrism(GeometricalCase):
     point_H = [
         Point(x, y, z) for x in range(7, 9) for y in [3, 3.5]
         for z in range(9, 11)
+    ]
+    
+    shift = [
+        Point(x, y, z) for x in [0] for y in [0]
+        for z in [0]
     ]
 
     def __init__(self,
@@ -383,54 +402,64 @@ class EquilateralTrianglePrism(GeometricalCase):
         point_O = self.__class__.point_O
         point_P = self.__class__.point_P
         point_H = self.__class__.point_H
+        shift = self.__class__.shift
 
         default_data_dict = {
             Symbol('A'): point_A,
             Symbol('P'): point_P,
             Symbol('O'): point_O,
             Symbol('H'): point_H,
+            'shift':shift,
         }
         return default_data_dict
-    def present_solution(self):
 
-        doc_model = Document(f'{self.__class__.__name__} solution')
+    
+    def get_random_parameters(self):
 
-        doc_model.packages.append(Package('booktabs'))
-        doc_model.packages.append(Package('float'))
-        doc_model.packages.append(Package('standalone'))
-        doc_model.packages.append(Package('siunitx'))
+        parameters_dict = super().get_random_parameters()
 
-        #ReportText.set_container(doc_model)
-        #ReportText.set_directory('./SDAresults')
+        point_H = parameters_dict[Symbol('H')]
+        point_O = parameters_dict[Symbol('O')]
+        point_A = parameters_dict[Symbol('A')]
+        point_P = parameters_dict[Symbol('P')]
 
-        for no, step3d in enumerate(self._solution3d_step):
-            GeometryScene()
+        shift = parameters_dict['shift']
+        parameters_dict.pop('shift')
 
-            for elem in range(no):
-                self._solution3d_step[elem].plot(color='k')
-                self._solution_step[elem].plot_vp(color='k').plot_hp(color='k')
+        for point in symbols('A P O H'):
+            parameters_dict[point] = parameters_dict[point] + shift
 
-            self._solution3d_step[no].plot(color='r')
-            self._solution_step[no].plot_vp(color='r').plot_hp(color='r')
-
-            with doc_model.create(Figure(position='H')) as fig:
-                #path=f'./images/image{no}.png'
-                #plt.savefig(path)
-                #fig.add_image(path)
-                fig.add_plot(width=NoEscape(r'1.4\textwidth'))
-
-                if step3d._label is not None:
-                    fig.add_caption(step3d._label)
-
-            plt.show()
-
-        return doc_model
+        return parameters_dict
 
 ## START –> odtąd KOPIOWAĆ
-class EquilateralTrianglePrism(EquilateralTrianglePrism):
+class EquilateralTrianglePrismNew(EquilateralTrianglePrism):
 
-    @propert
-    def base_generating_class:
+    point_A = [
+        Point(x, y, z) for x in [8] for y in [6, 6.5]
+        for z in [8]
+    ]
+
+    point_O = [
+        Point(x, y, z) for x in [5.5, 6, 6.5] for y in [9, 9.5, 10]
+        for z in [4, 4.5, 5, 5.5]
+    ]
+
+    point_P = [
+        Point(x, y, z) for x in [2, 2.5] for y in [4,4.5]
+        for z in [2, 2.5]]
+    
+    point_H = [
+        Point(x, y, z) for x in range(7, 9) for y in [3, 3.5]
+        for z in range(9, 11)
+    ]
+    
+    shift = [
+        Point(x, y, z) for x in [0] for y in [0]
+        for z in [0]
+    ]
+    
+    @property
+    def base_generating_class(self):
         return EquilateralTriangleOnPlane
     
     def _solution(self):
@@ -445,8 +474,9 @@ class EquilateralTrianglePrism(EquilateralTrianglePrism):
         # PASTE –> odtąd KOPIOWAĆ
         # ALWAYS (A,O,P)
         plane_alpha = Plane(A,O,P)
-        base = self.base_generating_class(A,O,P)
+        base = self.base_generating_class(A,O,P).solution()
         
+        current_obj._append_case(base)
 
         current_obj.point_A_0 = base.point_A_0
         current_obj.point_B_0 = base.point_B_0
@@ -455,7 +485,10 @@ class EquilateralTrianglePrism(EquilateralTrianglePrism):
         current_obj.point_A = base.point_A
         current_obj.point_B = base.point_B
         current_obj.point_C = base.point_C
-        
+
+
+        B = base.point_B
+        C = base.point_C
         
 
         G = (H @ plane_alpha)('G')
@@ -465,29 +498,16 @@ class EquilateralTrianglePrism(EquilateralTrianglePrism):
         dirHG = H - G
         distance_HG = (H.distance(G)).n(5)
 
+        base_plane = Plane(A,B,C)
 
+        prism=TriangularPrism(A,B,C,H).solution()
+        current_obj._append_case(prism)
 
-        A, B, C, D, E, F = Prism(triangle_plane,
-                                 dirHG)
-
-        current_obj.add_solution_step('Vertices D,E,F', [D, E, F])
-
-        elems += [D, E, F, G]
-
-        projections += [
-            G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
-            F @ VPP
-        ]
-
-        current_obj._assumptions = DrawingSet(
-            *current_obj.get_projections())('Solution')
-        current_obj._assumptions3d = DrawingSet(*current_obj)
-
-        current_obj.point_B = B
-        current_obj.point_C = C
-        current_obj.point_D = D
-        current_obj.point_E = E
-        current_obj.point_F = F
+        current_obj.point_B = prism.point_B
+        current_obj.point_C = prism.point_C
+        current_obj.point_D = prism.point_D
+        current_obj.point_E = prism.point_E
+        current_obj.point_F = prism.point_F
 
 
         return current_obj
@@ -497,11 +517,18 @@ class EquilateralTrianglePrism(EquilateralTrianglePrism):
 
 
 ## START –> odtąd KOPIOWAĆ
-class SquarePrism(EquilateralTrianglePrism):
+class SquarePrismNew(EquilateralTrianglePrism):
 
-    @propert
-    def base_generating_class:
+    @property
+    def base_generating_class(self):
         return SquareOnPlane
+    
+    
+class IsoscelesRightTrianglePrismNew(EquilateralTrianglePrismNew):
+
+    @property
+    def base_generating_class(self):
+        return IsoscelesRightTriangleOnPlane
     
 
     
@@ -3211,8 +3238,8 @@ class GivenHeightEdgeIsoscelesRightTrianglePrism(GivenHeightIsoscelesRightTriang
 class GivenHeightIsoscelesRightTrianglePrismSwappedProjections(GivenHeightIsoscelesRightTrianglePrism):
 
     shift = [
-        Point(x, y, z) for x in [ -9.5, -9, -8.5, -8,-7]
-        for y in [-1,-0.5,0,0.5] for z in [-15,-14,-13, -12, -11]
+        Point(x, y, z) for x in [ -8.5, -8,-7]
+        for y in [-1,-0.5,0,0.5] for z in [-11,-10,-9]
     ]
 
 class GivenHeightEdgeIsoscelesRightTrianglePrismSwappedProjections(GivenHeightEdgeIsoscelesRightTrianglePrism):
