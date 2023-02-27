@@ -658,7 +658,7 @@ class SimpleShaftSketch(ShaftSketch):
 
 
 
-    steps_no = {'max': 2, 'min': 0}
+    steps_no = {'max': 1, 'min': 0}
 
     
     shafts=None
