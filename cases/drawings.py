@@ -2338,3 +2338,91 @@ class RoundedBodyBlockCutTypeView(ShaftSketch
             
         return shafts    
     
+class ShortSleeve(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 4, 'min': 2}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+
+
+    
+        for i in range(50): # 1 Stopień
+            body_type1 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type2 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type3 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type4 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type5 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            hole_type1 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            hole_type2 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+         
+            shaft =[body_type1(random.randint(50,70),random.randint(50,90))] +[body_type2(random.randint(45,60),random.randint(40,80))]+[body_type3(random.randint(45,70),random.randint(40,80))]+                          [body_type4(random.randint(30,50),random.randint(40,80))]+[body_type5(random.randint(35,90),random.randint(50,70))]
+            shaft[-5]._origin = 0
+            shaft[-4]._origin=shaft[-5].end
+            shaft[-3]._origin = shaft[-4].end
+            shaft[-2]._origin=shaft[-3].end
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [hole_type1(random.randint(20,100),random.randint(15,32))]
+            shaft[-1]._origin = 0
+            shaft += [hole_type2(shaft[-2].end-shaft[-1].end,random.randint(15,32))]
+            shaft[-1]._origin = shaft[-2].end
+              
+           
+            shafts.append(shaft)
+  
+            
+        return shafts
+    
+        for i in range(50): # 2 Stopnie
+            body_type1 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type2 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type3 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type4 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type5 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+         
+            shaft =[body_type1(random.randint(50,70),random.randint(50,90))] +[body_type2(random.randint(45,60),random.randint(40,80))]+[body_type3(random.randint(45,70),random.randint(40,80))]+                          [body_type4(random.randint(30,50),random.randint(40,80))]+[body_type5(random.randint(35,90),random.randint(50,70))]
+            shaft[-5]._origin = 0
+            shaft[-4]._origin=shaft[-5].end
+            shaft[-3]._origin = shaft[-4].end
+            shaft[-2]._origin=shaft[-3].end
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [sol.OpenHole(shaft[-1].end,random.randint(15,32))]
+            shaft[-1]._origin = 0
+          
+              
+           
+            shafts.append(shaft)
+  
+            
+        return shafts
