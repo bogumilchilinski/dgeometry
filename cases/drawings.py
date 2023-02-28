@@ -693,8 +693,10 @@ class SleeveSketch(ShaftSketch
                                   step_modificator=step_mod_inc_chamfer,origin=0) 
 
             d_end=shaft[-1].diameter
+            d_height=shaft[-1].height
+            
 
-            shaft +=create_random_profile(steps['max'],steps['min'],
+            right_profile =create_random_profile(steps['max'],steps['min'],
                                   initial_diameter=[d_end+8, d_end+10 ],
                                   increase_values=[
                                       -4,
@@ -702,7 +704,9 @@ class SleeveSketch(ShaftSketch
                                       -6,
                                   ],
                                   step_modificator=step_mod_dec_chamfer,origin = shaft[-1].end)
-
+            shaft +=right_profile
+            thread_length = right_profile[-1].end
+            
             shaft +=create_random_profile(holes['max'],holes['min'],
                                        initial_diameter=[25, 30],
                                        increase_values=[
@@ -710,11 +714,11 @@ class SleeveSketch(ShaftSketch
                                            -3,
                                            -4,
                                        ],
-                                       step_lengths=[62, 65],
+                                       step_lengths=[thread_length/3],
                                        step_type=sol.Hole,origin=0)
-
-
+            
             shafts.append(shaft)
+            shaft[-1]._origin=0
         return shafts
 
 
@@ -764,7 +768,7 @@ class SleeveWithThreadsSketch(ShaftSketch
                                   step_lengths=[62, 65],
                                   step_modificator=step_mod_dec_hole_chamfer,
                                   step_type=sol.Hole, origin=0)
-
+             
             shafts.append(shaft)
         return shafts
 
@@ -812,6 +816,7 @@ class SleeveWithFlangeSketch(ShaftSketch
                                   step_lengths=[62, 65],
                                   step_modificator=step_mod_dec_hole_chamfer,
                                   step_type=sol.Hole, origin=0)
+                                  
             
             shafts.append(shaft)
         return shafts
@@ -2351,10 +2356,122 @@ class ShortSleeve(ShaftSketch
         holes = cls.holes_no
         
         shafts =  []
-
+        
+        for i in range(50): #Najprostsza wersja 2 stopnie i 3 stopnie otwór
+            body_type1 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type2 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            hole_type1 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            hole_type2 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            hole_type3 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            shaft =[body_type1(random.randint(50,70),random.randint(50,90))] +[body_type2(random.randint(45,60),random.randint(40,80))]
+            shaft[-2]._origin=0
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [hole_type1(random.randint(20,45),random.randint(15,32))]
+            shaft[-1]._origin = 0
+            shaft += [hole_type2(random.randint(10,35),random.randint(15,32))]
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [hole_type3(shaft[-3].end-shaft[-1].end,random.randint(15,32))]
+            shaft[-1]._origin = shaft[-2].end
+              
+           
+            shafts.append(shaft)
+        for i in range(50): #Najprostsza wersja 3 stopnie i 3 stopnie otwór
+            body_type1 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type2 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type3 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            hole_type1 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            hole_type2 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            hole_type3 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            shaft =[body_type1(random.randint(50,70),random.randint(50,90))] +[body_type2(random.randint(45,60),random.randint(40,80))]+[body_type3(random.randint(45,70),random.randint(40,80))]
+            shaft[-3]._origin = 0
+            shaft[-2]._origin=shaft[-3].end
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [hole_type1(random.randint(20,45),random.randint(15,32))]
+            shaft[-1]._origin = 0
+            shaft += [hole_type2(random.randint(10,35),random.randint(15,32))]
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [hole_type3(shaft[-3].end-shaft[-1].end,random.randint(15,32))]
+            shaft[-1]._origin = shaft[-2].end
+              
+           
+            shafts.append(shaft)
+        for i in range(50): #Najprostsza wersja 2 stopnie i 2 stopnie otwór
+            body_type1 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type2 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            hole_type1 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            hole_type2 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+         
+            shaft =[body_type1(random.randint(50,70),random.randint(50,90))] +[body_type2(random.randint(45,60),random.randint(40,80))]
+            shaft[-2]._origin=0
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [hole_type1(random.randint(20,70),random.randint(15,32))]
+            shaft[-1]._origin = 0
+            shaft += [hole_type2(shaft[-2].end-shaft[-1].end,random.randint(15,32))]
+            shaft[-1]._origin = shaft[-2].end
+              
+           
+            shafts.append(shaft)
+        for i in range(50): #Najprostsza wersja 3 stopnie i 2 stopnie otwór
+            body_type1 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type2 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            body_type3 = random.choice([sol.Cylinder,
+                                       sol.ChamferedCylinder,
+                                      ])
+            hole_type1 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            hole_type2 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+         
+            shaft =[body_type1(random.randint(50,70),random.randint(50,90))] +[body_type2(random.randint(45,60),random.randint(40,80))]+[body_type3(random.randint(45,70),random.randint(40,80))]
+            shaft[-3]._origin = 0
+            shaft[-2]._origin=shaft[-3].end
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [hole_type1(random.randint(20,80),random.randint(15,32))]
+            shaft[-1]._origin = 0
+            shaft += [hole_type2(shaft[-2].end-shaft[-1].end,random.randint(15,32))]
+            shaft[-1]._origin = shaft[-2].end
+              
+           
+            shafts.append(shaft)
 
     
-        for i in range(50): # 1 Stopień
+        for i in range(50): # 1 Stopień otwór
             body_type1 = random.choice([sol.Cylinder,
                                        sol.ChamferedCylinder,
                                       ])
@@ -2390,11 +2507,8 @@ class ShortSleeve(ShaftSketch
               
            
             shafts.append(shaft)
-  
-            
-        return shafts
-    
-        for i in range(50): # 2 Stopnie
+
+        for i in range(50): # 2 Stopnie otwór
             body_type1 = random.choice([sol.Cylinder,
                                        sol.ChamferedCylinder,
                                       ])
@@ -2410,6 +2524,15 @@ class ShortSleeve(ShaftSketch
             body_type5 = random.choice([sol.Cylinder,
                                        sol.ChamferedCylinder,
                                       ])
+            hole_type1 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            hole_type2 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
+            hole_type3 = random.choice([sol.OpenHole,
+                                       sol.ChamferedHole,
+                                      ])
          
             shaft =[body_type1(random.randint(50,70),random.randint(50,90))] +[body_type2(random.randint(45,60),random.randint(40,80))]+[body_type3(random.randint(45,70),random.randint(40,80))]+                          [body_type4(random.randint(30,50),random.randint(40,80))]+[body_type5(random.randint(35,90),random.randint(50,70))]
             shaft[-5]._origin = 0
@@ -2417,8 +2540,12 @@ class ShortSleeve(ShaftSketch
             shaft[-3]._origin = shaft[-4].end
             shaft[-2]._origin=shaft[-3].end
             shaft[-1]._origin = shaft[-2].end
-            shaft += [sol.OpenHole(shaft[-1].end,random.randint(15,32))]
+            shaft += [hole_type1(random.randint(20,100),random.randint(15,32))]
             shaft[-1]._origin = 0
+            shaft += [hole_type2(random.randint(20,100),random.randint(15,32))]
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [hole_type3(shaft[-3].end-shaft[-1].end,random.randint(15,32))]
+            shaft[-1]._origin = shaft[-2].end
           
               
            
