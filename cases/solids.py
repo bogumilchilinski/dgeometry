@@ -1249,7 +1249,7 @@ class OpenHole(Hole):
     }
     num_of_lines_sec = {
         'horizontal_lines': 3,
-        'vertical_lines': 1,
+        'vertical_lines': 0, # lack of legft line included
         'horizontal_dimensions': 0,
         'vertical_dimensions': 1,
         'inclined_lines': 0,
@@ -1257,7 +1257,7 @@ class OpenHole(Hole):
 
     num_of_lines_half_sec = {
         'horizontal_lines': 2,
-        'vertical_lines': 1,
+        'vertical_lines': 0, # lack of legft line included
         'horizontal_dimensions': 0,
         'vertical_dimensions': 1,
         'inclined_lines': 0,
