@@ -1422,19 +1422,7 @@ class HexNutSketch(ShaftSketch
         holes = cls.holes_no
 
         shafts =  []
-        for i in range(50):
-            indiameter = random.randint( 70,80)
-            height=round(0.8*0.5*indiameter)
-            
-            shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
-            shaft[0]._origin = 0
-            shaft += [sol.Cylinder(round(shaft[-1].height*0.2),round(shaft[-1].indiameter*0.9))]
-            shaft[-1]._origin= shaft[-2].end
-            shaft += [sol.ThreadedOpenHole(shaft[-2].height+shaft[-1].height,shaft[-2].diameter-5)]
-            shaft[-1]._origin = 0
-            
-            shafts.append(shaft)
-            
+
         for i in range(50):
             
             
@@ -1447,11 +1435,80 @@ class HexNutSketch(ShaftSketch
             shaft[-1]._origin= shaft[-2].end
             shaft  += [sol.ChamferedHexagonalPrism(shaft[-2].height, shaft[-2].indiameter, shaft[-2].chamfer_length)]
             shaft[-1]._origin = shaft[-2].end
-            shaft += [sol.ThreadedOpenHole(shaft[-3].height+shaft[-2].height+shaft[-1].height,shaft[-3].diameter-5)]
+            shaft += [sol.Cylinder(round(shaft[-1].height*0.3),round(shaft[-1].indiameter*0.9))]
+            shaft[-1]._origin= shaft[-2].end
+            shaft += [sol.ThreadedOpenHole(shaft[-4].height + shaft[-3].height+shaft[-2].height+shaft[-1].height,shaft[-3].diameter-8)]
+            shaft[-1]._origin = 0
+            
+            shafts.append(shaft)
+
+        for i in range(50):
+            
+            indiameter = random.randint( 70,80)
+            height=round(1.2*0.5*indiameter)
+            
+            shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+            shaft[0]._origin = 0
+            shaft += [sol.Cylinder(round(shaft[-1].height*0.3),round(shaft[-1].indiameter*0.9))]
+            shaft[-1]._origin= shaft[-2].end
+            shaft += [sol.Cylinder(round(shaft[-2].height*0.4),round(shaft[-2].indiameter*1.1))]
+            shaft[-1]._origin= shaft[-2].end
+            shaft  += [sol.ChamferedHexagonalPrism(shaft[-3].height, shaft[-3].indiameter, shaft[-3].chamfer_length)]
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [sol.ThreadedOpenHole(shaft[-4].height + shaft[-3].height+shaft[-2].height+shaft[-1].height,shaft[-3].diameter-8)]
+            shaft[-1]._origin = 0
+            
+            shafts.append(shaft)
+
+        for i in range(50):
+            
+            indiameter = random.randint( 70,80)
+            height=round(1.2*0.5*indiameter)
+            
+            shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+            shaft[0]._origin = 0
+            shaft += [sol.Cylinder(round(shaft[-1].height*0.3),round(shaft[-1].indiameter*0.9))]
+            shaft[-1]._origin= shaft[-2].end
+            shaft  += [sol.ChamferedHexagonalPrism(shaft[-2].height, shaft[-2].indiameter, shaft[-2].chamfer_length)]
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [sol.Cylinder(round(shaft[-1].height*0.4),round(shaft[-1].indiameter*0.9))]
+            shaft[-1]._origin= shaft[-2].end
+            shaft  += [sol.ChamferedHexagonalPrism(shaft[-2].height, shaft[-2].indiameter, shaft[-2].chamfer_length)]
+            shaft[-1]._origin = shaft[-2].end
+            shaft += [sol.ThreadedOpenHole(shaft[-5].height + shaft[-4].height + shaft[-3].height+shaft[-2].height+shaft[-1].height,shaft[-3].diameter-8)]
             shaft[-1]._origin = 0
             
             shafts.append(shaft)
             
+        return shafts
+    
+class SimpleHexNutSketch(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 2, 'min': 1}
+    holes_no = {'max': 2, 'min': 0}    
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+
+        shafts =  []
+        for i in range(50):
+            indiameter = random.randint( 70,80)
+            height=round(0.8*0.5*indiameter)
+            
+            shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+            shaft[0]._origin = 0
+            shaft += [sol.Cylinder(round(shaft[-1].height*0.2),round(shaft[-1].indiameter*0.9))]
+            shaft[-1]._origin= shaft[-2].end
+            shaft += [sol.ThreadedOpenHole(shaft[-2].height+shaft[-1].height,shaft[-2].diameter-5)]
+            shaft[-1]._origin = 0
+            
+            shafts.append(shaft)
+
         for i in range(50):
             indiameter = random.randint( 70,80)
             height=round(1.2*0.5*indiameter)
@@ -1477,6 +1534,7 @@ class HexNutSketch(ShaftSketch
             shafts.append(shaft)
 
         return shafts
+    
     
 class BasicGearSketch(ShaftSketch
                              #GeometricalCase
