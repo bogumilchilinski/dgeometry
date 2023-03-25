@@ -1367,6 +1367,67 @@ class ComplexBoltWithHole(ShaftSketch
             indiameter = random.randint( 60,70)
             height=round(1.2*0.5*indiameter)
             
+            shaft =  create_random_profile(steps['max'],steps['min'],
+                      initial_diameter=[40,35,30],
+                      increase_values=[
+                          4,
+                          5,
+                          6,
+                      ],
+                      step_modificator=step_mod_dec_threads , origin = 0)
+            
+            shaft += [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+            shaft[-1]._origin = shaft[-2].end
+            #shaft += [sol.ThreadedOpenHole(shaft[-1].height,shaft[-1].diameter-5)]
+            shaft[-1]._origin = shaft[-2].end
+            
+            shaft +=create_random_profile(steps['max'],steps['min'],
+                                  initial_diameter=[40,35,30],
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_lengths=[60, 70],
+                                  step_modificator=step_mod_dec_screw,origin = shaft[-1].end)
+            
+            shaft += create_random_profile(3,
+                                  1,
+                                  initial_diameter=[23,20],
+                                  increase_values=[
+                                      -5,
+                                      -7,
+                    
+                                  ],
+                                  step_lengths=[31, 33,37],
+                                  step_modificator=step_mod_dec_hole_chamfer,
+                                  step_type=sol.Hole,origin=0) 
+            
+            
+            shafts.append(shaft)
+        
+
+        return shafts
+
+    
+class SimpleBoltSketch(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 1, 'min': 0}
+    holes_no = {'max': 2, 'min': 0}    
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+
+        shafts =  []
+        for i in range(50):
+            indiameter = random.randint( 60,70)
+            height=round(1.2*0.5*indiameter)
+            
             shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
             shaft[-1]._origin=0
             #shaft += [sol.ThreadedOpenHole(shaft[-1].height,shaft[-1].diameter-5)]
@@ -1390,23 +1451,24 @@ class ComplexBoltWithHole(ShaftSketch
                                   step_lengths=[60, 70],
                                   step_modificator=step_mod_dec_screw,origin = shaft[-1].end)
             
-            shaft += create_random_profile(2,
-                                  1,
-                                  initial_diameter=[23,20],
-                                  increase_values=[
-                                      -5,
-                                      -7,
+#             shaft += create_random_profile(2,
+#                                   1,
+#                                   initial_diameter=[23,20],
+#                                   increase_values=[
+#                                       -5,
+#                                       -7,
                     
-                                  ],
-                                  step_lengths=[31, 33,37],
-                                  step_modificator=step_mod_dec_hole_chamfer,
-                                  step_type=sol.Hole,origin=0) 
+#                                   ],
+#                                   step_lengths=[31, 33,37],
+#                                   step_modificator=step_mod_dec_hole_chamfer,
+#                                   step_type=sol.Hole,origin=0) 
             
             
             shafts.append(shaft)
         
 
         return shafts
+    
     
 class HexNutSketch(ShaftSketch
                              #GeometricalCase
