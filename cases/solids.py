@@ -834,7 +834,7 @@ class Cylinder(Solid):
 
         res = GeometryScene.ax_2d.plot(
             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],
+            [-r        ,       r   , r         , -r        ,    -r],
             line_type,
             color=color) + GeometryScene.ax_2d.plot(
                 [origin - 0.5, origin + l + 0.5], [0, 0],
