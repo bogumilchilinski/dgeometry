@@ -2878,7 +2878,7 @@ class BlockInverseTShape(Solid):
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
+            'vertical_dimensions': 0,
             'angular_dimensions': 0,
         }
 
@@ -2887,7 +2887,7 @@ class BlockInverseTShape(Solid):
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
+            'vertical_dimensions': 0,
             'angular_dimensions': 0,
         }
 
@@ -2896,7 +2896,7 @@ class BlockInverseTShape(Solid):
             'vertical_lines': 2,  #axis excluded
             'inclined_lines': 0,
             'horizontal_dimensions': 1,
-            'vertical_dimensions': 1,
+            'vertical_dimensions': 0,
             'angular_dimensions': 0,
         }
 
@@ -2905,7 +2905,7 @@ class BlockInverseTShape(Solid):
             'vertical_lines': 4,  #axis excluede
             'inclined_lines': 0,
             'horizontal_dimensions': 3,
-            'vertical_dimensions': 1,
+            'vertical_dimensions': 3, #height, base, hole position included
             'angular_dimensions': 0,
             'arcs': 0,
         }
@@ -3417,14 +3417,14 @@ class BodyBlock(Solid):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
+        'vertical_dimensions': 0, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
@@ -3432,7 +3432,7 @@ class BodyBlock(Solid):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
+        'vertical_dimensions': 0, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
@@ -3458,7 +3458,8 @@ class BodyBlock(Solid):
              holes_diameter=None,
              holes_no=4 ):
 
-        num_of_lines_view = self.num_of_lines('view')
+        num_of_lines_view = self.num_of_lines('view') #test of class methdo
+        num_of_lines_view = self.__class__.num_of_lines_view
         num_of_lines_sec = self.__class__.num_of_lines_sec
         num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
         num_of_lines_front = self.__class__.num_of_lines_front
@@ -3606,22 +3607,22 @@ class BodyBlockShapeT(BodyBlock):
         'horizontal_lines': 4,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2,
+        'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
+        'vertical_dimensions': 0, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
     num_of_lines_half_sec = {
-        'horizontal_lines': 4,
+        'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
+        'vertical_dimensions': 0, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
@@ -3743,7 +3744,7 @@ class MediumBodyBlockShapeT(BodyBlockShapeT):
     
     @property
     def height_wider(self):
-        return round(self.height*0.6)
+        return round(self.height*0.35)
     
 
 
@@ -3772,7 +3773,7 @@ class HeavyBodyBlockShapeT(BodyBlockShapeT):
     
     @property
     def height_wider(self):
-        return round(self.height*0.6)
+        return round(self.height*0.9)
     
 
 
@@ -3806,14 +3807,14 @@ class BodyBlockShapeC(BodyBlock):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2,
+        'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
 
@@ -3821,7 +3822,7 @@ class BodyBlockShapeC(BodyBlock):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
 
@@ -3964,14 +3965,14 @@ class BodyBlockCutType(BodyBlock):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2,
+        'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
 
@@ -3979,7 +3980,7 @@ class BodyBlockCutType(BodyBlock):
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
 
@@ -4330,14 +4331,14 @@ class RoundedBodyBlockShapeT(RoundedBodyBlock):
         'horizontal_lines': 4,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2,
+        'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
         'horizontal_lines': 3,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
+        'vertical_dimensions': 0, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
@@ -4345,7 +4346,7 @@ class RoundedBodyBlockShapeT(RoundedBodyBlock):
         'horizontal_lines': 4,
         'vertical_lines': 2,
         'horizontal_dimensions': 1,
-        'vertical_dimensions': 2, # including the axis position (it doesn't make any sense for holes lack)
+        'vertical_dimensions': 0, # including the axis position (it doesn't make any sense for holes lack)
         'inclined_lines': 0,
     }
 
@@ -4865,7 +4866,7 @@ class BlockHole(Hole):
     num_of_lines_sec = {
         'horizontal_lines': 3,
         'vertical_lines': 1,
-        'horizontal_dimensions': 0,
+        'horizontal_dimensions': 1,
         'vertical_dimensions': 1,
         'inclined_lines': 0,
     }
@@ -4873,7 +4874,7 @@ class BlockHole(Hole):
     num_of_lines_half_sec = {
         'horizontal_lines': 2,
         'vertical_lines': 1,
-        'horizontal_dimensions': 0,
+        'horizontal_dimensions': 1,
         'vertical_dimensions': 1,
         'inclined_lines': 0,
     }
@@ -5010,7 +5011,7 @@ class BlockHiddenHole(OpenHole):
     }
     num_of_lines_sec = {
         'horizontal_lines': 3,
-        'vertical_lines': 1,
+        'vertical_lines': 0,
         'horizontal_dimensions': 0,
         'vertical_dimensions': 1,
         'inclined_lines': 0,
@@ -5018,7 +5019,7 @@ class BlockHiddenHole(OpenHole):
 
     num_of_lines_half_sec = {
         'horizontal_lines': 2,
-        'vertical_lines': 1,
+        'vertical_lines': 0,
         'horizontal_dimensions': 0,
         'vertical_dimensions': 1,
         'inclined_lines': 0,
