@@ -2743,3 +2743,18 @@ class ShortSleeve(ShaftSketch
   
             
         return shafts
+################################################Podziemie##############################################################################    
+class GeometrySc:
+    GeometryScene() 
+    #Pierwszy argument - lista wsp. x. Drugi argument - lista wsp. y 
+    GeometryScene.ax_2d.plot([1,1],[0,5]) # oś y 
+    GeometryScene.ax_2d.plot([0,5],[1,1]) # oś x 
+    GeometryScene.ax_2d.plot([1,5],[1,5]) # oś z 
+class GeometrySc2:
+        GeometryScene() 
+        GeometryScene.ax_2d.plot([6,6,10,10,6],[0,-4,-4,0,0]) 
+        GeometryScene.ax_2d.plot([6,10],[-2,-2]) 
+        GeometryScene.ax_2d.plot([5.5,10.5],[-0.5,-0.5],'-.',color='k',linewidth =1) 
+        GeometryScene.ax_2d.plot([5.5,10.5],[-3.5,-3.5],'-.',color='k', linewidth = 1) 
+    
+    
