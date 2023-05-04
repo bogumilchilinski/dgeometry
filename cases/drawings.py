@@ -1675,11 +1675,10 @@ class ScrewConnectionSketch(ShaftSketch
         for i in range(50): # 2 płytki
             
             screw_diameter = random.randint(40,60)
-            
-            shaft =  [sol.HexagonalHeadOfScrew(round(0.7 * screw_diameter), 2 * screw_diameter)]
+            shaft =  [sol.HexagonalHeadOfScrew(round(0.7 * screw_diameter), 2 * screw_diameter,random.randint(3,4))]
             shaft += [sol.ScrewCore(round(screw_diameter*3), screw_diameter)] 
             shaft += [sol.Washer(round(0.15 * screw_diameter), round(2.2 * screw_diameter))]
-            shaft += [sol.StandarizedNut(round(0.8 * screw_diameter), 2 * screw_diameter)]
+            shaft += [sol.StandarizedNut(round(0.8 * screw_diameter), 2 * screw_diameter,random.randint(3,4))]
             shaft += [sol.ThreadOfScrew(round(0.3 * screw_diameter), screw_diameter)]
             
             shaft += [sol.Plate(random.randint(70,80),random.randint(100,110))]
@@ -1706,10 +1705,10 @@ class ScrewConnectionSketch(ShaftSketch
             
             screw_diameter = random.randint(40,60)
             
-            shaft =  [sol.HexagonalHeadOfScrew(round(0.7 * screw_diameter), 2 * screw_diameter)]
+            shaft =  [sol.HexagonalHeadOfScrew(round(0.7 * screw_diameter), 2 * screw_diameter,random.randint(3,4))]
             shaft += [sol.ScrewCore(round(screw_diameter*3), screw_diameter)] 
             shaft += [sol.Washer(round(0.15 * screw_diameter), round(2.2 * screw_diameter))]
-            shaft += [sol.StandarizedNut(round(0.8 * screw_diameter), 2 * screw_diameter)]
+            shaft += [sol.StandarizedNut(round(0.8 * screw_diameter), 2 * screw_diameter,random.randint(3,4))]
             shaft += [sol.ThreadOfScrew(round(0.3 * screw_diameter), screw_diameter)]
             
             shaft += [sol.Plate(random.randint(40,60),random.randint(100,110))]
@@ -1742,10 +1741,10 @@ class ScrewConnectionSketch(ShaftSketch
             
             screw_diameter = random.randint(40,60)
             
-            shaft =  [sol.HexagonalHeadOfScrew(round(0.7 * screw_diameter), 2 * screw_diameter)]
+            shaft =  [sol.HexagonalHeadOfScrew(round(0.7 * screw_diameter), 2 * screw_diameter,random.randint(3,4))]
             shaft += [sol.ScrewCore(round(screw_diameter*3), screw_diameter)] 
             shaft += [sol.Washer(round(0.15 * screw_diameter), round(2.2 * screw_diameter))]
-            shaft += [sol.StandarizedNut(round(0.8 * screw_diameter), 2 * screw_diameter)]
+            shaft += [sol.StandarizedNut(round(0.8 * screw_diameter), 2 * screw_diameter,random.randint(3,4))]
             shaft += [sol.ThreadOfScrew(round(0.3 * screw_diameter), screw_diameter)]
             
             shaft += [sol.Plate(random.randint(40,60),random.randint(100,110))]

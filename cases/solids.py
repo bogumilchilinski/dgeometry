@@ -1065,12 +1065,12 @@ class Plate(Cylinder):
 
     def str_en(self):
         return 'Plate \n with thickness t={length}mm \n and width b={d}mm'.format(
-            length=self.height, d=self.diameter)
+            length=self.height, d=2*self.diameter)
 
     def str_pl(self):
         return 'Płyta \n o grubości g={length}mm i szerokości b={d}mm'.format(
             length=self.height,
-            d=self.diameter).replace('right',
+            d=2*self.diameter).replace('right',
                                      'prawej').replace('left', 'lewej')
 
 
@@ -3288,9 +3288,11 @@ class HexagonalHeadOfScrew(ChamferedHexagonalPrism):
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}  # to improve
 
     def str_en(self):
-        return 'Hexagonal head of screw \n with L={length}mm \n and internal diameter {d}mm '.format(
+        return 'Hexagonal head of screw \n with L={length}mm \n wrench size S={d}mm and chamfer {l_ch}x{angle}'.format(
             length=self.height,
             d=self.indiameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
         )
 
     def str_pl(self):
