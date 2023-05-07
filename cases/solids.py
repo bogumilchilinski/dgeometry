@@ -906,7 +906,7 @@ class ScrewCore(Cylinder):
     }
     num_of_lines_sec = {
         'horizontal_lines': 3,
-        'vertical_lines': 2,
+        'vertical_lines': 0,
         'horizontal_dimensions': 1,
         'vertical_dimensions': 1,
         'inclined_lines': 0,
@@ -914,7 +914,7 @@ class ScrewCore(Cylinder):
 
     num_of_lines_half_sec = {
         'horizontal_lines': 2,
-        'vertical_lines': 2,
+        'vertical_lines': 0,
         'horizontal_dimensions': 1,
         'vertical_dimensions': 1,
         'inclined_lines': 0,
@@ -1016,7 +1016,21 @@ class Plate(Cylinder):
     {'pl': 'Walec'}
 
     """
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
 
+    num_of_lines_half_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
     def _plot_2d(self, language='en'):
 
         class_name = self.__class__.__name__
@@ -1981,7 +1995,7 @@ class ThreadOfScrew(Thread):
 
     num_of_lines_sec = {
         'horizontal_lines': 5,
-        'vertical_lines': 3,
+        'vertical_lines': 0,
         'inclined_lines': 2,
         'horizontal_dimensions': 2,
         'vertical_dimensions': 1,
@@ -1990,7 +2004,7 @@ class ThreadOfScrew(Thread):
 
     num_of_lines_half_sec = {
         'horizontal_lines': 5,
-        'vertical_lines': 3,
+        'vertical_lines': 0,
         'inclined_lines': 2,
         'horizontal_dimensions': 2,
         'vertical_dimensions': 1,
@@ -3091,7 +3105,21 @@ class Washer(Cylinder):
     {'pl': 'Podkładka'}
     
     """
-
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 1,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+    num_of_lines_half_sec = {
+            'horizontal_lines': 3,
+            'vertical_lines': 0,
+            'inclined_lines': 2,
+            'horizontal_dimensions': 2,
+            'vertical_dimensions': 1,
+            'angular_dimensions': 1,
+        }
     def _plot_2d(self, language='en'):
 
         #         print(f'self.origin property is {self.origin()}')
@@ -3267,7 +3295,7 @@ class HexagonalHeadOfScrew(ChamferedHexagonalPrism):
 
     num_of_lines_sec = {
         'horizontal_lines': 5,
-        'vertical_lines': 2,
+        'vertical_lines': 0,
         'inclined_lines': 2,
         'arcs': 3,
         'horizontal_dimensions': 2,
@@ -3277,7 +3305,7 @@ class HexagonalHeadOfScrew(ChamferedHexagonalPrism):
 
     num_of_lines_half_sec = {
         'horizontal_lines': 5,
-        'vertical_lines': 2,
+        'vertical_lines': 0,
         'inclined_lines': 2,
         'arcs': 3,
         'horizontal_dimensions': 2,
@@ -3321,7 +3349,7 @@ class ThreadOfScrew(Thread):
 
         num_of_lines_sec = {
             'horizontal_lines': 5,
-            'vertical_lines': 3,
+            'vertical_lines': 1,
             'inclined_lines': 2,
             'horizontal_dimensions': 2,
             'vertical_dimensions': 1,
@@ -3331,7 +3359,7 @@ class ThreadOfScrew(Thread):
 
         num_of_lines_half_sec = {
             'horizontal_lines': 5,
-            'vertical_lines': 3,
+            'vertical_lines': 1,
             'inclined_lines': 2,
             'horizontal_dimensions': 2,
             'vertical_dimensions': 1,
