@@ -570,8 +570,9 @@ class PointOnPlane(GeometricalCase):
         else:
             projections=[]
 
-        self._assumptions=DrawingSet(*projections)
 
+        self._assumptions=DrawingSet(point_A,point_B,*projections)
+        self._assumptions3d = DrawingSet(point_A,point_B,point_D)
 
         self._point_A=point_A
         self._point_B=point_B
@@ -992,7 +993,7 @@ class TwoPlanesIntersection(GeometricalCase):
             projections=[]
 
         self._assumptions=DrawingSet(*projections)
-
+        self._assumptions3d = DrawingSet(point_A, point_O, point_B, point_D, point_E, point_F)
 
 
 
@@ -1380,7 +1381,7 @@ class PlanePerpendicularToLineIntersection(GeometricalCase):
             projections=[]
 
         self._assumptions=DrawingSet(*projections)
-
+        self._assumptions3d = DrawingSet(point_A,point_E,point_D)
 
 
 
@@ -1476,7 +1477,7 @@ class PlanePerpendicularToPlaneIntersection(GeometricalCase):
             projections=[]
 
         self._assumptions=DrawingSet(*projections)
-
+        self._assumptions3d = DrawingSet(point_A,point_B,point_O,point_D,point_E)
 
 
 

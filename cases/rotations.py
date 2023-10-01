@@ -177,6 +177,7 @@ class LineRotation(GeometricalCase):
             projections=[]
 
         self._assumptions=DrawingSet(*projections)
+        self._assumptions3d = DrawingSet(point_A,point_B)
 
         self._point_A=point_A
         self._point_B=point_B

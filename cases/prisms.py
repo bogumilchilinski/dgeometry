@@ -612,7 +612,7 @@ class SquarePrism(GeometricalCase):
         #square_side =  square_diagonal / (((3)**(1/2))/2)
         print(square_diagonal)
         B = (S + dirPS / (P.distance(S)) * (square_diagonal / 2))('B')
-        D = (S - dirPS / (P.distance(S)) * s(square_diagonal / 2))('D')
+        D = (S - dirPS / (P.distance(S)) * (square_diagonal / 2))('D')
         C = (A + 2 * dirAS)('C')
 
         #         line_AD=A^D
