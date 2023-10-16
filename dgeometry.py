@@ -26,12 +26,23 @@ import itertools as it
 
 linewidth = 1.5
 
+default_colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 
 def plots_no():
     num = 0
     while True:
         yield num
         num += 1
+
+def get_color():
+    colours_no = len(default_colors)
+    
+    num = 0
+    while True:
+        yield default_colors[num % colours_no]
+        num += 1
+
+color_source = get_color() 
 
 
 class GeometrySceneDG:
@@ -257,6 +268,15 @@ class Entity:
 
     _at_symbol = '@'
 
+    __color = None
+    __text = None
+    __marker = None
+    __style = None
+    __fmt = None
+    _linewidth = 0.5
+
+    _share_color = True
+
     def __init__(self,
                  coding_points=None,
                  display=None,
@@ -265,6 +285,7 @@ class Entity:
                  color=None,
                  marker='o',
                  style='-',
+                 linewidth = None,
                  projection=False,
                  *args,
                  **kwargs):
@@ -275,6 +296,7 @@ class Entity:
         self.__coding_points = coding_points
         self._label = label
         self.__color = color
+        self._linewidth = linewidth
         self.__text = None
         self.__marker = marker
         self.__style = style
@@ -289,6 +311,7 @@ class Entity:
                  color=None,
                  marker=None,
                  style=None,
+                 linewidth = None,
                  text=None,
                  caption=None,
                  *args,
@@ -302,8 +325,10 @@ class Entity:
 #             if obj.display is None:
 #                 obj._label = label
         if label is not None:
-            obj._label = label                
-                    
+            obj._label = label
+
+        if label is not None:
+            obj._linewidth = linewidth
 
         if color is not None:
             obj.__color = color
@@ -375,7 +400,7 @@ class Entity:
         style='-',
         text=None,
         fontsize=13,
-        linewidth=linewidth,
+        linewidth=None,
         scene=GeometrySceneDG.ax_3d,
     ):
         '''
@@ -395,7 +420,11 @@ class Entity:
             marker = self.__marker
 
         if color is None:
-            color = self.__color
+            color = self.color
+            
+        if linewidth is None:
+            linewidth = self.linewidth
+            
 
         points_cooridinates = self._generating_points()
 
@@ -423,11 +452,11 @@ class Entity:
         style='-',
         text=None,
         fontsize=13,
-        linewidth=linewidth,
+        linewidth=None,
         scene=GeometrySceneDG.ax_2d,
     ):
         '''
-        Set the coordinates of the points with the text explanation         
+        Set the coordinates of the points with the text explanation
         Return: Line with the text that presents the actual point on the chosen plane
         '''
 
@@ -443,7 +472,10 @@ class Entity:
             marker = self.__marker
 
         if color is None:
-            color = self.__color
+            color = self.color
+            
+        if linewidth is None:
+            linewidth = self.linewidth
 
         if str(self)[-1] == "\'" and str(self)[-2] != "\'":
             points_cooridinates = self._generating_points()
@@ -471,7 +503,7 @@ class Entity:
         style='-',
         text=None,
         fontsize=13,
-        linewidth=linewidth,
+        linewidth=None,
         scene=GeometrySceneDG.ax_2d,
     ):
         '''
@@ -490,25 +522,14 @@ class Entity:
             marker = self.__marker
 
         if color is None:
-            color = self.__color
+            color = self.color
+            
+        if linewidth is None:
+            linewidth = self.linewidth
 
         points_cooridinates = self._generating_points()
 
-        # plt.figure(figsize=(12,9))
-        # ax_2d = plt.subplot(121)
-        # ax_2d.set(ylabel=(r'<-x | z ->'))
 
-        # plt.xlim(0, 16)
-        # plt.ylim(-12, 12)
-
-        # ax_3d = plt.subplot(122, projection='3d')
-
-        # plt.xlim(0, 10)
-        # plt.ylim(0, 10)
-        # ax_3d.set_zlim(0, 10)
-        # plt.tight_layout()
-
-        # scene=ax_2d
 
         if str(self)[-1] == "\'" and str(self)[-2] == "\'":
             scene.plot(points_cooridinates['y'],
@@ -534,7 +555,7 @@ class Entity:
         style='-',
         text=None,
         fontsize=13,
-        linewidth=linewidth,
+        linewidth=None,
         scene=GeometrySceneDG.ax_3d,
     ):
         '''
@@ -549,7 +570,7 @@ class Entity:
             style=style,
             text=text,
             fontsize=fontsize,
-            #linewidth=linewidth,
+            linewidth=linewidth,
             scene=scene)
 
         self.plot_hp(
@@ -559,7 +580,7 @@ class Entity:
             style=style,
             text=text,
             fontsize=fontsize,
-            #linewidth=linewidth,
+            linewidth=linewidth,
             scene=scene)
         
         
@@ -570,7 +591,7 @@ class Entity:
             style=style,
             text=text,
             fontsize=fontsize,
-            #linewidth=linewidth,
+            linewidth=linewidth,
             scene=scene)
         
         
@@ -594,6 +615,9 @@ class Entity:
 
         points_cooridinates = self._generating_points()
 
+        if color is None:
+            color = self.color
+        
         scene.plot(points_cooridinates['x'],
                    points_cooridinates['y'],
                    points_cooridinates['z'],
@@ -653,10 +677,59 @@ class Entity:
 
         new_obj._label = f'{self._label}{at}{entity._label}'
 
+        if self._share_color is True:
+            new_obj.color = self.color
+        
         return new_obj
 
     def __and__(self, o):
         return o.intersection(self)
+
+    @property
+    def color(self):
+        if self.__color is not None:
+            return self.__color
+        else:
+            self.__color = next(color_source)
+            return self.__color
+
+    @color.setter
+    def color(self,color):
+        self.__color=color
+
+
+    @property
+    def linewidth(self):
+        if self._linewidth is not None:
+            return self._linewidth
+        else:
+            return self.__class__._linewidth
+            #return type(self)._linewidth
+
+    @linewidth.setter
+    def linewidth(self,linewidth):
+        self._linewidth=linewidth
+        
+        
+    def _gp(self):
+        result = [self @ HPP,self @ VPP]
+        
+        return DrawingSet(*result)
+     
+        
+
+    def get_projections(self):
+        return self._gp()
+    
+    def _wp(self):
+
+        result = self._gp()
+        
+        return DrawingSet(self,*result)
+    
+    def with_projections(self):
+        return self._wp()
+
 
 
 class Point(Entity):
@@ -791,6 +864,8 @@ class Line(Entity):
     Line calass is used to create line objects and manipulate them
     """
 
+    _default_extension = 0.2
+    
     def __init__(self, p1, p2, **kwargs):
         self._p1 = p1
         self._p2 = p2
@@ -803,8 +878,15 @@ class Line(Entity):
 #     def __str__(self):
 #         return self.__class__.__name__
 
+    @property
+    def extension(self):
+        return self._default_extension
+
     def _coding_points(self):
-        return (self._geo_ref.p1, self._geo_ref.p2)
+        
+        delta =  self._p2-self._p1
+        
+        return (self._p1+(-self.extension * delta), self._p2+self.extension * delta)
 
 #     def __repr__(self):
 #         return self.__class__.__name__ +str(self._coding_points())
@@ -943,6 +1025,53 @@ class Plane(Entity):
 
         return entity_convert(self._geo_ref.parallel_plane(p._geo_ref))
 
+    
+    def get_associated_point(self,point,projection=None):
+        
+        if projection is None:
+            proj = VPP
+
+        aux_p = (Line(point @ proj ,point)  & self)[0]
+            
+        return aux_p
+    
+    def get_associated_line(self,line,projection=None):
+        
+        if projection is None:
+            proj = VPP
+
+        aux_p1 = self.get_associated_point(line.p1,projection)
+        aux_p2 = self.get_associated_point(line.p2,projection)
+            
+        return Line(aux_p1,aux_p2)
+    
+    def get_horizontal_line(self,p=None):
+        
+        p1,p2,p3=self._vertices()
+        other_points = (Line(p2,p3) & HorizontalPlane(p1))
+        
+        if len(other_points) == 0:
+            return Line(p2,p3)
+        else:
+            
+            result = Line(p1,other_points[0])
+            result._label = f'$h_{{{self._label.replace("$","")}}}$'
+            return result
+
+
+
+    def get_frontal_line(self,p=None):
+
+        p1,p2,p3=self._vertices()
+        other_points = (Line(p2,p3) & FrontalPlane(p1))
+
+        if len(other_points) == 0:
+            return Line(p2,p3)
+        else:
+            result = Line(p1,other_points[0])
+            result._label = f'$f_{{{self._label.replace("$","")}}}$'
+            return result
+
 
 class Tetragon(Plane):
     _label = 'Tetragon'
@@ -1063,6 +1192,7 @@ LPPend = LateralPlane( Point(0,16,0) )
 
 
 class DrawingSet(Entity, list):
+    __color = None
 
     def __init__(self, *entities, scene=None):
         super(list, self).__init__()
@@ -1103,19 +1233,28 @@ class DrawingSet(Entity, list):
 
         return {'x': [x_min, x_max], 'y': [y_min, y_max], 'z': [z_min, z_max]}
 
+    @property
+    def color(self):
+        return self.__color
+    
     def plot(
         self,
         fmt=None,
         marker=None,
         color=None,
         style='-',
+        linewidth = linewidth,
         text=None,
         fontsize=13,
-        scene=GeometrySceneDG.ax_3d,
+        scene=GeometrySceneDG.ax_3d
     ):
+
 
         obj = copy.deepcopy(self)
 
+        if color is None:
+            color = obj.color
+            
         for elem in obj:
             elem.plot(fmt=fmt,
                       marker=marker,
@@ -1136,13 +1275,16 @@ class DrawingSet(Entity, list):
         marker=None,
         color=None,
         style='-',
+        linewidth = linewidth,
         text=None,
         fontsize=13,
         scene=GeometrySceneDG.ax_2d,
     ):
 
         obj = copy.deepcopy(self)
-
+        if color is None:
+            color = obj.color   
+        
         for elem in obj:
             elem.plot_hp(fmt=fmt,
                          marker=marker,
@@ -1163,6 +1305,7 @@ class DrawingSet(Entity, list):
         marker=None,
         color=None,
         style='-',
+        linewidth = linewidth,
         text=None,
         fontsize=13,
         scene=GeometrySceneDG.ax_2d,
@@ -1170,6 +1313,9 @@ class DrawingSet(Entity, list):
 
         obj = copy.deepcopy(self)
 
+        if color is None:
+            color = obj.color   
+        
         for elem in obj:
             elem.plot_vp(fmt=fmt,
                          marker=marker,
@@ -1402,6 +1548,8 @@ class GeometricalCase(DrawingSet):
         scene=GeometrySceneDG.ax_3d,
     ):
 
+        
+        
         self._assumptions.plot_vp(fmt=fmt,
                                   marker=marker,
                                   color=color,
