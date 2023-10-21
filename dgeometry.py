@@ -273,7 +273,7 @@ class Entity:
     __marker = None
     __style = None
     __fmt = None
-    _linewidth = 0.5
+    _linewidth = 1.5
 
     _share_color = True
 
@@ -935,6 +935,8 @@ class Plane(Entity):
     Plane class is used to create plane object and manipulate them
     """
 
+    _linewidth = 0.5
+    
     def __init__(self, p1, a=None, b=None, **kwargs):
         super().__init__(marker=None)
 
