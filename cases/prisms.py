@@ -4088,3 +4088,38 @@ class GivenHeightRhomboidPrism(GeometricalCase):
             parameters_dict[point] = parameters_dict[point] + shift
 
         return parameters_dict
+
+
+class EquilateralTrianglePrismNew2(EquilateralTrianglePrismNew):
+
+    point_A = [
+        Point(x, y, z) for x in [8] for y in [6, 6.5]
+        for z in [8]
+    ]
+
+    point_O = [
+        Point(x, y, z) for x in [5.5, 6] for y in [9.5, 10]
+        for z in [5, 5.5]
+    ]
+
+    point_P = [
+        Point(x, y, z) for x in [3, 3.5] for y in [4,4.5]
+        for z in [2, 2.5]]
+    
+    point_H = [
+        Point(x, y, z) for x in [3] for y in [3]
+        for z in [9]
+    ]
+    
+    shift = [
+        Point(x, y, z) for x in [0,0.5,1,1.5,2] for y in [-1,0,1,2]
+        for z in [0,-0.5,-1,-1.5,-2]
+    ]
+
+class EquilateralTrianglePrismNew2SwappedProjections(EquilateralTrianglePrismNew2):
+
+
+    shift = [
+        Point(x, y, z) for x in [-9,-9.5,-10,-10.5,-11] for y in [-1,0,1,2]
+        for z in [-9,-9.5,-10,-10.5,-11]
+    ]
