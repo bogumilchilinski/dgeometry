@@ -1139,6 +1139,7 @@ class HorizontalEgdePlaneAndPlaneIntersection(TwoPlanesIntersection):
 
         return parameters_dict
 
+
 class FrontalEgdePlaneAndPlaneIntersection(TwoPlanesIntersection):
     
     point_A = [Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]
@@ -1188,10 +1189,45 @@ class FrontalEgdePlaneAndPlaneIntersection(TwoPlanesIntersection):
         point_B=parameters_dict[Symbol('B')] 
         print(point_B.coordinates)
         
-        parameters_dict[Symbol('O')]=(point_A+point_B)*0.5+Point(1,0,0)
+        parameters_dict[Symbol('O')]=(point_A+point_B)*0.5+Point(5,0,0)
         print(parameters_dict[Symbol('O')].coordinates)
 
         return parameters_dict
+    
+class FrontalEgdePlaneAndHorizontalEgdePlaneIntersection(FrontalEgdePlaneAndPlaneIntersection):
+    
+    point_A = [Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [4,4.5,5,5.5,6,6.5]  ]
+
+    point_O = [Point(x,y,z) for x in range(7,11) for y in range(8,12) for z in range(8,12) ]
+
+
+    point_B=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [13,13.5,14,14.5,15] for z in [4,4.5,5,5.5,6,6.5] ]
+
+    point_D=[Point(x,y,z) for x in range(6,9) for y in [1,1.5,2,2.5,3,3.5] for z in range(8,12) ]
+    point_E = [Point(x,y,z) for x in [7,7.5,8,8.5,9] for y in [7,7.5,8.5,9,9.5] for z in range(2,5) ]
+
+    point_F = [Point(x,y,z) for x in  range(6,9) for y in [10,10.5,11,11.5,12] for z in range(8,12) ]
+
+
+
+
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_D=parameters_dict[Symbol('D')]
+
+        point_F=parameters_dict[Symbol('F')] 
+
+        
+        parameters_dict[Symbol('E')]=(point_D+point_F)*0.5+Point(0,0,-5)
+        #print(parameters_dict[Symbol('E')].coordinates)
+
+        return parameters_dict
+    
+    
     
 class LinePerpendicularToPlaneIntersection(GeometricalCase):
     
@@ -1447,6 +1483,58 @@ class PlanePerpendicularToLineIntersection(GeometricalCase):
 
         }
         return default_data_dict
+
+    
+
+class PlanePerpendicularToHorizontalLineIntersection(PlanePerpendicularToLineIntersection):
+
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]
+    point_D=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [6,6.5,7,7.5] for z in range(6,8) ]
+
+    point_E = [Point(x,y,z) for x in [7,7.5,8,8.5,9] for y in [8,8.5,9,9.5] for z in range(2,5) ]
+    
+    
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_D=parameters_dict[Symbol('D')]
+        point_E=parameters_dict[Symbol('E')] 
+        #point_O=parameters_dict[Symbol('O')] 
+
+        
+        #parameters_dict[Symbol('D')]=Point(point_A.x,point_O.y,point_O.z)
+        parameters_dict[Symbol('E')]=Point(point_E.x,point_E.y,point_D.z)
+
+        return parameters_dict
+    
+
+    
+class PlanePerpendicularToFrontalLineIntersection(PlanePerpendicularToLineIntersection):
+
+    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]
+
+    point_D=[Point(x,y,z) for x in [1,1.5,2,2.5,3,3.5] for y in [6,6.5,7,7.5] for z in range(6,8) ]
+
+    point_E = [Point(x,y,z) for x in [7,7.5,8,8.5,9] for y in [8,8.5,9,9.5] for z in range(2,5) ]
+    
+    
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+        point_D=parameters_dict[Symbol('D')]
+        point_E=parameters_dict[Symbol('E')] 
+        #point_O=parameters_dict[Symbol('O')] 
+
+        
+        #parameters_dict[Symbol('D')]=Point(point_A.x,point_O.y,point_O.z)
+        parameters_dict[Symbol('E')]=Point(point_D.x,point_E.y,point_E.z)
+
+        return parameters_dict
+    
     
     
     
@@ -1563,6 +1651,7 @@ class PlanePerpendicularToPlaneIntersection(GeometricalCase):
 
         }
         return default_data_dict
+    
 class LineParallelToPlane(TwoPlanesIntersection):
     
     point_A = [Point(x,y,z) for x in [4,4.5,5,5.5,6,6.5] for y in [2,2.5,3,3.5,4,4.5,5] for z in [1,1.5,2,2.5,3,3.5] ]

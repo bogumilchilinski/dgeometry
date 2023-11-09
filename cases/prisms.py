@@ -26,6 +26,67 @@ from .basics import LineAndPlaneIntersection
 
 
 class TriangularPrism(GeometricalCase):
+    edge_plane = False
+
+#### MODE 1  
+    
+#     point_A = [
+#         Point(x, y, z) for x in [5]
+#         for y in [4] for z in [3]
+#     ]
+
+#     point_B = [
+#         Point(x, y, z) for x in [1] for y in [9]
+#         for z in [2]
+#     ]
+
+#     point_C = [
+#         Point(x, y, z) for x in [3]
+#         for y in [11] for z in [6]
+#     ]
+
+#     point_O = [
+#         Point(x, y, z) for x in [7] for y in [11]
+#         for z in [2]
+#     ]
+
+    
+#     shift = [
+#         Point(x, y, z) for x in [0] for y in [0,0.5,1,1.5,2]
+#         for z in [2,2.5,3,3.5,4,4.5,5] # zmin 2 ymin 0
+#    ]
+
+#### MODE 1    
+    
+#### MODE 2
+
+#     point_A = [
+#         Point(x, y, z) for x in [5]
+#         for y in [11] for z in [3]
+#     ]
+
+#     point_B = [
+#         Point(x, y, z) for x in [1] for y in [9]
+#         for z in [2]
+#     ]
+
+#     point_C = [
+#         Point(x, y, z) for x in [3]
+#         for y in [4] for z in [6]
+#     ]
+
+#     point_O = [
+#         Point(x, y, z) for x in [7] for y in [4]
+#         for z in [0]
+#     ]
+
+    
+#     shift = [
+#         Point(x, y, z) for x in [0] for y in [-2,-1,0]
+#         for z in [3,4,5] #zmax 5 ymax 0
+#     ]
+    
+##### MODE 3
 
     point_A = [
         Point(x, y, z) for x in [1, 1.5, 2, 2.5]
@@ -52,8 +113,9 @@ class TriangularPrism(GeometricalCase):
         Point(x, y, z) for x in [0] for y in [0]
         for z in [0]
     ]
-    
-    
+
+##### MODE 3
+
     def __init__(self,
                  point_A=None,
                  point_B=None,
@@ -104,25 +166,28 @@ class TriangularPrism(GeometricalCase):
 
 
 
-        plane_alpha = Plane(A, B, C)
+        plane_alpha = Plane(A, B, C)('$\\alpha$')
 
 
 
         plane_beta = HorizontalPlane(B)
         plane_eta = VerticalPlane(B)
 
+        line_h = plane_alpha.get_horizontal_line()('h')
+        current_obj.line_h=line_h
+        current_obj.add_solution_step('horizontal line',[line_h])
 
-        point_P1 = plane_beta.intersection(A ^ C)[0]('1')
+        point_P1 = line_h.p2
         current_obj.P1 = point_P1
-        line_h = (B ^ point_P1)('h')
+        current_obj.add_solution_step('Point P1',[point_P1])
 
-        point_P2 = plane_eta.intersection(A ^ C)[0]('2')
+        line_f = plane_alpha.get_frontal_line()('f')
+        point_P2 = line_f.p2
 
-        line_f = (B ^ point_P2)('f')
 
-        beta_p1 = O-(point_P1-B)
+        beta_p1 = O-(point_P1-A)
         beta_p0 = O
-        beta_p2 = O-(point_P2-B)
+        beta_p2 = O-(point_P2-A)
 
         plane_beta=Plane(beta_p0,beta_p1,beta_p2)
         
@@ -144,9 +209,15 @@ class TriangularPrism(GeometricalCase):
         
         plane_gamma=Plane(D,E,F)
 
-        
-        intersec_case  = LineAndPlaneIntersection(beta_p1,beta_p0,beta_p2 , A,aux_point ).solution()
-        current_obj._append_case(intersec_case)
+        if self.edge_plane is True:
+            
+            intersec_case  = D
+            current_obj.add_solution_step('Vertices',[D])
+            
+        else:
+            
+            intersec_case  = LineAndPlaneIntersection(beta_p1,beta_p0,beta_p2 , A,aux_point ).solution()
+            current_obj._append_case(intersec_case)
         
         # triangle_plane = Plane(A, B, C)
         # A, B, C, D, E, F = Prism.right_from_parallel_plane(triangle_plane, O)
@@ -169,7 +240,10 @@ class TriangularPrism(GeometricalCase):
                         [D,E,F,plane_gamma])
 
         current_obj.add_solution_step('Prism',
-                        [plane_alpha,plane_gamma,line_ad,line_be,line_cf])
+                        [plane_alpha,plane_gamma,line_ad,line_be,line_cf,A,B,C,O])
+        
+        current_obj.append([plane_alpha,plane_gamma,line_ad,line_be,line_cf,A@HPP,B@HPP,C@HPP])
+        current_obj._assumptions=current_obj._solution_step[-1]
         
         return current_obj
 
@@ -179,18 +253,75 @@ class TriangularPrism(GeometricalCase):
         point_B = self.__class__.point_B
         point_C = self.__class__.point_C
         point_O = self.__class__.point_O
+        shift = self.__class__.shift
 
         default_data_dict = {
             Symbol('A'): point_A,
             Symbol('B'): point_B,
             Symbol('C'): point_C,
             Symbol('O'): point_O,
+            'shift': shift,
         }
         return default_data_dict
+    
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_B = parameters_dict[Symbol('B')]
+        point_O = parameters_dict[Symbol('O')]
+        point_A = parameters_dict[Symbol('A')]
+        point_C = parameters_dict[Symbol('C')]
+
+        shift = parameters_dict['shift']
+        parameters_dict.pop('shift')
+
+        for point in symbols('A B C O'):
+            parameters_dict[point] = parameters_dict[point] + shift
+
+        return parameters_dict    
 
 
+class TriangularPrismHFLines(TriangularPrism):
     
 
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_A=parameters_dict[Symbol('A')]
+        point_B=parameters_dict[Symbol('B')] 
+        point_C=parameters_dict[Symbol('C')] 
+
+        
+        parameters_dict[Symbol('C')]=Point(point_A.x,point_C.y,point_C.z)
+        parameters_dict[Symbol('B')]=Point(point_B.x,point_B.y,point_A.z)
+
+        return parameters_dict
+    
+class EdgeTriangularPrism(TriangularPrism):
+    
+    edge_plane=True
+    
+    shift = [
+        Point(x, y, z) for x in [0] for y in [-2,-1,0,1,2] #ymax 2
+        for z in [-2,-1,0,1,2] 
+    ]
+    
+
+    
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_A = parameters_dict[Symbol('A')]
+        point_C = parameters_dict[Symbol('C')]
+
+        parameters_dict[Symbol('B')] = (point_A + point_C) * 0.5 + Point(0, 0, 3)
+
+        return parameters_dict
 
 class EquilateralTrianglePrism(GeometricalCase):
     """"
@@ -1622,7 +1753,7 @@ class TetragonalPrism(GeometricalCase):
     ]
 
     point_Z = [
-        Point(x, y, z) for x in range(4, 8) for y in range(11, 13)
+        Point(x, y, z) for x in [4,7] for y in [11,12]
         for z in [2, 2.5, 3, 3.5]
     ]
 
@@ -2075,39 +2206,39 @@ class TiltedTetragonalPrism(TetragonalPrism):
 
 
 
-class TriangularPrismHFLines(TriangularPrism):
-    point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [4,4.5,5] for z in [2,2.5,3,3.5]  ]
+# class TriangularPrismHFLines(TriangularPrism):
+#     point_A = [Point(x,y,z) for x in [1,1.5,2,2.5] for y in [4,4.5,5] for z in [2,2.5,3,3.5]  ]
 
-    point_B = [Point(x,y,z) for x in [3,3.5,4,4.5,5] for y in range(9,12) for z in [5,5.5,6,6.5,7] ]
-
-
-    point_C=[Point(x,y,z) for x in [4,4.5,5,5.5,6] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5] ]
+#     point_B = [Point(x,y,z) for x in [3,3.5,4,4.5,5] for y in range(9,12) for z in [5,5.5,6,6.5,7] ]
 
 
-    point_O=[Point(x,y,z) for x in range(9,12) for y in [6,6.5,7,7.5,8.5] for z in range(9,12) ]
+#     point_C=[Point(x,y,z) for x in [4,4.5,5,5.5,6] for y in [13,13.5,14,14.5,15] for z in [1,1.5,2,2.5] ]
 
-    shift = [
-        Point(x, y, z) for x in [-1, -0.5, 0, 0.5, 1]
-        for y in [0, 0.5]
-        for z in [-1, -0.5, 0, 0.5, 1]
-    ]
+
+#     point_O=[Point(x,y,z) for x in range(9,12) for y in [6,6.5,7,7.5,8.5] for z in range(9,12) ]
+
+#     shift = [
+#         Point(x, y, z) for x in [-1, -0.5, 0, 0.5, 1]
+#         for y in [0, 0.5]
+#         for z in [-1, -0.5, 0, 0.5, 1]
+#     ]
     
 
-    def get_random_parameters(self):
+#     def get_random_parameters(self):
 
-        parameters_dict=super().get_random_parameters()
+#         parameters_dict=super().get_random_parameters()
 
 
 
-        point_A=parameters_dict[Symbol('A')]
-        point_B=parameters_dict[Symbol('B')] 
-        point_C=parameters_dict[Symbol('C')] 
+#         point_A=parameters_dict[Symbol('A')]
+#         point_B=parameters_dict[Symbol('B')] 
+#         point_C=parameters_dict[Symbol('C')] 
 
         
-        parameters_dict[Symbol('C')]=Point(point_A.x,point_C.y,point_C.z)
-        parameters_dict[Symbol('B')]=Point(point_B.x,point_B.y,point_A.z)
+#         parameters_dict[Symbol('C')]=Point(point_A.x,point_C.y,point_C.z)
+#         parameters_dict[Symbol('B')]=Point(point_B.x,point_B.y,point_A.z)
 
-        return parameters_dict
+#         return parameters_dict
     
 class TriangularPrismSwappedProjections(TriangularPrism):
     shift = [
