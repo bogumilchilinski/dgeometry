@@ -22,6 +22,38 @@ from ..dgeometry import *#wyskakuje bład w jupku nie wiem czemu
 from .basics import LineAndPlaneIntersection
 
 
+
+triangle1 = {
+              'A':[Point(5, 4, 3)], 
+
+                 'B':[Point(1, 7, 2)],
+             'C':[Point(3,11,6)],
+              'O':[Point(7,11,2)] ,
+             'shift' : [Point(x, y, z) for x in [0] for y in [0,0.5,1,1.5,2] for z in [2,2.5,3,3.5,4,4.5,5]], # zmin 2 ymin 0
+             }
+
+triangle2 = {
+              'A':[Point(5, 11, 3)], 
+
+                 'B':[Point(1, 9, 2)],
+             'C':[Point(3,4,6)],
+              'O':[Point(7,4,0)] ,
+             'shift' : [Point(x, y, z) for x in [0] for y in [0,0.5,1,1.5,2] for z in [3,3.5,4,4.5,5]], # zmin 2 ymin 0
+             }
+
+
+
+
+
+triangle1_edge = {
+              'A':[Point(5, 4, 3)], 
+             'B':[Point(4, 7, 4+3)],
+             'C':[Point(3,10,6)],
+              'O':[Point(7,11,2)] ,
+             'shift' : [Point(x, y, z) for x in [0] for y in [-2,-1,0,1,2] for z in [-2,-1,0,1,2]], # zmin 2 ymin 0
+             }
+
+
 class RectangularBaseACDiagonalPyramid(GeometricalCase):
 
     
@@ -2211,6 +2243,13 @@ class TriangularPyramid(GeometricalCase):
 
     edge_plane = False
 
+    point_packs = [ triangle1,
+                    triangle2,
+                   #triangle1_edge,
+    ]
+    
+
+    
 #### MODE 1
 #     point_A = [
 #         Point(x, y, z) for x in [5]
@@ -2440,11 +2479,22 @@ class TriangularPyramid(GeometricalCase):
 
     def get_default_data(self):
 
-        point_A = self.__class__.point_A
-        point_B = self.__class__.point_B
-        point_C = self.__class__.point_C
-        point_O = self.__class__.point_O
-        shift = self.__class__.shift
+        if self.__class__.point_packs is not None:
+            
+            points_dict=random.choice(self.__class__.point_packs)
+            
+            
+            point_A = points_dict['A']
+            point_B = points_dict['B']
+            point_C = points_dict['C']
+            point_O = points_dict['O']
+            shift = points_dict['shift']
+        else:
+            point_A = self.__class__.point_A
+            point_B = self.__class__.point_B
+            point_C = self.__class__.point_C
+            point_O = self.__class__.point_O
+            shift = self.__class__.shift
 
         default_data_dict = {
             Symbol('A'): point_A,
@@ -2453,7 +2503,6 @@ class TriangularPyramid(GeometricalCase):
             Symbol('O'): point_O,
             'shift': shift,
         }
-        
         return default_data_dict
     
     def get_random_parameters(self):
