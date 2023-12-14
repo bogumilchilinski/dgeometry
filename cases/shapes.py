@@ -459,24 +459,34 @@ class EquilateralTriangleOnPlane(ShapeOnPlane):
         B = (S + dirPS / (P.distance(S)) * (triangle_side / 2))('B')
         C = (S - dirPS / (P.distance(S)) * (triangle_side / 2))('C')
 
-        triangle_plane = Plane(A, B, C)
+        triangle_plane = Plane(A, B, C)('$\\alpha$')
 
         current_set = DrawingSet(*current_obj._solution_step[-1])
 
         line_a = Line(A, B)('a')
         line_b = Line(C, A)('b')
-        plane_alpha = Plane(A, O, P)
+        plane_alpha = Plane(A, O, P)('$\\alpha$')
 
         plane_beta = HorizontalPlane(P)
         plane_eta = VerticalPlane(P)
 
         line_k = plane_alpha.intersection(plane_beta)[0]('a')
 
-        point_P1 = plane_beta.intersection(A ^ O)[0]('1')
-        point_P2 = plane_eta.intersection(A ^ O)[0]('2')
+        
+        line_h = plane_alpha.get_horizontal_line()('h')
+        current_obj.line_h=line_h
+        current_obj.add_solution_step('horizontal line',[line_h])
+
+        point_P1 = line_h.p2
         current_obj.P1 = point_P1
-        line_kk = (P ^ point_P1)('a')
-        line_f = (P ^ point_P2)('f')
+        current_obj.add_solution_step('Point P1',[point_P1])
+
+        line_f = plane_alpha.get_frontal_line()('f')
+        point_P2 = line_f.p2
+        current_obj.P1 = point_P1
+        
+        line_kk = (line_h)('a')
+        line_f = line_f
 
         # it creates next step of solution - lines are presented
         #current_step3d=copy.deepcopy(current_obj._solution3d_step[-1])+[(A^point_P1)('AO'),point_P1,(P^point_P1)('a')]
@@ -484,7 +494,7 @@ class EquilateralTriangleOnPlane(ShapeOnPlane):
         #it sets the step elements
         current_obj.add_solution_step('Axis of rotation',
                                       [(A ^ point_P1)('AO'), point_P1,
-                                       (P ^ point_P1)('a'), 
+                                       (line_h)('a'), 
                                        point_P2,
                                        #line_f,
                                       ])

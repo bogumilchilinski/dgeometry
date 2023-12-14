@@ -828,9 +828,15 @@ class Point(Entity):
         point_rot_center = (point @ axis)(f'S_{point._label}')
 
         radius = point.distance(point_rot_center)
+        print('radius of rotation')
+        print(round(radius,3))
 
         if radius == 0:
             rotated_point = copy.deepcopy(point)(f'{point._label}_0')
+        elif round(radius,4) < 0.001:
+            print(f'!!!!!!!!! WARNING !!!!!!! - radius is close zero = {round(radius,4)}')
+            rotated_point = copy.deepcopy(point)(f'{point._label}_0')
+        
         else:
 
             # zaimplementować w metode dla punktu
