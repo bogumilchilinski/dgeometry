@@ -618,6 +618,46 @@ hf_triangle_AOP_2 = {
              'shift' : [Point(x, y, z) for x in [0] for y in [0,0.5,1,1.5,2] for z in [3,3.5,4,4.5,5]], # zmin 2 ymin 0
              }
 
+ 
+swapped_hf_triangle_AOP_1 = {
+              'P':[Point(6-12, 4, 3-12)], 
+
+                 'A':[Point(6-12, 10, -1-12)],
+             'O':[Point(3-12,11,3-12)],
+              'H':[Point(7-12,11,2-12)] ,
+             'shift' : [Point(x, y, z) for x in [0] for y in [0,0.5,1,1.5,2] for z in [2,2.5,3,3.5,4,4.5,5]], # zmin 2 ymin 0
+             }
+
+swapped_hf_triangle_AOP_2 = {
+              'P':[Point(5-12, 11, 6-12)], 
+
+                 'A':[Point(3-12, 9, 2-12)],
+             'O':[Point(3-12,4,6-12)],
+              'H':[Point(7-12,4,0-12)] ,
+             'shift' : [Point(x, y, z) for x in [1,2] for y in [0,0.5,1,1.5,2] for z in [2,3,3.5,4]], # zmin 2 ymin 0
+             }
+    
+    
+swapped_h_triangle_AOP_1 = {
+              'P':[Point(6-12, 4, 3-12)], 
+
+                 'A':[Point(2-12, 10, -1-12)],
+             'O':[Point(3-12,11,3-12)],
+              'H':[Point(7-12,11,2-12)] ,
+             'shift' : [Point(x, y, z) for x in [0] for y in [-3,-2,-1
+                                                              #-0.5,0,0.5,1
+                                                             ] for z in [3,3.5,4,4.5,5]], # zmin 2 ymin 0
+             }
+
+swapped_h_triangle_AOP_2 = {
+              'P':[Point(5-12, 11, 6-12)], 
+
+                 'A':[Point(2-12, 10, 2-12)],
+             'O':[Point(3-12,4,6-12)],
+              'H':[Point(7-12,4,0-12)] ,
+             'shift' : [Point(x, y, z) for x in [1,2] for y in [0,0.5,1,1.5,2] for z in [2,3,3.5,4]], # zmin 2 ymin 0
+             }
+    
     
 class EquilateralTrianglePrism(GeometricalCase):
     """"
@@ -966,6 +1006,21 @@ class EquilateralTrianglePrismHFLines(EquilateralTrianglePrism):
                    hf_triangle_AOP_2,
                    #triangle1_edge, 
                   ]
+    
+    
+class EquilateralTrianglePrismHFLinesSwappedProjections(EquilateralTrianglePrism):
+    point_packs = [ swapped_hf_triangle_AOP_1,
+                   swapped_hf_triangle_AOP_2,
+                   #triangle1_edge, 
+                  ]
+
+    
+class EquilateralTrianglePrismHLineSwappedProjections(EquilateralTrianglePrism):
+    point_packs = [ swapped_h_triangle_AOP_1,
+                   swapped_h_triangle_AOP_2,
+                   #triangle1_edge, 
+                  ]
+
 ## START –> odtąd KOPIOWAĆ
 class EquilateralTrianglePrismNew(EquilateralTrianglePrism):
 
@@ -1984,22 +2039,7 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
 
         return current_obj
 
-#     def get_default_data(self):
 
-#         point_A = self.__class__.point_A
-#         point_O = self.__class__.point_O
-#         point_P = self.__class__.point_P
-#         point_H = self.__class__.point_H
-#         shift = self.__class__.shift
-
-#         default_data_dict = {
-#             Symbol('A'): point_A,
-#             Symbol('P'): point_P,
-#             Symbol('O'): point_O,
-#             Symbol('H'): point_H,
-#             'shift':shift,
-#         }
-#         return default_data_dict
 
     
     
@@ -2057,6 +2097,22 @@ class IsoscelesRightTrianglePrismHFLines(IsoscelesRightTrianglePrism):
                    #triangle1_edge, 
                   ]
     
+    
+
+
+class IsoscelesRightTrianglePrismHFLinesSwappedProjections(IsoscelesRightTrianglePrism):
+    point_packs = [ swapped_hf_triangle_AOP_1,
+                   swapped_hf_triangle_AOP_2,
+                   #triangle1_edge, 
+                  ]
+    
+    
+class IsoscelesRightTrianglePrismHLineSwappedProjections(IsoscelesRightTrianglePrism):
+    point_packs = [ swapped_h_triangle_AOP_1,
+                   swapped_h_triangle_AOP_2,
+                   #triangle1_edge, 
+                  ]
+
     
     
 class EdgeIsoscelesRightTrianglePrism(IsoscelesRightTrianglePrism):
