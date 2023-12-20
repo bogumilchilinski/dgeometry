@@ -1,0 +1,5 @@
+
+reset;history -d $(history 1)
+[?2004h]0;~/Marek Skwarka/Shared files/modules/dgeometry[01;34m~/Marek Skwarka/Shared files/modules/dgeometry[00m$ 
+[?2004l[?2004h]0;~/Marek Skwarka/Shared files/modules/dgeometry[01;34m~/Marek Skwarka/Shared files/modules/dgeometry[00m$ reset;history -d $(history 1)
+[?2004lc]104[!p[?3;4l[4l>[?69l[?2004h]0;~/Marek Skwarka/Shared files/modules/dgeometry[01;34m~/Marek Skwarka/Shared files/modules/dgeometry[00m$ 

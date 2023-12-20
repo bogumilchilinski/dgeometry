@@ -1,0 +1,8 @@
+
+reset;history -d $(history 1)
+[?2004h]0;~/Marek Skwarka/Shared files/modules/dgeometry[01;34m~/Marek Skwarka/Shared files/modules/dgeometry[00m$ 
+[?2004l[?2004h]0;~/Marek Skwarka/Shared files/modules/dgeometry[01;34m~/Marek Skwarka/Shared files/modules/dgeometry[00m$ reset;history -d $(history 1)
+[?2004lc]104[!p[?3;4l[4l>[?69l[?2004h]0;~/Marek Skwarka/Shared files/modules/dgeometry[01;34m~/Marek Skwarka/Shared files/modules/dgeometry[00m$ ls
+[?2004lLICENSE  README.md  __init__.py  [0m[01;34m__pycache__[0m  [01;34mcases[0m  dgeometry.py  [01;34mimages[0m  term.term
+[?2004h]0;~/Marek Skwarka/Shared files/modules/dgeometry[01;34m~/Marek Skwarka/Shared files/modules/dgeometry[00m$ python dgeometry.py
+[?2004l[?2004h]0;~/Marek Skwarka/Shared files/modules/dgeometry[01;34m~/Marek Skwarka/Shared files/modules/dgeometry[00m$ 
