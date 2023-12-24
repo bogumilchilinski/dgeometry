@@ -828,9 +828,15 @@ class Point(Entity):
         point_rot_center = (point @ axis)(f'S_{point._label}')
 
         radius = point.distance(point_rot_center)
+        print('radius of rotation')
+        print(round(radius,3))
 
         if radius == 0:
             rotated_point = copy.deepcopy(point)(f'{point._label}_0')
+        elif round(radius,4) < 0.001:
+            print(f'!!!!!!!!! WARNING !!!!!!! - radius is close zero = {round(radius,4)}')
+            rotated_point = copy.deepcopy(point)(f'{point._label}_0')
+        
         else:
 
             # zaimplementować w metode dla punktu
@@ -1049,7 +1055,16 @@ class Plane(Entity):
     
     def get_horizontal_line(self,p=None):
         
-        p1,p2,p3=self._vertices()
+        
+        if p is not None: 
+            p1=p
+            new_vertices_list=[*self._vertices(),]
+            new_vertices_list.remove(p1)
+            new_vertices_tuple=tuple(new_vertices_list)
+            p2,p3=new_vertices_tuple
+        else:
+            p1,p2,p3=self._vertices()
+            
         other_points = (Line(p2,p3) & HorizontalPlane(p1))
         
         if len(other_points) == 0:
@@ -1064,14 +1079,23 @@ class Plane(Entity):
 
     def get_frontal_line(self,p=None):
 
-        p1,p2,p3=self._vertices()
+        if p is not None: 
+            p1=p
+            new_vertices_list=[*self._vertices(),]
+            new_vertices_list.remove(p1)
+            new_vertices_tuple=tuple(new_vertices_list)
+            p2,p3=new_vertices_tuple
+        else:
+            p1,p2,p3=self._vertices()
+            
         other_points = (Line(p2,p3) & FrontalPlane(p1))
-
+        
         if len(other_points) == 0:
             return Line(p2,p3)
         else:
+            
             result = Line(p1,other_points[0])
-            result._label = f'$f_{{{self._label.replace("$","")}}}$'
+            result._label = f'$h_{{{self._label.replace("$","")}}}$'
             return result
 
 class ParallelPlane(Plane):
