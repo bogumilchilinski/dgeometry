@@ -1074,6 +1074,12 @@ class Plane(Entity):
             result._label = f'$f_{{{self._label.replace("$","")}}}$'
             return result
 
+class ParallelPlane(Plane):
+    def __init__(self, plane,distance ,**kwargs):
+        
+        p1,p2,p3=plane._vertices()
+        
+        super().__init__(p1+distance, a=p2+distance, b=p3+distance, **kwargs)
 
 class Tetragon(Plane):
     _label = 'Tetragon'
