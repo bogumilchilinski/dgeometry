@@ -1648,7 +1648,7 @@ class BasicGearSketch(ShaftSketch
             
 #             shafts.append(shaft)
         for i in range(50): # Git
-            shaft =[sol.Cylinder(random.randint(20,40),random.randint(50,60))] +[sol.Cylinder(random.randint(20,40),random.randint(50,60))]+[sol.Cylinder(random.randint(20,40),random.randint(50,60))]
+            shaft =[sol.Cylinder(random.randint(20,40),random.randint(50,60))] +[sol.Cylinder(random.randint(20,40),random.randint(50,60))]+[sol.Cylinder(random.randint(20,40),random.randint(50,60))+sol.Hole()]
             shaft[-3]._origin = 0
             shaft[-2]._origin=shaft[-3].end
             shaft[-1]._origin = shaft[-2].end
@@ -1659,6 +1659,87 @@ class BasicGearSketch(ShaftSketch
   
             
         return shafts
+class DoubleRingGear(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 4, 'min': 2}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+        for i in range(50): # Git
+            cylinder_diameter=random.randint(20,40)
+            shaft =[sol.ChamferedCylinder(random.randint(40,50),random.randint(80,120))] +[sol.Gear(random.randint(20,40),random.randint(40,50),random.uniform(2,3))]+[sol.ChamferedCylinder(random.randint(40,50),random.randint(80,120))]
+            shaft += [sol.OpenHole(shaft[-3].end+shaft[-2].end+shaft[-1].end,round(cylinder_diameter*0.7))]
+            shaft[-4]._origin = 0
+            shaft[-3]._origin=shaft[-4].end
+            shaft[-2]._origin=shaft[-3].end
+
+            shafts.append(shaft)
+
+        return shafts
+class SingleRingGear(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 4, 'min': 2}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+        for i in range(50): # Git
+            cylinder_diameter=random.randint(20,40)
+            shaft =[sol.ChamferedCylinder(random.randint(40,50),random.randint(80,120))] +[sol.Gear(random.randint(20,40),random.randint(40,50),random.uniform(2,3))]
+            shaft += [sol.OpenHole(shaft[-2].end,round(cylinder_diameter*random.uniform(0.3,0.6)))]
+            shaft += [sol.Hole(shaft[-3].origin+shaft[-2].end,round(cylinder_diameter*random.uniform(0.6,0.8)))]
+            shaft[-4]._origin = 0
+            shaft[-3]._origin=shaft[-4].end
+            shaft[-2]._origin=shaft[-1].end
+
+            shafts.append(shaft)
+
+        return shafts
+    
+class SimpleFlangeSleeve(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 4, 'min': 2}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+        for i in range(50): # Git
+            cylinder_diameter=random.randint(30,40)
+            
+            shaft =[sol.FlangeWithHoles(cylinder_diameter,random.randint(140,160),random.randint(60,80),random.randint(20,30),random.randint(2,8))] +[sol.Cylinder(random.randint(40,50),random.randint(50,70)*1.1)]+[sol.Cylinder(random.randint(60,70),random.randint(50,70))]+[sol.ChamferedCylinder(random.randint(40,50),random.randint(50,70))]
+            shaft += [sol.ThreadedOpenHole(shaft[-4].end+shaft[-2].end,round(cylinder_diameter*random.uniform(0.6,0.8)))]
+            shaft += [sol.Hole(shaft[-4].end+shaft[-2].end,round(cylinder_diameter*random.uniform(0.3,0.5)))]
+            shaft[-6]._origin = 0
+            shaft[-5]._origin=shaft[-6].end
+            shaft[-4]._origin=shaft[-5].end
+            shaft[-3]._origin=shaft[-4].end
+            shaft[-2]._origin=shaft[-1].end
+            
+
+           
+
+            shafts.append(shaft)
+
+        return shafts    
     
 class ScrewConnectionSketch(ShaftSketch
                              #GeometricalCase
