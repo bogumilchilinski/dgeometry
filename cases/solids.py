@@ -5679,3 +5679,133 @@ class ChamferedCylinderWithKeyseat(ChamferedCylinder):
                      [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
+        
+################################################## Complex Solids aka podziemie ################################################
+class CylinderWithHole(Cylinder):
+
+    line_type = '-'
+    color = 'k'
+
+    num_of_lines_view = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 3,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+    num_of_lines_sec = {
+        'horizontal_lines': 3,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 1,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 4,
+        'vertical_lines': 2,
+        'horizontal_dimensions': 3,
+        'vertical_dimensions': 1,
+        'inclined_lines': 0,
+    }
+
+    num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
+    
+    
+
+    def str_en(self):
+        return 'Cylinder with Hole\n with L={length}mm and diameter={d}mm'.format(
+            length=self.height,
+            d=self.diameter)
+
+    def str_pl(self):
+        return 'Walec z otworem \n o L={length}mm i średnicy={d}mm'.format(
+            length=self.height,
+            d=self.diameter).replace('right',
+                                          'prawej').replace('left', 'lewej')
+    
+    
+    def _plot_2d(self, language='en'):
+
+        #         print(f'self.origin property is {self.origin()}')
+        #         print(f'self.end property is {self.end()}')
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        #         print(f'plot_2d is called for {class_name}')
+
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        origin = self.origin / 10
+        end = self.end / 10
+       #r_h = self.hole_diameter / 2 / 10
+        
+        t_l = origin - 3
+        t_r = (r + 5.5)
+
+        line_type = self.line_type
+        color = self.color
+        
+        #angle = np.linspace(1/2*np.pi,3/2*np.pi,100)
+        
+        #x_c_l = r*2/9 * np.cos(angle)
+        #y_c_l = r*2/9 * np.sin(angle)
+        #x_c_r = r*2/9 * -np.cos(angle)
+        #y_c_r = r*2/9 * -np.sin(angle)
+        
+        #x_coords_l=x_c_l
+        #y_coords_l=y_c_l
+        #x_coords_r=x_c_r
+        #y_coords_r=y_c_r
+        
+        #circle_l = np.array([[x,y]  for x,y in zip(x_coords_l,y_coords_l)])
+        #circle_r = np.array([[x,y]  for x,y in zip(x_coords_r,y_coords_r)])
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            line_type,
+            color=color) + GeometryScene.ax_2d.plot(
+                [origin - 0.5, origin + l + 0.5], [0, 0],
+                '-.',
+                color='k',
+                linewidth=1) + GeometryScene.ax_2d.plot(
+                    [origin + 0, origin + l], 
+                    [r*2/9, r*2/9],
+                    '--',
+                    color='b',
+                        linewidth=1) + GeometryScene.ax_2d.plot(
+                        [origin + l, origin + 0], 
+                        [-r*2/9, -r*2/9],
+                        '--',
+                        color='b',
+                        linewidth=1)+ GeometryScene.ax_2d.plot(
+                            [origin + 0, origin + 0],
+                            [-r*2/9, r*2/9],
+                            '--',
+                            color='b',
+                            linewidth=3) + GeometryScene.ax_2d.plot(
+                                [origin + l, origin + l],
+                                [-r*2/9, r*2/9],
+                                '--',
+                                color='b',
+                                linewidth=3)
+
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(0,0, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+
+        print(res)

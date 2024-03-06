@@ -2823,6 +2823,31 @@ class ShortSleeve(ShaftSketch
   
             
         return shafts
+class CylinderWithKeyseatSketch(ShaftSketch
+                              #GeometricalCase
+                              ):
+    
+
+
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts  = []
+
+            
+        for i in range(50):
+            shaft = [sol.CylinderWithHole(400, 600)]
+            shaft[0]._origin = 0
+            
+            shafts.append(shaft)
+        
+
+        return shafts            
+            
 ################################################Podziemie##############################################################################    
 class GeometrySc:
     GeometryScene() 
