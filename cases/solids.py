@@ -4498,7 +4498,7 @@ class RoundedMediumBodyBlockShapeT(RoundedBodyBlockShapeT):
     
     @property
     def height_wider(self):
-        return round(self.height*0.6)
+        return round(self.height*0.35)
     
 
 

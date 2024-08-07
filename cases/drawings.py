@@ -1316,10 +1316,12 @@ class ThreadedSleeveWithGrearsSketch(ShaftSketch
                                       5,
                                       6,
                                   ],
-                                  step_modificator= step_mod_inc_threads,origin = 0)
+                                  step_modificator= step_mod_inc_keyseat,origin = 0)
             
-            shaft +=  [sol.Gear(25, 40, 3)]
+            shaft +=  [sol.CylinderWithKeyseat(40, 60),sol.Gear(25, 40, 3)]
+            shaft[-2]._origin = shaft[-3].end
             shaft[-1]._origin = shaft[-2].end
+            
             
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
@@ -1327,10 +1329,10 @@ class ThreadedSleeveWithGrearsSketch(ShaftSketch
                                       -5,
                                       -6,
                                   ],
-                                  step_modificator=step_mod_inc_gear,origin = shaft[-1].end)
+                                  step_modificator=step_mod_inc_keyseat,origin = shaft[-1].end)
             
-            shaft += create_random_profile(4,
-                                  2,
+            shaft += create_random_profile(2,
+                                  1,
                                   initial_diameter=[30,25,20],
                                   increase_values=[
                                       -2,
@@ -2617,7 +2619,7 @@ class RoundedBodyBlockShapeTView(ShaftSketch
             
             body_type = random.choice([
                                        sol.RoundedBodyBlockShapeT,
-                                       sol.RoundedHeavyBodyBlockShapeT,
+                                       #sol.RoundedHeavyBodyBlockShapeT,
                                        sol.RoundedMediumBodyBlockShapeT,
                                       ])
             
