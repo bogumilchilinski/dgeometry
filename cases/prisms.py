@@ -37,8 +37,9 @@ triangle2 = {
               'A':[Point(5, 11, 3)], 
 
                  'B':[Point(1, 9, 2)],
-             'C':[Point(3,4,6)],
+             'C':[Point(3,4,5)],
               'O':[Point(7,4,0)] ,
+             'N':[Point(5, 11, 3) +  0.25*(  Point(3,4,6) - Point(7,4,0)    )] ,
              'shift' : [Point(x, y, z) for x in [0] for y in [0,0.5,1,1.5,2] for z in [3,3.5,4,4.5,5]], # zmin 2 ymin 0
              }
 
@@ -94,7 +95,7 @@ class TriangularPrism(GeometricalCase):
 
 
     point_packs = [ triangle1,
-                   # triangle2,
+                    triangle2,
                    #triangle1_edge,
     ]
     #point_packs = None
