@@ -27,8 +27,9 @@ triangle1 = {
               'A':[Point(5, 4, 3)], 
 
                  'B':[Point(1, 7, 2)],
-             'C':[Point(3,11,6)],
+             'C':[Point(3,9,5)],
               'O':[Point(7,11,2)] ,
+             'N':[Point(5, 4, 3) +  0.25*(  Point(3,9,5) - Point(7,11,2)    )] ,
              'shift' : [Point(x, y, z) for x in [0] for y in [0,0.5,1,1.5,2] for z in [2,2.5,3,3.5,4,4.5,5]], # zmin 2 ymin 0
              }
 
@@ -93,7 +94,7 @@ class TriangularPrism(GeometricalCase):
 
 
     point_packs = [ triangle1,
-                    triangle2,
+                   # triangle2,
                    #triangle1_edge,
     ]
     #point_packs = None
@@ -190,6 +191,7 @@ class TriangularPrism(GeometricalCase):
                  point_B=None,
                  point_C=None,
                  point_O=None,
+                 point_N=None,
                  **kwargs):
 
         super().__init__()
@@ -202,17 +204,19 @@ class TriangularPrism(GeometricalCase):
         self.point_B = point_B
         self.point_C = point_C
         self.point_O = point_O
+        self.point_N = point_N
 
         self._given_data = {
             'A': point_A,
             'B': point_B,
             'C': point_C,
             'O': point_O,
+            'N': point_N,
         }
 
 
         self.add_solution_step('Assumptions',
-                        [point_A, point_B, point_C, point_O])
+                        [point_A, point_B, point_C, point_O, point_N])
 
         
         
@@ -232,6 +236,7 @@ class TriangularPrism(GeometricalCase):
         B = current_obj.point_B
         C = current_obj.point_C
         O = current_obj.point_O
+        N = current_obj.point_N
 
 
 
@@ -246,7 +251,7 @@ class TriangularPrism(GeometricalCase):
         current_obj.line_h=line_h
         current_obj.add_solution_step('horizontal line',[line_h])
 
-        point_P1 = line_h.p2
+        point_P1 = line_h.p2('I')
         current_obj.P1 = point_P1
         current_obj.add_solution_step('Point P1',[point_P1])
 
@@ -304,14 +309,20 @@ class TriangularPrism(GeometricalCase):
         current_obj.point_E = E
         current_obj.point_F = F
 
+        Q = (plane_alpha & Line(N,O))[0]('Q')
+
+        current_obj.point_Q = Q
         
         current_obj.add_solution_step('Vertices',
                         [D,E,F,plane_gamma])
 
         current_obj.add_solution_step('Prism',
                         [plane_alpha,plane_gamma,line_ad,line_be,line_cf,A,B,C,O])
+ 
+        current_obj.add_solution_step('Prism',
+                        [plane_alpha,plane_gamma,line_ad,line_be,line_cf,A,B,C,O,point_P1,N,Q])
         
-        current_obj.append([plane_alpha,plane_gamma,line_ad,line_be,line_cf,A@HPP,B@HPP,C@HPP])
+        current_obj.append([plane_alpha,plane_gamma,line_ad,line_be,line_cf,A@HPP,B@HPP,C@HPP,point_P1@HPP,point_P1@VPP])
         current_obj._assumptions=current_obj._solution_step[-1]
         
         return current_obj
@@ -327,12 +338,14 @@ class TriangularPrism(GeometricalCase):
             point_B = points_dict['B']
             point_C = points_dict['C']
             point_O = points_dict['O']
+            point_N = points_dict['N']
             shift = points_dict['shift']
         else:
             point_A = self.__class__.point_A
             point_B = self.__class__.point_B
             point_C = self.__class__.point_C
             point_O = self.__class__.point_O
+            point_N = self.__class__.point_N
             shift = self.__class__.shift
 
         default_data_dict = {
@@ -340,6 +353,7 @@ class TriangularPrism(GeometricalCase):
             Symbol('B'): point_B,
             Symbol('C'): point_C,
             Symbol('O'): point_O,
+            Symbol('N'): point_N,
             'shift': shift,
         }
         return default_data_dict
@@ -352,11 +366,12 @@ class TriangularPrism(GeometricalCase):
         point_O = parameters_dict[Symbol('O')]
         point_A = parameters_dict[Symbol('A')]
         point_C = parameters_dict[Symbol('C')]
+        point_N = parameters_dict[Symbol('N')]
 
         shift = parameters_dict['shift']
         parameters_dict.pop('shift')
 
-        for point in symbols('A B C O'):
+        for point in symbols('A B C O N'):
             parameters_dict[point] = parameters_dict[point] + shift
 
         return parameters_dict    
