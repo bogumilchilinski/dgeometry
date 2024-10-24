@@ -254,6 +254,7 @@ class TriangularPrism(GeometricalCase):
 
         point_P1 = line_h.p2('I')
         current_obj.P1 = point_P1
+        current_obj.point_I = point_P1
         current_obj.add_solution_step('Point P1',[point_P1])
 
         line_f = plane_alpha.get_frontal_line()('f')
@@ -311,8 +312,10 @@ class TriangularPrism(GeometricalCase):
         current_obj.point_F = F
 
         Q = (plane_alpha & Line(N,O))[0]('Q')
+        P = (O@plane_alpha)('P')
 
         current_obj.point_Q = Q
+        current_obj.point_P = P
         
         current_obj.add_solution_step('Vertices',
                         [D,E,F,plane_gamma])
@@ -321,7 +324,7 @@ class TriangularPrism(GeometricalCase):
                         [plane_alpha,plane_gamma,line_ad,line_be,line_cf,A,B,C,O])
  
         current_obj.add_solution_step('Prism',
-                        [plane_alpha,plane_gamma,line_ad,line_be,line_cf,A,B,C,O,point_P1,N,Q])
+                        [plane_alpha,plane_gamma,line_ad,line_be,line_cf,A,B,C,O,point_P1,N,Q,P])
         
         current_obj.append([plane_alpha,plane_gamma,line_ad,line_be,line_cf,A@HPP,B@HPP,C@HPP,point_P1@HPP,point_P1@VPP])
         current_obj._assumptions=current_obj._solution_step[-1]
