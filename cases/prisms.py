@@ -1887,7 +1887,7 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
 
         line_a = Line(A, B)('a')
         line_b = Line(C, A)('b')
-        plane_alpha = Plane(A, O, P)('$\\alpha$')
+        plane_alpha = Plane(P,A, O)('$\\alpha$')
 
         plane_beta = HorizontalPlane(P)
         plane_eta = VerticalPlane(P)
@@ -1899,7 +1899,7 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         current_obj.line_h=line_h
         current_obj.add_solution_step('horizontal line',[line_h])
 
-        point_P1 = line_h.p2
+        point_P1 = line_h.p2('I')
         current_obj.P1 = point_P1
         current_obj.add_solution_step('Point P1',[point_P1])
 
@@ -1909,6 +1909,11 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         
         
         current_obj.P1 = point_P1
+        current_obj.point_I = point_P1
+        
+        print('Point I')
+        print(point_P1.coordinates)
+        
         line_kk = line_h('a')
         line_f = line_f
 
@@ -1968,6 +1973,7 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         current_obj.add_solution_step('Base ABC', [A, B, C])
 
         G = (H @ plane_alpha)('G')
+        current_obj.point_G = G
 
         ############  upper  base
 
@@ -2029,7 +2035,7 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         
         projections += [
             G @ HPP, G @ VPP, D @ HPP, D @ VPP, E @ HPP, E @ VPP, F @ HPP,
-            F @ VPP
+            F @ VPP,point_P1@ HPP, point_P1 @ VPP,
         ]
 
         line_ad = Line(A, D)('a')
@@ -2039,7 +2045,7 @@ class IsoscelesRightTrianglePrism(GeometricalCase):
         
         plane_gamma = Plane(D,E,F)('$\\gamma$')
         current_obj.add_solution_step('Prism',
-                        [plane_alpha,plane_gamma,line_ad,line_be,line_cf,A,B,C,O])
+                        [plane_alpha,plane_gamma,line_ad,line_be,line_cf,A,B,C,O,point_P1])
         
         
         
