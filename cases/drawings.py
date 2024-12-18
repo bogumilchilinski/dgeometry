@@ -2367,7 +2367,7 @@ class SimpleShaftWithKeyseats(ShaftWithKeyseats
                               #GeometricalCase
                               ):
     
-    steps_no = {'max': 2, 'min': 0}
+    steps_no = {'max': 1, 'min': 0}
     holes_no = {'max': 1, 'min': 0}
     
 class BodyBlockSimpleView(ShaftSketch
