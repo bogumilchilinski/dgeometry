@@ -495,9 +495,13 @@ class ParallelogramPrism(GeometricalCase):
         current_obj.line_h=line_h
         current_obj.add_solution_step('horizontal line',[line_h])
 
-        point_P1 = line_h.p2
+        point_P1 = line_h.p2('I')
         current_obj.P1 = point_P1
         current_obj.add_solution_step('Point P1',[point_P1])
+
+        current_obj.point_I = point_P1
+        current_obj.add_solution_step('Point P1',[point_P1])
+
 
         line_f = plane_alpha.get_frontal_line()('f')
         point_P2 = line_f.p2
@@ -523,6 +527,7 @@ class ParallelogramPrism(GeometricalCase):
         aux_point = E
         
         
+        
         height_A = Line(A,aux_point)('hA')
         current_obj.add_solution_step('Perpendicular line - height',[height_A])
         
@@ -537,6 +542,11 @@ class ParallelogramPrism(GeometricalCase):
             
             intersec_case  = LineAndPlaneIntersection(beta_p1,beta_p0,beta_p2 , A,aux_point ).solution()
             current_obj._append_case(intersec_case)
+        
+        
+        P = (O@plane_alpha)('P')
+
+        current_obj.point_P = P
         
         # triangle_plane = Plane(A, B, C)
         # A, B, C, D, E, F = Prism.right_from_parallel_plane(triangle_plane, O)
@@ -561,14 +571,17 @@ class ParallelogramPrism(GeometricalCase):
         current_obj.point_H = H
 
         
+
+        
+        
         current_obj.add_solution_step('Vertices',
                         [D,E,F,G,H,plane_gamma])
 
         current_obj.add_solution_step('Prism',
                         [plane_alpha,plane_gamma,
-                         line_ad,line_be,line_cf,line_dh,A,B,C,D,E,F,G,H,line_ab,line_bc,line_cd,line_ad])
+                         line_ad,line_be,line_cf,line_dh,A,B,C,D,E,F,G,H,line_ab,line_bc,line_cd,line_ad,point_P1,P])
         
-        current_obj.append([Tetragon(A,B,C,D),plane_alpha,plane_gamma,line_ad,line_be,line_cf,A@HPP,B@HPP,C@HPP])
+        current_obj.append([Tetragon(A,B,C,D),plane_alpha,plane_gamma,line_ad,line_be,line_cf,A@HPP,B@HPP,C@HPP,point_P1@HPP,point_P1@VPP])
         current_obj._assumptions=current_obj._solution_step[-1]
         
         return current_obj
@@ -618,6 +631,32 @@ class ParallelogramPrism(GeometricalCase):
 
         return parameters_dict    
 
+
+class ParallelogramPrismHFLines(ParallelogramPrism):
+    edge_plane = False
+
+
+    point_packs = [ triangle1,
+                    triangle2,
+                   #triangle1_edge,
+    ]
+    
+
+    def get_random_parameters(self):
+
+        parameters_dict=super().get_random_parameters()
+
+
+
+        point_A=parameters_dict[Symbol('A')]
+        point_B=parameters_dict[Symbol('B')] 
+        point_C=parameters_dict[Symbol('C')] 
+
+        
+        parameters_dict[Symbol('C')]=Point(point_A.x,point_C.y,point_C.z)
+        parameters_dict[Symbol('B')]=Point(point_B.x,point_B.y,point_A.z)
+
+        return parameters_dict
 
 hf_triangle_AOP_1 = {
               'P':[Point(6, 4, 3)], 
