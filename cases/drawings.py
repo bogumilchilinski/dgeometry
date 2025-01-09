@@ -540,7 +540,6 @@ class ShaftSketch(GeometricalCase):
 
 
 
-        
     def _scheme(self):
 
         if self._path is None:
@@ -895,6 +894,10 @@ class SimpleSleeveWithFlangeSketch(SleeveWithFlangeSketch):
 
     steps_no = {'max': 1, 'min': 0}
     holes_no = {'max': 1, 'min': 0}
+    
+    
+
+    
     
 class SleeveWithThreadedHoleSketch(ShaftSketch
                                    #GeometricalCase
@@ -2358,6 +2361,9 @@ class ShaftWithKeyseats(ShaftSketch
             #shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,14)]
             #shaft[-1]._origin=shaft[-2].end
             
+            
+            
+            
             shafts.append(shaft)
         
 
@@ -2369,6 +2375,50 @@ class SimpleShaftWithKeyseats(ShaftWithKeyseats
     
     steps_no = {'max': 1, 'min': 0}
     holes_no = {'max': 1, 'min': 0}
+    
+    
+class NewShaftWithKeyseats(ShaftSketch):
+    
+    steps_no = {'max': 1, 'min': 0}
+    holes_no = {'max': 1, 'min': 0}
+    
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+        for i in range(50):
+            
+            shaft = [sol.CylinderWithKeyseat(60, 40)]
+            shaft[0]._origin = 0
+            
+            shaft += create_random_profile(steps['max'],steps['min'],
+                                  increase_values=[
+                                      4,
+                                      5,
+                                      6,
+                                  ],
+                                  step_modificator=step_mod_inc_chamfer,origin=shaft[-1].end) 
+            
+            d_end=shaft[-1].diameter
+            
+            shaft +=create_random_profile(steps['max'],steps['min'],
+                                  initial_diameter=[d_end+8, d_end+10 ],
+                                  increase_values=[
+                                      -4,
+                                      -5,
+                                      -6,
+                                  ],
+                                  step_modificator=step_mod_dec_chamfer,origin = shaft[-1].end)
+            
+            shaft += [sol.CylinderWithKeyseat(60, 40)]
+            shaft[-1]._origin=shaft[-2].end
+            
+            shafts.append(shaft)
+        return shafts
+    
     
 class BodyBlockSimpleView(ShaftSketch
                               #GeometricalCase
