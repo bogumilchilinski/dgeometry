@@ -2782,7 +2782,7 @@ class RoundedBodyBlockCutTypeView(ShaftSketch
             
         return shafts    
     
-class ShortSleeve(ShaftSketch
+class RoundedBodyBlockCutTypeView(ShaftSketch
                              #GeometricalCase
                              ):
 
@@ -3016,7 +3016,33 @@ class CylinderWithKeyseatSketch(ShaftSketch
         
 
         return shafts            
+class HexagonalScrewWithThread(ShaftSketch
+                             #GeometricalCase
+                             ):
+
+    steps_no = {'max': 4, 'min': 2}
+
+    @classmethod
+    def _structure_generator(cls):
+        
+        steps = cls.steps_no
+        holes = cls.holes_no
+        
+        shafts =  []
+        diameter_of_screw = random.randint(25,40)
+        height_of_screw = random.randint(40,60)
+        for i in range(50): # Git
+            shaft =[sol.HexagonalHeadOfScrew(random.randint(20,40),random.randint(50,60))]+ [sol.Cylinder(0.3*height_of_screw , diameter_of_screw)] + [sol.ThreadOfScrew( height_of_screw ,diameter_of_screw, random.randint(3,4))] + [sol.ChamferedCylinder(random.randint(10,20),random.randint(20,30))]
+            shaft[-4]._origin = 0
+            shaft[-3]._origin = shaft[-4].end
+            shaft[-2]._origin=shaft[-3].end
+            shaft[-1]._origin = shaft[-2].end
+
+              
+            shafts.append(shaft)
+  
             
+        return shafts            
 ################################################Podziemie##############################################################################    
 class GeometrySc:
     GeometryScene() 
