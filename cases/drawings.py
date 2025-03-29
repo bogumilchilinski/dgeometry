@@ -541,7 +541,7 @@ class ShaftSketch(GeometricalCase):
 
 
     def _scheme(self):
-
+    
         if self._path is None:
             self.preview()
 
