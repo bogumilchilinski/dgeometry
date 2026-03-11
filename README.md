@@ -6,10 +6,8 @@
   - [3. Getting Started on CoCalc](#3-getting-started-on-cocalc)
 - [How to Start / Basic Usage](#how-to-start--basic-usage)
   - [1. Example Script](#1-example-scripts)
-    #to-do: expand
-- [Installation \& Setup (Optional, for Local Development)]
-    #to-do: 
-(#installation--setup-optional-for-local-development)
+    to-do: expand
+- [Installation \& Setup (Optional, for Local Development)](#installation--setup-optional-for-local-development)
   - [Requirements](#requirements)
   - [Manual Installation](#manual-installation)
 - [Licensing Information](#licensing-information)
@@ -36,7 +34,7 @@ To begin working with dgeometry, you need an account on [CoCalc](https://cocalc.
 
 1. Create an account on CoCalc.
 2. Accept the project invitation using this [link](https://cocalc.com/app?project-invite=hXnPFLqokQsoK6TG).
-3. It is highly recommended to get familiar with Dynpi module first. To do so open the [README](https://cocalc.com/projects/b51ce971-5b39-4911-ad97-ef59f15f0039/files/READme.ipynb) file and follow the instructions in the introductory guide.
+3. It is highly recommended to get familiar with DynPi module first. To do so open the [README](https://cocalc.com/projects/b51ce971-5b39-4911-ad97-ef59f15f0039/files/READme.ipynb) file and follow the instructions in the introductory guide.
 
 ---
 
@@ -58,17 +56,18 @@ SleeveSketch.from_random_data().preview()
 
 Python Version: **Python 3.8+**. Required Libraries:
 
-- **numpy**
+- **numpy** 
 - **pylatex**
 - **sympy**
 - **pandas**
 - **matplotlib**
 - **scipy**
 - **pint**
-- **pypandoc**
+- **pypandoc** 
 - **pygithub**
-- **wand**
-- **pymupdf**
+- **wand** 
+- **pymupdf** 
+
 
 ## Manual Installation
 
@@ -90,18 +89,14 @@ For Mac users: https://git-scm.com/install/mac
 git clone https://github.com/bogumilchilinski/dgeometry
 ```
 5. Install required libraries (code to be used in terminal available above)
-5.1 Installing the plugin in VS Code (git extension package + latex workshop)
-5.2 #to-do: create requirements.txt and add pip install -r requirements.txt
+5.1. Installing the plugin in VS Code (git extension package + latex workshop)
+5.2. #to-do: create requirements.txt and add pip install -r requirements.txt
 6. Creating a virtual environment in VSCode
 Working folder on the main drive + subfolders (output, images)
 Set the kernel and Jupyter Notebook environment
 Set Git Autofetch: True in VSCode settings
 
-Support LaTeX:
-6. Install a separate Latex distribution - e.g., MikaTex (https://miktex.org/download#dok)
-7. (optional) Strawberry Pearl environment
-Installation: https://strawberryperl.com/ + remaining steps to obtain the PDF (admin required)
 
 # Licensing Information
 
-DynPy is distributed under an open-source license. Refer to the LICENSE file for details.
+dgeometry is distributed under an open-source license. Refer to the LICENSE file for details.
