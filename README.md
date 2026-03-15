@@ -67,10 +67,12 @@ print(line_AB)
 ```
 
 You can extend this by defining additional points, lines, planes, and performing geometric constructions or visualizations depending on your use case.
+
 The module can be used in:
-Python scripts
-Jupyter notebooks
-educational or computational geometry projects
+
+- Python scripts
+- Jupyter notebooks
+- Educational or computational geometry projects
 
 ---
 
@@ -127,13 +129,13 @@ uv is a fast Python package and environment manager written in Rust by Astral. I
 
 Why uv?
 
-⚡ Fast – written in Rust with a very fast dependency resolver
+    Fast – written in Rust with a very fast dependency resolver
 
-📦 All-in-one tool – manages dependencies, environments, and Python versions
+    All-in-one tool – manages dependencies, environments, and Python versions
 
-🔒 Reproducible environments – uses lockfiles to ensure consistent installs
+    Reproducible environments – uses lockfiles to ensure consistent installs
 
-🐍 Automatic Python installation – downloads the required Python version if it is not available locally
+    Automatic Python installation – downloads the required Python version if it is not available locally
 
 Python Versions:
 uv can work with two types of Python installations:
@@ -160,7 +162,9 @@ For more information you can refer to the documentation of uv package --> https:
 
 7. Creating a virtual environment in VSCode
 Working folder on the main drive + subfolders (output, images)
+
 Set the kernel and Jupyter Notebook environment
+
 Set Git Autofetch: True in VSCode settings
 
 Assuming uv was installed; utilize it to create virtual environment.
