@@ -6,10 +6,10 @@
   - [3. Getting Started on CoCalc](#3-getting-started-on-cocalc)
 - [How to Start / Basic Usage](#how-to-start--basic-usage)
   - [1. Example Script](#1-example-scripts)
-    to-do: expand
+  - [2. Usage](#2-usage)
 - [Installation \& Setup (Optional, for Local Development)](#installation--setup-optional-for-local-development)
-  - [Requirements](#requirements)
-  - [Manual Installation](#manual-installation)
+  - [1. equirements](#1-requirements)
+  - [2. Manual Installation](#2-manual-installation)
 - [Licensing Information](#licensing-information)
 
 # Introduction
@@ -23,7 +23,7 @@ dgeometry addresses this limitation by representing geometric objects as Python 
 
 ## 2. Key Features
 
-- **Representation of basic Geometric Objects:** Provides classes and structures to represent fundamental geometric elements such as points, lines, and planes.
+- **Representation of Basic Geometric Objects:** Provides classes and structures to represent fundamental geometric elements such as points, lines, and planes.
 - **Geometric Transformations and Operations:** Supports creating and manipulating geometric relationships including intersections, projections, and dependencies between objects.
 - **Visualization:** Enables generation of diagrams and visual representations of geometric structures to help analyze and present results.
 - **Modular and Extensible Design:** Designed as a flexible Python module that can be easily extended with new geometric primitives, algorithms, or visualization features.
@@ -49,10 +49,34 @@ from dgeometry.cases.drawings import SleeveSketch
 SleeveSketch.from_random_data().preview()
 ```
 
+## 2. Usage
+
+After installing the dependencies (refer to Installation & Setup (Optional, for Local Development) section), you can import the module in your Python scripts or notebooks and start creating geometric objects and constructions.
+Example:
+```python
+from dgeometry import *
+
+# Example geometric objects
+A = Point(0, 0)
+B = Point(4, 3)
+
+# Create a line passing through two points
+line_AB = Line(A, B)
+
+print(line_AB)
+```
+
+You can extend this by defining additional points, lines, planes, and performing geometric constructions or visualizations depending on your use case.
+The module can be used in:
+Python scripts
+Jupyter notebooks
+educational or computational geometry projects
+
+---
 
 # Installation & Setup (Optional, for Local Development)
 
-## Requirements
+## 1. Requirements
 
 Python Version: **Python 3.8+**. Required Libraries:
 
@@ -67,20 +91,13 @@ Python Version: **Python 3.8+**. Required Libraries:
 - **pygithub**
 - **wand** 
 - **pymupdf** 
+- **cadquery**
 
 
-## Manual Installation
+## 2. Manual Installation
 
-```bash
-pip install numpy pylatex sympy pandas matplotlib scipy pint pypandoc wand pymupdf
-
-pip install dgeometry
-```
-
-Installing the Development Environment for Engineering Analysis
-
-1. Install Visual Studio Code (Microsoft Store)
-2. Install Python (Microsoft Store)
+1. Install Visual Studio Code (Microsoft Store or code.visualstudio.com/docs/setup/mac for mac)
+2. Install Python (Microsoft Store or python.org)
 3. Install Git
 For Windows users: https://git-scm.com/install/windows
 For Mac users: https://git-scm.com/install/mac
@@ -88,14 +105,67 @@ For Mac users: https://git-scm.com/install/mac
 ```bash
 git clone https://github.com/bogumilchilinski/dgeometry
 ```
-5. Install required libraries (code to be used in terminal available above)
-5.1. Installing the plugin in VS Code (git extension package + latex workshop)
-5.2. #to-do: create requirements.txt and add pip install -r requirements.txt
-6. Creating a virtual environment in VSCode
+5. Install all required libraries (2 ways):
+- If you are just starting coding or your abilities are limited you can install required libraries by using the following code:
+```bash
+pip install -r requirements.txt
+```
+ if for some reason the result of above command returns "command not found: pip", then try this code:
+```bash
+pip3 install -r requirements.txt
+```
+if the issue still persist verify if step 2 is fulfilled.
+
+- For users more familiar with coding it is HIGHLY RECOMMENDED to use uv. Install it first --> https://docs.astral.sh/uv/#python-versions, then after doing so run the following command in terminal:
+```bash
+uv venv
+uv pip install -r requirements.txt
+```
+
+It allows user to manage Python versions, dependencies, and virtual environments.
+uv is a fast Python package and environment manager written in Rust by Astral. It replaces several traditional Python tools such as pip, venv, pip-tools, pipx, and pyenv with a single unified workflow.
+
+Why uv?
+⚡ Fast – written in Rust with a very fast dependency resolver
+📦 All-in-one tool – manages dependencies, environments, and Python versions
+🔒 Reproducible environments – uses lockfiles to ensure consistent installs
+🐍 Automatic Python installation – downloads the required Python version if it is not available locally
+
+Python Versions:
+uv can work with two types of Python installations:
+- System Python
+  Python already installed on the system (via OS packages, Homebrew, pyenv, etc.).
+- Managed Python
+  Python versions automatically downloaded and managed by uv.
+
+If a required Python version is not installed, uv will automatically download and install it.
+
+You can run commands inside the project environment with:
+```bash
+uv run <command>
+```
+
+Example:
+```bash
+uv run python main.py
+```
+
+For more information you can refer to the documentation of uv package --> https://docs.astral.sh/uv/
+
+6. Install plugins: in VS Code (git extension package)
+
+7. Creating a virtual environment in VSCode
 Working folder on the main drive + subfolders (output, images)
 Set the kernel and Jupyter Notebook environment
 Set Git Autofetch: True in VSCode settings
 
+Assuming uv was installed; utilize it to create virtual environment.
+Typical workflow:
+```bash
+uv venv
+uv sync
+uv run python example.py
+```
 
 # Licensing Information
 
