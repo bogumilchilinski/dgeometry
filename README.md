@@ -23,10 +23,10 @@ dgeometry addresses this limitation by representing geometric objects as Python 
 
 ## 2. Key Features
 
-- **Dynamics Module:** Tools for modeling mechanical systems and their dynamics.
-- **Mechanical Models:** A collection of predefined mechanical models developed by experts.
-- **Symbolic and Numeric Solvers:** Tools for solving Ordinary Differential Equations (ODEs) using symbolic and numerical methods.
-- **Reporting Module:** A structured reporting system for generating and exporting reports.
+- **Representation of basic Geometric Objects:** Provides classes and structures to represent fundamental geometric elements such as points, lines, and planes.
+- **Geometric Transformations and Operations:** Supports creating and manipulating geometric relationships including intersections, projections, and dependencies between objects.
+- **Visualization:** Enables generation of diagrams and visual representations of geometric structures to help analyze and present results.
+- **Modular and Extensible Design:** Designed as a flexible Python module that can be easily extended with new geometric primitives, algorithms, or visualization features.
 
 ## 3. Getting Started on CoCalc
 
