@@ -8,7 +8,7 @@
   - [1. Example Script](#1-example-scripts)
   - [2. Usage](#2-usage)
 - [Installation \& Setup (Optional, for Local Development)](#installation--setup-optional-for-local-development)
-  - [1. equirements](#1-requirements)
+  - [1. Requirements](#1-requirements)
   - [2. Manual Installation](#2-manual-installation)
 - [Licensing Information](#licensing-information)
 
@@ -126,9 +126,13 @@ It allows user to manage Python versions, dependencies, and virtual environments
 uv is a fast Python package and environment manager written in Rust by Astral. It replaces several traditional Python tools such as pip, venv, pip-tools, pipx, and pyenv with a single unified workflow.
 
 Why uv?
+
 ⚡ Fast – written in Rust with a very fast dependency resolver
+
 📦 All-in-one tool – manages dependencies, environments, and Python versions
+
 🔒 Reproducible environments – uses lockfiles to ensure consistent installs
+
 🐍 Automatic Python installation – downloads the required Python version if it is not available locally
 
 Python Versions:
