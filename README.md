@@ -129,13 +129,10 @@ uv is a fast Python package and environment manager written in Rust by Astral. I
 
 Why uv?
 
-    Fast – written in Rust with a very fast dependency resolver
-
-    All-in-one tool – manages dependencies, environments, and Python versions
-
-    Reproducible environments – uses lockfiles to ensure consistent installs
-
-    Automatic Python installation – downloads the required Python version if it is not available locally
+- Fast – written in Rust with a very fast dependency resolver
+- All-in-one tool – manages dependencies, environments, and Python versions
+- Reproducible environments – uses lockfiles to ensure consistent installs
+- Automatic Python installation – downloads the required Python version if it is not available locally
 
 Python Versions:
 uv can work with two types of Python installations:
