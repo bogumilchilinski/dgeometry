@@ -812,51 +812,45 @@ class Cylinder(Solid):
                                      'prawej').replace('left', 'lewej')
 
     def _plot_2d(self, language='en'):
-
-        #         print(f'self.origin property is {self.origin()}')
-        #         print(f'self.end property is {self.end()}')
-
         class_name = self.__class__.__name__
-
         span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
 
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        origin = self.origin / 10
-        end = self.end / 10
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
+        end = self.end / 5
 
-        t_l = origin - 3
-        t_r = (r + 5.5)
+        t_l = origin + 1
+        t_r = (r + 7)
 
         line_type = self.line_type
         color = self.color
 
+        # --- DODANE KRESKOWANIE (tylko dolna połowa) ---
+        GeometryScene.ax_2d.fill_between(
+            [origin, origin + l], 
+            [0, 0],   # Od osi
+            [-r, -r], # Do krawędzi zewnętrznej
+            facecolor='none', hatch='//', edgecolor='k', alpha=0.5, zorder=1
+        )
+
+        # --- OBRYS WAŁKA (bez zmian, dodano zorder=3) ---
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r        ,       r   , r         , -r        ,    -r],
+            [origin, origin, origin + l, origin + l, origin],
+            [-r, r, r, -r, -r],
             line_type,
-            color=color) + GeometryScene.ax_2d.plot(
+            color=color, zorder=3) + GeometryScene.ax_2d.plot(
                 [origin - 0.5, origin + l + 0.5], [0, 0],
                 '-.',
                 color='k',
-                linewidth=1)
+                linewidth=1, zorder=3)
 
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_pl(),
-                                            rotation='vertical',
-                                            multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_pl(), rotation='vertical', multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_en(),
-                                            rotation='vertical',
-                                            multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_en(), rotation='vertical', multialignment='center')
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        ShaftPreview(0,0, origin / 2, [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         print(res)
 
@@ -1187,23 +1181,32 @@ class Hole(Solid):
         span = np.linspace(0, len(class_name), 100)
         #         print(f'plot_2d is called for {class_name}')
 
-        origin = self.origin / 10
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        end = self.end / 10
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
+        end = self.end / 5
 
-        t_l = origin + l / 4
-        t_r = (-r - 20)
+        t_l = origin + l / 6
+        t_r = (-r - 23)
 
+        # Rysuje biały blok "czyszczący" pod osią, aby schować kreskowanie wałka
+        GeometryScene.ax_2d.fill_between(
+            [origin, origin + l], 
+            [0, 0], 
+            [-r, -r], # Gdzie -r to promień otworu
+            facecolor='white', edgecolor='none', zorder=2
+        )
+        
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],
-            '--',
-            color='b') + GeometryScene.ax_2d.plot(
-                [origin - 0.5, origin + l + 0.5], [0, 0],
-                '-.',
-                color='k',
-                linewidth=1)
+            [origin, origin, origin + l, origin + l],
+            [0, -r, -r, 0],
+             '-',
+             color='b') #+ #GeometryScene.ax_2d.plot(
+                #[origin - 0.5, origin + l + 0.5], [0, 0],
+                #'-.',
+                 #color='k',
+               # linewidth=1
+#)
 
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
@@ -1289,24 +1292,33 @@ class OpenHole(Hole):
 
     def _plot_2d(self, language='en'):
 
-        origin = self.origin / 10
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        end = self.end / 10
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
+        end = self.end / 5
 
         t_l = origin + l / 2
         t_r = (-r - 23)
 
-        res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],
-            '--',
-            color='b')
-        GeometryScene.ax_2d.plot([origin - 0.5, origin + l + 0.5], [0, 0],
-                                 '-.',
-                                 color='k',
-                                 linewidth=1)
+        # Rysuje biały blok "czyszczący" pod osią, aby schować kreskowanie wałka
+        GeometryScene.ax_2d.fill_between(
+            [origin, origin + l], 
+            [0, 0], 
+            [-r, -r], # Gdzie -r to promień otworu
+            facecolor='white', edgecolor='none', zorder=2
+        )
 
+        res = GeometryScene.ax_2d.plot(
+            [origin, origin, origin + l, origin + l],
+            [0, -r, -r, 0],
+             '-',
+             color='b') #+ GeometryScene.ax_2d.plot(
+                #[origin - 0.5, origin + l + 0.5], [0, 0],
+                # '-.',
+                # color='k',
+                #linewidth=1
+#)
+               
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
                                             t_r,
@@ -1472,23 +1484,50 @@ class ChamferedHole(Solid):
         span = np.linspace(0, len(class_name), 100)
         #         print(f'plot_2d is called for {class_name}')
 
-        origin = self.origin / 10
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        end = self.end / 10
+
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
+        end = self.end / 5
+        c_l = self.chamfer_length / 5
+
+        # Obliczenia dla fazy
+        # Zamieniamy stopnie na radiany, bo np.tan tak woli:
+        c_h = c_l * np.tan(np.radians(self.chamfer_angle))
 
         t_l = origin + l / 7
-        t_r = (-r - 14.5)
+        t_r = (-r - 25)
 
+        if self.chamfer_pos == 'left':
+            x_coords = [origin, origin, origin + c_l, origin + l, origin + l]
+            y_coords = [0, -r - c_h, -r, -r, 0]
+        elif self.chamfer_pos == 'right':
+            x_coords = [origin, origin, origin + l - c_l, origin + l, origin + l]
+            y_coords = [0, -r, -r, -r - c_h, 0]
+        else:
+            # W razie braku fazy lub błędu w parametrze, rysuje prosty otwór
+            x_coords = [origin, origin, origin + l, origin + l]
+            y_coords = [0, -r, -r, 0]
+        
+        # Rysuje biały blok "czyszczący" pod osią, aby schować kreskowanie wałka
+        GeometryScene.ax_2d.fill_between(
+            [origin, origin + l], 
+            [0, 0], 
+            [-r, -r], # Gdzie -r to promień otworu
+            facecolor='white', edgecolor='none', zorder=2
+        )
+
+        # Rysowanie obrysu otworu z fazą + oś symetrii
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],
-            '--',
-            color='c') + GeometryScene.ax_2d.plot(
-                [origin - 0.5, origin + l + 0.5], [0, 0],
-                '-.',
-                color='k',
-                linewidth=1)
+            x_coords, y_coords,
+            '-',
+            color='b'
+        ) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5], [0, 0],
+            '-.',
+            color='k',
+            linewidth=1
+        )
 
         if language == 'pl':
             text = GeometryScene.ax_2d.text(t_l,
@@ -1596,13 +1635,21 @@ class ChamferedOpenHoleWithKeyway(ChamferedHole):
         span = np.linspace(0, len(class_name), 100)
         #         print(f'plot_2d is called for {class_name}')
 
-        origin = self.origin / 10
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        end = self.end / 10
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
+        end = self.end / 5
 
-        t_l = origin + l / 7
-        t_r = (-r - 14.5)
+        t_l = origin + l / 2
+        t_r = (-r - 23)
+
+        # Rysuje biały blok "czyszczący" pod osią, aby schować kreskowanie wałka
+        GeometryScene.ax_2d.fill_between(
+            [origin, origin + l], 
+            [0, 0], 
+            [-r, -r], # Gdzie -r to promień otworu
+            facecolor='white', edgecolor='none', zorder=2
+        )
 
         res = GeometryScene.ax_2d.plot(
             [
@@ -1794,47 +1841,81 @@ class ChamferedCylinder(Solid):
 #         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
 
     def _plot_2d(self, language='en'):
-
-        #         print(f'self.origin property is {self.origin()}')
-        #         print(f'self.end property is {self.end()}')
-
         class_name = self.__class__.__name__
-
         span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
 
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        origin = self.origin / 10
-        end = self.end / 10
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
+        end = self.end / 5
+        
+        c_l = getattr(self, 'chamfer_length', 1) / 5    
+        c_a = getattr(self, 'chamfer_angle', 45)
+        c_h = c_l * np.tan(np.radians(c_a))
+        chamfer_pos = getattr(self, 'chamfer_pos', 'both') 
 
         t_l = origin + l / 4
         t_r = (r + 0.5)
 
+        # --- LOGIKA WSPÓŁRZĘDNYCH DLA KRESKOWANIA I OBRYSU ---
+        if chamfer_pos == 'left':
+            x_hatch = [origin, origin + c_l, origin + l]
+            y_hatch = [-r + c_h, -r, -r]
+            x_coords = [origin, origin + c_l, origin + l, origin + l, origin + c_l, origin, origin]
+            y_coords = [-r + c_h, -r, -r, r, r, r - c_h, -r + c_h]
+        elif chamfer_pos == 'right':
+            x_hatch = [origin, origin + l - c_l, origin + l]
+            y_hatch = [-r, -r, -r + c_h]
+            x_coords = [origin, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin, origin]
+            y_coords = [-r, -r, -r + c_h, r - c_h, r, r, -r]
+        elif chamfer_pos == 'both':
+            x_hatch = [origin, origin + c_l, origin + l - c_l, origin + l]
+            y_hatch = [-r + c_h, -r, -r, -r + c_h]
+            x_coords = [origin, origin + c_l, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin + c_l, origin, origin]
+            y_coords = [-r + c_h, -r, -r, -r + c_h, r - c_h, r, r, r - c_h, -r + c_h]
+        else: # Gdy nie ma fazy
+            x_hatch = [origin, origin + l]
+            y_hatch = [-r, -r]
+            x_coords = [origin, origin, origin + l, origin + l, origin]
+            y_coords = [-r, r, r, -r, -r]
+
+        # --- 1. KRESKOWANIE (fill_between dopasowuje się do fazy) ---
+        GeometryScene.ax_2d.fill_between(
+            x_hatch,
+            [0] * len(x_hatch),
+            y_hatch,
+            facecolor='none', hatch='//', edgecolor='k', alpha=0.5, zorder=1
+        )
+
+        # --- 2. OBRYS ---
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],
-            color='g') + GeometryScene.ax_2d.plot(
-                [origin - 0.5, origin + l + 0.5], [0, 0],
-                '-.',
-                color='k',
-                linewidth=1)
+            x_coords, y_coords,
+            color='g', zorder=3
+        ) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5], [0, 0],
+            '-.',
+            color='k',
+            linewidth=1, zorder=3
+        )
+
+        # --- 3. PIONOWE LINIE FAZY ---
+        if chamfer_pos in ['left', 'both']:
+            res += GeometryScene.ax_2d.plot(
+                [origin + c_l, origin + c_l], [-r, r],
+                color='g', zorder=3
+            )
+        if chamfer_pos in ['right', 'both']:
+            res += GeometryScene.ax_2d.plot(
+                [origin + l - c_l, origin + l - c_l], [-r, r],
+                color='g', zorder=3
+            )
 
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_pl(),
-                                            rotation='vertical',
-                                            multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_pl(), rotation='vertical', multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_en(),
-                                            rotation='vertical',
-                                            multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_en(), rotation='vertical', multialignment='center')
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        ShaftPreview(0, 0, origin / 2, [2 * r / 2, l / 2, "z fazą", 0.2, '#6b7aa1'])
 
 
 #     def _plot_2d(self,language='en'):
@@ -1894,7 +1975,8 @@ class Thread(Solid):
                  diameter,
                  chamfer_length=1,
                  chamfer_angle=45,
-                 thread='M'):
+                 thread='M',
+                 chamfer_pos ='left'):
 
         num_of_lines_view = self.__class__.num_of_lines_view
         num_of_lines_sec = self.__class__.num_of_lines_sec
@@ -1911,6 +1993,7 @@ class Thread(Solid):
         self.thread = thread
         self.chamfer_length = chamfer_length
         self.chamfer_angle = chamfer_angle
+        self.chamfer_pos = chamfer_pos
         # self._parameters = thread + str(
         #     diameter), height, chamfer_length, chamfer_angle,
         # self._class_description = "{} with L={}mm and chamfer {}x{}".format(
@@ -1937,49 +2020,83 @@ class Thread(Solid):
         )
 
     def _plot_2d(self, language='en'):
-
         class_name = self.__class__.__name__
-
         span = np.linspace(0, len(class_name), 100)
-        print(f'plot_2d is called for {class_name}')
 
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        r_t = 0.9 * r
-        origin = self.origin / 10
-        end = self.end / 10
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
+        
+        # Fazka dynamiczna
+        c_l = getattr(self, 'chamfer_length', 1) / 5
+        c_a = getattr(self, 'chamfer_angle', 45)
+        c_h = c_l * np.tan(np.radians(c_a)) 
+        chamfer_pos = getattr(self, 'chamfer_pos', 'left')
+        
+        t_l = origin + l / 2
+        t_r = (r + 7) 
+        r_t = 0.9 * r # Rdzeń gwintu
 
-        t_l = origin + l * 5 / 4
-        t_r = (-r - 14.5)
+        # --- LOGIKA WSPÓŁRZĘDNYCH DLA KRESKOWANIA I OBRYSU ---
+        if chamfer_pos == 'left':
+            x_hatch = [origin, origin + c_l, origin + l]
+            y_hatch = [-r + c_h, -r, -r]
+            x_obrys = [origin, origin + c_l, origin + l, origin + l, origin + c_l, origin, origin]
+            y_obrys = [-r + c_h, -r, -r, r, r, r - c_h, -r + c_h]
+        elif chamfer_pos == 'right':
+            x_hatch = [origin, origin + l - c_l, origin + l]
+            y_hatch = [-r, -r, -r + c_h]
+            x_obrys = [origin, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin, origin]
+            y_obrys = [-r, -r, -r + c_h, r - c_h, r, r, -r]
+        elif chamfer_pos == 'both':
+            x_hatch = [origin, origin + c_l, origin + l - c_l, origin + l]
+            y_hatch = [-r + c_h, -r, -r, -r + c_h]
+            x_obrys = [origin, origin + c_l, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin + c_l, origin, origin]
+            y_obrys = [-r + c_h, -r, -r, -r + c_h, r - c_h, r, r, r - c_h, -r + c_h]
+        else: # bez fazy
+            x_hatch = [origin, origin + l]
+            y_hatch = [-r, -r]
+            x_obrys = [origin, origin, origin + l, origin + l, origin, origin]
+            y_obrys = [-r, -r, -r, r, r, -r]
 
+        # --- 1. KRESKOWANIE ---
+        GeometryScene.ax_2d.fill_between(
+            x_hatch, 
+            [0] * len(x_hatch), 
+            y_hatch, 
+            facecolor='none', hatch='//', edgecolor='k', alpha=0.5, zorder=1
+        )
+
+        # --- 2. OBRYS PEŁNY (GÓRA I DÓŁ, z fazą) ---
         res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],
-            color='k') + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-                [-r_t, r_t, r_t, -r_t, -r_t],
-                linewidth=1,
-                color='r') + GeometryScene.ax_2d.plot(
-                    [origin - 0.5, origin + l + 0.5], [0, 0],
-                    '-.',
-                    color='k',
-                    linewidth=1)
+            x_obrys, y_obrys,
+            color='k', zorder=3
+        ) + GeometryScene.ax_2d.plot(
+            [origin, origin + l], [-r_t, -r_t], # Dolna linia gwintu
+            '-', linewidth=0.5, color='r', zorder=3
+        ) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5], [0, 0], # Oś symetrii
+            '-.', color='k', linewidth=1, zorder=3
+        )
+
+        # --- 3. PIONOWE LINIE FAZY ---
+        if chamfer_pos in ['left', 'both']:
+            res += GeometryScene.ax_2d.plot(
+                [origin + c_l, origin + c_l], [-r, r],
+                color='k', linewidth=1, zorder=3
+            )
+        if chamfer_pos in ['right', 'both']:
+            res += GeometryScene.ax_2d.plot(
+                [origin + l - c_l, origin + l - c_l], [-r, r],
+                color='k', linewidth=1, zorder=3
+            )
 
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_pl(),
-                                            rotation='vertical',
-                                            multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_pl(), rotation='vertical', multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_en(),
-                                            rotation='vertical',
-                                            multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_en(), rotation='vertical', multialignment='center')
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#56754A'])
+        ShaftPreview(0, 0, origin / 2, [2 * r / 2, l / 2, "z fazą", 0.2, '#56754A'])
 
 
 class ThreadOfScrew(Thread):
@@ -2139,59 +2256,60 @@ class ThreadedOpenHole(Solid):
             l_ch=self.chamfer_length)
 
     def _plot_2d(self, language='en'):
-
         class_name = self.__class__.__name__
-
         span = np.linspace(0, len(class_name), 100)
-        print(f'plot_2d is called for {class_name}')
 
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        c_l = self.chamfer_length / 10
-        c_a = self.chamfer_angle
-        c_h = c_l * np.tan(c_a)
-        t = 1.1 * r
-
-        origin = self.origin / 10
-        end = self.end / 10
-
-        res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],
-            '--',
-            color='y') + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + 0 - c_l, origin + 0 - c_l, origin + 0],
-                [-r, -r - c_h, r + c_h, r],
-                '--',
-                color='y') + GeometryScene.ax_2d.plot(
-                    [origin - c_l, origin + l], [-t, -t],
-                    '--',
-                    linewidth=1,
-                    color='y') + GeometryScene.ax_2d.plot(
-                        [origin - c_l, origin + l], [t, t],
-                        '--',
-                        linewidth=1,
-                        color='y') + GeometryScene.ax_2d.plot(
-                            [origin + l, origin + l], [t, -t], '--', color='y')
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
+        
+        # Fazki z obu stron otworu
+        c_l = getattr(self, 'chamfer_length', 1) / 5
+        c_a = getattr(self, 'chamfer_angle', 45)
+        c_h = c_l * np.tan(np.radians(c_a)) 
+        
+        t = 1.1 * r # Linia gwintu wewnętrznego
 
         t_l = origin + l / 7
-        t_r = (-r - 13.5)
+        t_r = (-t - 20)
+
+        # --- 1. BIAŁA MASKA (tylko na dole, żeby zasłonić wałek pod spodem) ---
+        x_mask = [origin, origin + c_l, origin + l - c_l, origin + l]
+        y_mask = [-r - c_h, -r, -r, -r - c_h]
+        
+        GeometryScene.ax_2d.fill_between(
+            x_mask, 
+            [0, 0, 0, 0], 
+            y_mask, 
+            facecolor='white', edgecolor='none', zorder=2
+        )
+
+        # --- 2. OBRYS PEŁNY OTWORU (GÓRA I DÓŁ) ---
+        x_top = [origin, origin + c_l, origin + l - c_l, origin + l]
+        y_top = [r + c_h, r, r, r + c_h]
+        
+        x_bot = [origin, origin + c_l, origin + l - c_l, origin + l]
+        y_bot = [-r - c_h, -r, -r, -r - c_h]
+
+        res = GeometryScene.ax_2d.plot(
+            x_bot, y_bot, '-', color='y', zorder=3
+        ) + GeometryScene.ax_2d.plot(
+            [origin + c_l, origin + c_l], [-r, 0], # Pionowa krawędź lewej fazy (ucięta do osi)
+            '-', linewidth=0.5, color='y', zorder=3
+        ) + GeometryScene.ax_2d.plot(
+            [origin + l - c_l, origin + l - c_l], [-r, 0], # Pionowa krawędź prawej fazy (ucięta do osi)
+            '-', linewidth=0.5, color='y', zorder=3
+        ) + GeometryScene.ax_2d.plot(
+            [origin, origin + l], [-t, -t], # Dolna cienka linia gwintu
+            '-', linewidth=0.5, color='y', zorder=3
+        )
 
         if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_pl(),
-                                            rotation='vertical',
-                                            multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_pl(), rotation='vertical', multialignment='center')
         else:
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_en(),
-                                            rotation='vertical',
-                                            multialignment='center')
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_en(), rotation='vertical', multialignment='center')
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
+        ShaftPreview(0,0, origin / 2, [2 * r / 2, l / 2, "z fazami", 0.7, '#6b7aa1'])
 
 
 class Gear(Solid):
@@ -2673,78 +2791,74 @@ class FlangeWithHoles(Solid):
     def _plot_2d(self, language='en'):
 
         class_name = self.__class__.__name__
-
         span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
 
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        r_h = self.hole_diameter / 2 / 10
-        r_r = self.reference_diameter / 2 / 10
+        # --- Zmiana skali na / 5 ---
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
+        r_h = self.hole_diameter / 2 / 5
+        r_r = self.reference_diameter / 2 / 5
         holes_no = self.holes_no
-        c_l = self.chamfer_length / 10
+        end = self.end / 5
+        
+        # Poprawiona trygonometria fazy
+        c_l = self.chamfer_length / 5
         c_a = self.chamfer_angle
-        c_h = c_l * np.tan(c_a)
+        c_h = c_l * np.tan(np.radians(c_a))
 
-        origin = self.origin / 10
-        end = self.end / 10
+        # Zabezpieczenie przed uciekającym tekstem
+        t_l = origin - 5
+        t_r = (-r - 5)
 
-        t_l = origin + l / 4
-        t_r = (r + 0.5)
+        # --- 1. KRESKOWANIE (DÓŁ) ---
+        GeometryScene.ax_2d.fill_between(
+            [origin, origin + l], 
+            [0, 0], 
+            [-r, -r], 
+            facecolor='none', hatch='//', edgecolor='k', alpha=0.5, zorder=1
+        )
 
+        # --- 2. BIAŁA MASKA DLA OTWORU NA DOLE (aby usunąć kreskowanie w świetle otworu) ---
+        GeometryScene.ax_2d.fill_between(
+            [origin, origin + l],
+            [-r_r + r_h, -r_r + r_h],
+            [-r_r - r_h, -r_r - r_h],
+            facecolor='white', edgecolor='none', zorder=2
+        )
+
+        # --- 3. OBRYSY I OSIE (ZORDER=3) ---
+        # Zmieniłem color='m' (magenta) na 'k' (czarny), aby wyglądało to profesjonalnie
         res = GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5], [0, 0],
-            '-.',
-            color='k',
-            linewidth=1) + GeometryScene.ax_2d.plot(
-                [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-                [-r, r, r, -r, -r],
-                color='m') + GeometryScene.ax_2d.plot(
-                    [
-                        origin + 0, origin + 0, origin + l, origin + l,
-                        origin + 0
-                    ], [r_r - r_h, r_r + r_h, r_r + r_h, r_r - r_h, r_r - r_h],
-                    '--',
-                    color='m',
-                    linewidth=1) + GeometryScene.ax_2d.plot(
-                        [origin - 0.5, origin + l + 0.5], [r_r + 0, r_r + 0],
-                        '-.',
-                        color='k',
-                        linewidth=1) + GeometryScene.ax_2d.plot(
-                            [
-                                origin + 0, origin + 0, origin + l, origin + l,
-                                origin + 0
-                            ], [
-                                -r_r - r_h, -r_r + r_h, -r_r + r_h, -r_r - r_h,
-                                -r_r - r_h
-                            ],
-                            '--',
-                            color='m',
-                            linewidth=1) + GeometryScene.ax_2d.plot(
-                                [origin - 0.5, origin + l + 0.5],
-                                [-r_r + 0, -r_r + 0],
-                                '-.',
-                                color='k',
-                                linewidth=1)
+            [origin - 0.5, origin + l + 0.5], [0, 0], # Główna oś symetrii
+            '-.', color='k', linewidth=1, zorder=3
+        ) + GeometryScene.ax_2d.plot(
+            [origin, origin, origin + l, origin + l, origin], # Główny zewnętrzny obrys kołnierza
+            [-r, r, r, -r, -r],
+            color='k', zorder=3 
+        ) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5], [r_r, r_r], # Oś górnego otworu
+            '-.', color='k', linewidth=1, zorder=3
+        ) + GeometryScene.ax_2d.plot(
+            [origin, origin, origin + l, origin + l, origin], # Dolny otwór (PRZEKRÓJ - ciągłe linie '-')
+            [-r_r - r_h, -r_r + r_h, -r_r + r_h, -r_r - r_h, -r_r - r_h],
+            '-', color='k', linewidth=1, zorder=3
+        ) + GeometryScene.ax_2d.plot(
+            [origin - 0.5, origin + l + 0.5], [-r_r, -r_r], # Oś dolnego otworu
+            '-.', color='k', linewidth=1, zorder=3
+        )
 
-        text = GeometryScene.ax_2d.text(t_l,
-                                        t_r,
-                                        self.str_en(),
-                                        rotation='vertical',
-                                        multialignment='center')
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_pl(), rotation='vertical', multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_en(), rotation='vertical', multialignment='center')
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        ShaftPreview(0,0, origin / 2, [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
         for hole_no in range(holes_no):
-
             xh = r_r * np.cos(hole_no * 2 * np.pi / holes_no)
             yh = r_r * np.sin(hole_no * 2 * np.pi / holes_no)
-
-            ShaftPreview(5 + xh, 5 + yh, origin / 2,
-                         [2 * r_h / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
-
-        print(res)
+            ShaftPreview(5 + xh, 5 + yh, origin / 2, [2 * r_h / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
 
 
 class BlockBearingHolder(Solid):

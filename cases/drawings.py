@@ -783,49 +783,58 @@ class SleeveWithThreadsSketch(ShaftSketch
             shafts.append(shaft)
         return shafts
     
-class ShaftWithThreadsSketch(ShaftSketch
-                              #GeometricalCase
-                              ):
+class ShaftWithThreadsSketch(ShaftSketch):
 
     steps_no = {'max': 2, 'min': 1}
 
     @classmethod
     def _structure_generator(cls):
-
         steps = cls.steps_no
-#         holes = cls.holes_no
-
-        shafts  = []
+        shafts = []
+        
         for i in range(50):
-#             shaft = create_random_profile(steps['max'],steps['min'],
-#                                   increase_values=[
-#                                       4,
-#                                       5,
-#                                       6,
-#                                   ],origin=0)
-            shaft=[sol.Thread(random.randint(40, 80), random.randint(30,70))]
-            d_end=shaft[-1].diameter
-            shaft += create_random_profile(steps['max'],steps['min'],initial_diameter=[d_end+8,d_end+10],
-                                  increase_values=[
-                                      -4,
-                                      -5,
-                                      -6,
-                                  ],
-                                  step_modificator=step_mod_dec_threads,origin=shaft[0].end)
-#             shaft += create_random_profile(2,
-#                                   1,
-#                                   initial_diameter=[25, 22],
-#                                   increase_values=[
-#                                       -2,
-#                                       -3,
-#                                   ],
-#                                   step_lengths=[62, 65],
-#                                   step_modificator=step_mod_dec_hole_chamfer,
-#                                   step_type=sol.Hole, origin=0)
-#             shaft += [sol.OpenHole(shaft[-1].diameter-5,14)]
-            shaft[-1]._origin=shaft[-2].end             
+            # 1. Tworzymy pierwszy element (gwint)
+            shaft = [sol.Thread(random.randint(40, 80), random.randint(30, 70))]
+            d_end = shaft[-1].diameter
+            
+            # 2. Generujemy resztę profilu
+            # Uwaga: create_random_profile zwraca listę obiektów
+            random_part = create_random_profile(
+                steps['max'], steps['min'],
+                initial_diameter=[d_end + 8, d_end + 10],
+                increase_values=[-4, -5, -6],
+                step_modificator=step_mod_dec_threads,
+                origin=shaft[0].end
+            )
+            shaft += random_part
+
+            # Ustawiamy origin ostatniego elementu (standard w Twoim kodzie)
+            shaft[-1]._origin = shaft[-2].end             
+            
+            # ----------------------------------------------------------------
+            # --- LOGIKA INTELIGENTNYCH FAZ (PORÓWNYWANIE ŚREDNIC) ---
+            # ----------------------------------------------------------------
+            # Iterujemy tylko po elementach zewnętrznych (bez otworów, jeśli by tu były)
+            # Sprawdzamy pary: obecny i następny
+            for j in range(len(shaft) - 1):
+                obecny = shaft[j]
+                nastepny = shaft[j+1]
+                
+                # Jeśli obecna średnica jest większa niż następna -> faza z prawej
+                if obecny.diameter > nastepny.diameter:
+                    obecny.chamfer_pos = 'right'
+                else:
+                    # Jeśli wchodzimy na większą średnicę, faza z prawej byłaby błędem
+                    # Możemy ustawić 'left' lub 'none'
+                    obecny.chamfer_pos = 'left'
+
+            # Ostatni element wałka zawsze powinien mieć fazę z prawej (koniec wałka)
+            if shaft:
+                shaft[-1].chamfer_pos = 'right'
+            # ----------------------------------------------------------------
             
             shafts.append(shaft)
+
         return shafts
     
 class SimpleShaftWithThreadsSketch(ShaftWithThreadsSketch):
@@ -1847,7 +1856,7 @@ class SimpleFlangeHub(ShaftSketch
         for i in range(50): # Git
             cylinder_diameter=random.randint(30,40)
             
-            shaft =[sol.FlangeWithHoles(random.randint(30,40),cylinder_diameter*3,16,(cylinder_diameter*2),random.choice([2,4,6]))]+[sol.Thread(random.randint(40,50),random.randint(30,40))]
+            shaft =[sol.FlangeWithHoles(random.randint(30,40),cylinder_diameter*3,16,(cylinder_diameter*2),random.choice([2,4,6]))]+[sol.Thread(random.randint(40,50),random.randint(30,40), chamfer_pos='right')]
             
             shaft += [sol.ThreadedOpenHole(shaft[-1].end+shaft[-2].end,round(cylinder_diameter*random.uniform(0.4,0.6)))]
             #shaft += [sol.Hole(shaft[-4].end+shaft[-2].end,round(cylinder_diameter*random.uniform(0.4,0.6)))]
@@ -1855,7 +1864,7 @@ class SimpleFlangeHub(ShaftSketch
 
             shaft[-2]._origin=shaft[-3].end
             shaft[-1]._origin=0
-            
+            chamfer_pos ='right'
 
            
 
