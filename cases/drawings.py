@@ -229,7 +229,7 @@ step_mod_dec_flange = lambda step: random.choice([
     sol.ChamferedCylinder(step.height,
                           step.diameter,
                           chamfer_angle=45,
-                          chamfer_length=1,
+                          chamfer_length=None,
                           chamfer_pos='right'),
     [
         copy.copy(step),
@@ -260,7 +260,7 @@ step_mod_dec_flange = lambda step: random.choice([
 step_mod_inc_threads = lambda step: random.choice([
     #step,
     sol.ChamferedCylinder(
-        step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
+        step.height, step.diameter, chamfer_angle=45, chamfer_length=None),
     sol.Thread(step.height, step.diameter),
 ])
 
@@ -270,24 +270,24 @@ step_mod_dec_screw = lambda step: random.choice([
             sol.Thread(step.height, step.diameter),sol.ChamferedCylinder(round(step.height*0.3),
                               round(step.diameter*0.85),
                               chamfer_angle=45,
-                              chamfer_length=1,
+                              chamfer_length=None,
                               chamfer_pos='right')],
         
     [sol.ChamferedCylinder(10,
                               round(step.diameter*1.3),
                               chamfer_angle=45,
-                              chamfer_length=1,
+                              chamfer_length=None,
                               chamfer_pos='right'),
             sol.Thread(step.height, step.diameter),sol.ChamferedCylinder(round(step.height*0.3),
                               round(step.diameter*0.85),
                               chamfer_angle=45,
-                              chamfer_length=1,
+                              chamfer_length=None,
                               chamfer_pos='right')],
     sol.Thread(step.height, step.diameter),
     [sol.Thread(step.height, step.diameter),sol.ChamferedCylinder(round(step.height*0.3),
                               round(step.diameter*0.85),
                               chamfer_angle=45,
-                              chamfer_length=1,
+                              chamfer_length=None,
                               chamfer_pos='right')],
         
 ])
@@ -306,7 +306,7 @@ step_mod_dec_threads = lambda step: random.choice([
 step_mod_inc_chamfer = lambda step: random.choice([
     copy.copy(step),
     sol.ChamferedCylinder(
-        step.height, step.diameter, chamfer_angle=45, chamfer_length=1),
+        step.height, step.diameter, chamfer_angle=45, chamfer_length=None),
 ])
 
 
@@ -322,7 +322,7 @@ step_mod_dec_chamfer = lambda step: random.choice([
     sol.ChamferedCylinder(step.height,
                           step.diameter,
                           chamfer_angle=45,
-                          chamfer_length=1,
+                          chamfer_length=None,
                           chamfer_pos='right'),
 ])
 
@@ -341,12 +341,12 @@ step_mod_dec_keyseat = lambda step: random.choice([
     sol.ChamferedCylinderWithKeyseat(step.height,
                           step.diameter,
                           chamfer_angle=45,
-                          chamfer_length=1,
+                          chamfer_length=None,
                           chamfer_pos='right'),
     sol.ChamferedCylinder(step.height,
                           step.diameter,
                           chamfer_angle=45,
-                          chamfer_length=1,
+                          chamfer_length=None,
                           chamfer_pos='right'),
     sol.CylinderWithKeyseat(step.height,
                           step.diameter),
@@ -403,13 +403,11 @@ def create_random_profile(max_steps_no,
                           origin=0):
     steps_no = random.randint(min_steps_no, max_steps_no - 1)
 
-    #boundary_node=random.randint(0,steps_no)
-
     first_d = random.choice(initial_diameter)
 
     profile_changes = [
         random.choice(increase_values) for node in range(steps_no)
-    ]  #+[-random.choice(increase_values)  for node in range(boundary_node,steps_no)]
+    ] 
 
     profile = [first_d] + [
         first_d + sum(profile_changes[0:step_no + 1])
@@ -421,15 +419,18 @@ def create_random_profile(max_steps_no,
         for diameter in profile
     ]
 
-    steps_list=sympy.flatten([step_modificator(step) for step in base_geometry])
+    steps_list = sympy.flatten([step_modificator(step) for step in base_geometry])
     
-    steps_list[0]._origin = origin
-    
-    for no,step in enumerate(steps_list):
-        step._ref_elem = steps_list[no-1]
+    # --- PĘTLA LINKUJĄCA (Wstrzykiwanie sąsiadów) ---
+    for no, step in enumerate(steps_list):
+        # Sąsiad z lewej
+        step.prev_elem = steps_list[no - 1] if no > 0 else None
+        # Sąsiad z prawej
+        step.next_elem = steps_list[no + 1] if no < len(steps_list) - 1 else None
+        # Zachowujemy też stary _ref_elem z Twojego oryginalnego kodu
+        step._ref_elem = steps_list[no - 1] if no > 0 else None
         
     steps_list[0]._origin = origin
-    steps_list[0]._ref_elem = None
     
     return steps_list
 
@@ -507,9 +508,9 @@ class ShaftSketch(GeometricalCase):
         for i in range(50):
             shaft = create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
-                                      4,
-                                      5,
-                                      6,
+                                      8,
+                                      10,
+                                      12,
                                   ],
                                   step_modificator=step_mod_inc_chamfer,origin=0) 
             
@@ -518,14 +519,17 @@ class ShaftSketch(GeometricalCase):
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   initial_diameter=[d_end+8, d_end+10 ],
                                   increase_values=[
-                                      -4,
-                                      -5,
-                                      -6,
+                                      -8,
+                                      -10,
+                                      -12,
                                   ],
                                   step_modificator=step_mod_dec_chamfer,origin = shaft[-1].end)
             
 
-            
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+
             shafts.append(shaft)
         return shafts
 
@@ -567,7 +571,7 @@ class ShaftSketch(GeometricalCase):
 
     
     def preview(self, example=False,language='en'):
-        GeometryScene(30,60,figsize=(14,7))
+        GeometryScene(30,70,figsize=(16,7))
 
         self._solid_structure.preview(language=language)
 
@@ -685,9 +689,9 @@ class SleeveSketch(ShaftSketch
         for i in range(50):
             shaft = create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
-                                      4,
-                                      5,
-                                      6,
+                                      8,
+                                      10,
+                                      12,
                                   ],
                                   step_modificator=step_mod_inc_chamfer,origin=0) 
 
@@ -698,9 +702,9 @@ class SleeveSketch(ShaftSketch
             right_profile =create_random_profile(steps['max'],steps['min'],
                                   initial_diameter=[d_end+8, d_end+10 ],
                                   increase_values=[
-                                      -4,
-                                      -5,
-                                      -6,
+                                      -8,
+                                      -10,
+                                      -12,
                                   ],
                                   step_modificator=step_mod_dec_chamfer,origin = shaft[-1].end)
             shaft +=right_profile
@@ -719,6 +723,11 @@ class SleeveSketch(ShaftSketch
             shaft += [sol.OpenHole(thread_length - shaft[-1].end,shaft[-1].diameter+5)]
             shaft[-1]._origin=shaft[-2].end    
             
+    
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+
             shafts.append(shaft)
             #shaft[-1]._origin=0
             
@@ -751,35 +760,39 @@ class SleeveWithThreadsSketch(ShaftSketch
         for i in range(50):
             shaft = create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
-                                      4,
-                                      5,
-                                      6,
+                                      8,
+                                      10,
+                                      12,
                                   ],
                                   step_modificator=step_mod_inc_threads,origin=0)
             d_end=shaft[-1].diameter
             d_height=shaft[-1].height
             right_profile= create_random_profile(steps['max'],steps['min'],initial_diameter=[d_end+8, d_end+10 ],
                                   increase_values=[
-                                      -4,
-                                      -5,
-                                      -6,
+                                      -8,
+                                      -10,
+                                      -12,
                                   ],
                                   step_modificator=step_mod_dec_threads,origin=shaft[-1].end)
             shaft +=right_profile
             thread_length = right_profile[-1].end
             shaft += create_random_profile(2,
                                   1,
-                                  initial_diameter=[25, 22],
+                                  initial_diameter=[32, 26],
                                   increase_values=[
-                                      -2,
-                                      -3,
+                                      -6,
+                                      -8,
                                   ],
                                   step_lengths=[32, 35],
                                   step_modificator=step_mod_dec_hole_chamfer,
                                   step_type=sol.Hole, origin=0)
-            shaft += [sol.ThreadedOpenHole(thread_length - shaft[-1].end,shaft[-1].diameter-5)]
+            shaft += [sol.ThreadedOpenHole(thread_length - shaft[-1].end,shaft[-1].diameter-4)]
             shaft[-1]._origin=shaft[-2].end             
-            
+
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+
             shafts.append(shaft)
         return shafts
     
@@ -802,7 +815,7 @@ class ShaftWithThreadsSketch(ShaftSketch):
             random_part = create_random_profile(
                 steps['max'], steps['min'],
                 initial_diameter=[d_end + 8, d_end + 10],
-                increase_values=[-4, -5, -6],
+                increase_values=[-8, -10, -12],
                 step_modificator=step_mod_dec_threads,
                 origin=shaft[0].end
             )
@@ -833,6 +846,10 @@ class ShaftWithThreadsSketch(ShaftSketch):
                 shaft[-1].chamfer_pos = 'right'
             # ----------------------------------------------------------------
             
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+                
             shafts.append(shaft)
 
         return shafts
@@ -867,17 +884,17 @@ class SleeveWithFlangeSketch(ShaftSketch
         for i in range(50):
             shaft = create_random_profile(1,0,
                                   increase_values=[
-                                      4,
-                                      5,
-                                      6,
+                                      8,
+                                      10,
+                                      12,
                                   ],
                                   step_modificator=step_mod_inc_flange,origin=0)
             
             right_profile = create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
-                                      -4,
-                                      -5,
-                                      -6,
+                                      -8,
+                                      -10,
+                                      -12,
                                   ],
                                   step_modificator=step_mod_dec_threads,
                                            origin=shaft[-1].end)
@@ -896,6 +913,10 @@ class SleeveWithFlangeSketch(ShaftSketch
             shaft += [sol.ThreadedOpenHole(thread_length - shaft[-1].end,shaft[-1].diameter-5)]
             shaft[-1]._origin=shaft[-2].end
             
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+                
             shafts.append(shaft)
         return shafts
 
@@ -925,17 +946,17 @@ class SleeveWithThreadedHoleSketch(ShaftSketch
         for i in range(50):
             shaft = create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
-                                      4,
-                                      5,
-                                      6,
+                                      8,
+                                      10,
+                                      12,
                                   ],
                                   step_modificator=step_mod_inc_threads,origin=0) 
             
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
-                                      -4,
-                                      -5,
-                                      -6,
+                                      -8,
+                                      -10,
+                                      -12,
                                   ],
                                   step_modificator=step_mod_dec_threads,origin = shaft[-1].end)
             
@@ -953,6 +974,10 @@ class SleeveWithThreadedHoleSketch(ShaftSketch
             shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,1.4)]
             shaft[-1]._ref_elem=shaft[-2].end
             
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+                
             shafts.append(shaft)
         
         
@@ -1006,6 +1031,10 @@ class SleeveWithGrearsSketch(ShaftSketch
             shaft += [sol.ThreadedOpenHole(shaft[-1].diameter-5,14)]
             shaft[-1]._origin=shaft[-2].end
             
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+                
             shafts.append(shaft)
         
 
@@ -1045,6 +1074,10 @@ class SimpleGearSketch(ShaftSketch
                                   step_modificator=step_mod_dec_hole_chamfer,
                                   step_type=sol.Hole,origin=0) 
             
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+                
             shafts.append(shaft)
         
 
@@ -1478,6 +1511,10 @@ class SimpleBoltSketch(ShaftSketch
 #                                   step_type=sol.Hole,origin=0) 
             
             
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+                
             shafts.append(shaft)
         
 
@@ -1835,6 +1872,10 @@ class SimpleFlangeSleeve(ShaftSketch
             
 
            
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+                
 
             shafts.append(shaft)
 
@@ -1867,6 +1908,10 @@ class SimpleFlangeHub(ShaftSketch
             chamfer_pos ='right'
 
            
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+                
 
             shafts.append(shaft)
 
@@ -2343,17 +2388,17 @@ class ShaftWithKeyseats(ShaftSketch
             
             shaft += create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
-                                      4,
-                                      5,
-                                      6,
+                                      8,
+                                      10,
+                                      12,
                                   ],
                                   step_modificator=step_mod_inc_keyseat,origin=shaft[-1].end) 
             
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
-                                      -4,
-                                      -5,
-                                      -6,
+                                      -8,
+                                      -10,
+                                      -12,
                                   ],
                                   step_modificator=step_mod_dec_keyseat,origin = shaft[-1].end)
             
@@ -2373,6 +2418,10 @@ class ShaftWithKeyseats(ShaftSketch
             
             
             
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+                
             shafts.append(shaft)
         
 
@@ -2405,9 +2454,9 @@ class NewShaftWithKeyseats(ShaftSketch):
             
             shaft += create_random_profile(steps['max'],steps['min'],
                                   increase_values=[
-                                      4,
-                                      5,
-                                      6,
+                                      8,
+                                      10,
+                                      12,
                                   ],
                                   step_modificator=step_mod_inc_chamfer,origin=shaft[-1].end) 
             
@@ -2416,15 +2465,20 @@ class NewShaftWithKeyseats(ShaftSketch):
             shaft +=create_random_profile(steps['max'],steps['min'],
                                   initial_diameter=[d_end+8, d_end+10 ],
                                   increase_values=[
-                                      -4,
-                                      -5,
-                                      -6,
+                                      -8,
+                                      -10,
+                                      -12,
                                   ],
                                   step_modificator=step_mod_dec_chamfer,origin = shaft[-1].end)
             
             shaft += [sol.CylinderWithKeyseat(60, 40)]
             shaft[-1]._origin=shaft[-2].end
             
+            for j in range(len(shaft)):
+                shaft[j].prev_elem = shaft[j-1] if j > 0 else None
+                shaft[j].next_elem = shaft[j+1] if j < len(shaft) - 1 else None
+
+
             shafts.append(shaft)
         return shafts
     

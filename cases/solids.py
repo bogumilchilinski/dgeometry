@@ -779,82 +779,119 @@ class Cylinder(Solid):
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
 
     def __init__(self, height, diameter):
-
-        num_of_lines_view = self.__class__.num_of_lines_view
-        num_of_lines_sec = self.__class__.num_of_lines_sec
-        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
-        num_of_lines_front = self.__class__.num_of_lines_front
-
-        super().__init__(View(**num_of_lines_view),
-                         Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front))
-
+        super().__init__(View(**self.__class__.num_of_lines_view),
+                         Section(**self.__class__.num_of_lines_sec),
+                         HalfSection(**self.__class__.num_of_lines_half_sec),
+                         FrontView(**self.__class__.num_of_lines_front))
         self.height = height
         self.diameter = diameter
-
         self._parameters = height, diameter
-        self._class_description = "with L={}mm and diameter ={}mm".format(
-            *self._parameters)
-
-        self._name['pl'] = 'Walec'
-        self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
-            *self._parameters)
 
     def str_en(self):
-        return 'Cylinder \n with L={length}mm \n and diameter={d}mm'.format(
-            length=self.height, d=self.diameter)
+        return f'Cylinder\nwith L={self.height}mm\nand diameter={self.diameter}mm'
 
     def str_pl(self):
-        return 'Walec \n o L={length}mm i średnicy={d}mm'.format(
-            length=self.height,
-            d=self.diameter).replace('right',
-                                     'prawej').replace('left', 'lewej')
+        return f'Walec\no L={self.height}mm\ni średnicy={self.diameter}mm'
 
     def _plot_2d(self, language='en'):
-        class_name = self.__class__.__name__
-        span = np.linspace(0, len(class_name), 100)
+        self._plot_2d_view(language=language)
+        self._plot_2d_section(language=language)
+        
+        origin, r, l = self.origin/5, self.diameter/2/5, self.height/5
+        ShaftPreview(0, 0, origin/2, [r, l, "Walec", 0.2, '#6b7aa1'])
 
-        origin = self.origin / 5
-        r = self.diameter / 2 / 5
-        l = self.height / 5
-        end = self.end / 5
+    def _plot_2d_view(self, language='en'):
+        """Góra: Widok + JEDYNY OPIS"""
+        origin, r, l = self.origin/5, self.diameter/2/5, self.height/5
 
-        t_l = origin + 1
-        t_r = (r + 7)
+        # --- OBLICZENIE STYKU Z SĄSIADEM ---
+        prev_r = 0
+        if getattr(self, 'prev_elem', None) is not None:
+            prev_r = getattr(self.prev_elem, 'diameter', 0) / 10
+            
+            # Sprawdzamy czy sąsiad ma fazę
+            if hasattr(self.prev_elem, 'chamfer_pos') and getattr(self.prev_elem, 'chamfer_pos') in ['right', 'both']:
+                # BEZPIECZNE POBIERANIE WARTOSCI: Jeśli nie ma chamfer_length, podstaw 0
+                n_cl = getattr(self.prev_elem, 'chamfer_length', 0) / 5
+                n_ca = getattr(self.prev_elem, 'chamfer_angle', 45)
+                
+                n_ch = n_cl * np.tan(np.radians(n_ca))
+                prev_r -= n_ch
 
-        line_type = self.line_type
-        color = self.color
+        x_pts, y_pts = [], []
+        
+        # Start od osi (żeby narysować pełne czoło wału) i przejście do promienia sąsiada
+        x_pts.extend([origin, origin, origin])
+        y_pts.extend([0, prev_r, r])
+        
+        # Górna krawędź
+        x_pts.append(origin + l)
+        y_pts.append(r)
+        
+        # --- ZMIANA: INTELIGENTNE ZAMYKANIE PRAWEJ KRAWĘDZI ---
+        # Sprawdzamy, czy następny element to twardy materiał (nie "powietrze" czyli Hole)
+        next_is_solid = self.next_elem is not None and 'Hole' not in type(self.next_elem).__name__
+        
+        # Zjazd do osi jeśli kończymy wał albo zaczyna się otwór
+        if not next_is_solid:
+            x_pts.append(origin + l)
+            y_pts.append(0)
 
-        # --- DODANE KRESKOWANIE (tylko dolna połowa) ---
-        GeometryScene.ax_2d.fill_between(
-            [origin, origin + l], 
-            [0, 0],   # Od osi
-            [-r, -r], # Do krawędzi zewnętrznej
-            facecolor='none', hatch='//', edgecolor='k', alpha=0.5, zorder=1
-        )
+        res = GeometryScene.ax_2d.plot(x_pts, y_pts, color='k', linewidth=1, zorder=3)
+        res += GeometryScene.ax_2d.plot([origin-1, origin+l+1], [0, 0], linestyle=(0, (25, 10, 2, 10)), color='k', linewidth=0.5, zorder=3)
 
-        # --- OBRYS WAŁKA (bez zmian, dodano zorder=3) ---
-        res = GeometryScene.ax_2d.plot(
-            [origin, origin, origin + l, origin + l, origin],
-            [-r, r, r, -r, -r],
-            line_type,
-            color=color, zorder=3) + GeometryScene.ax_2d.plot(
-                [origin - 0.5, origin + l + 0.5], [0, 0],
-                '-.',
-                color='k',
-                linewidth=1, zorder=3)
+        # OPIS TYLKO TUTAJ (Nad obiektem)
+        label = self.str_pl() if language == 'pl' else self.str_en()
+        GeometryScene.ax_2d.text(origin + l/2, r + 5, label,
+                                 rotation='vertical', multialignment='center', 
+                                 va='bottom', ha='center', color='k')
+        return res
 
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_pl(), rotation='vertical', multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_en(), rotation='vertical', multialignment='center')
+    def _plot_2d_section(self, language='en'):
+        """Dół: Przekrój (szrafowanie + inteligentny obrys ze schodkami)"""
+        origin, r, l = self.origin/5, self.diameter/2/5, self.height/5
 
-        ShaftPreview(0,0, origin / 2, [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        # Kreskowanie
+        GeometryScene.ax_2d.fill_between([origin, origin+l], [0, 0], [-r, -r], 
+                                         facecolor='none', hatch='//', edgecolor='k', linewidth=0, alpha=0.3, zorder=1)
+        
+        # --- OBLICZENIE STYKU Z SĄSIADEM ---
+        prev_r = 0
+        if getattr(self, 'prev_elem', None) is not None:
+            prev_r = getattr(self.prev_elem, 'diameter', 0) / 10
+            
+            # Sprawdzamy czy sąsiad ma fazę
+            if hasattr(self.prev_elem, 'chamfer_pos') and getattr(self.prev_elem, 'chamfer_pos') in ['right', 'both']:
+                # BEZPIECZNE POBIERANIE WARTOSCI: Jeśli nie ma chamfer_length, podstaw 0
+                n_cl = getattr(self.prev_elem, 'chamfer_length', 0) / 5
+                n_ca = getattr(self.prev_elem, 'chamfer_angle', 45)
+                
+                n_ch = n_cl * np.tan(np.radians(n_ca))
+                prev_r -= n_ch
 
-        print(res)
+        # --- INTELIGENTNY OBRYS ---
+        x_pts = []
+        y_pts = []
+        
+        # LEWA STRONA: Zjazd tylko od skorygowanego promienia sąsiada
+        x_pts.extend([origin, origin])
+        y_pts.extend([-prev_r, -r])
+            
+        # DNO
+        x_pts.append(origin+l)
+        y_pts.append(-r)
+        
+        # --- ZMIANA: INTELIGENTNE ZAMYKANIE PRAWEJ KRAWĘDZI ---
+        next_is_solid = self.next_elem is not None and 'Hole' not in type(self.next_elem).__name__
+        
+        # Zjazd do zera, jeśli to koniec wału albo zaczyna się otwór
+        if not next_is_solid:
+            x_pts.append(origin+l)
+            y_pts.append(0)
 
-
+        res = GeometryScene.ax_2d.plot(x_pts, y_pts, color='k', linewidth=1, zorder=3)
+        return res
+    
 class ScrewCore(Cylinder):
     """This object represents core of the screw.
     
@@ -1083,300 +1120,203 @@ class Plate(Cylinder):
 
 
 class Hole(Solid):
-    """This object represents hole that can be made inside solid.
-    
-    The hole object has predefined numbers of lines and dimensions that are needed 
-    to make a engineering drawing in view, section and half-section.It also stores 
-    information about height and diameter.
-    
-    Parameters
-    ==========
-    
-    height : int
-        The value of height of hole
-        
-    diameter : int
-        The value of diameter of hole
-    
-    Examples
-    ========
-    
-    >>> from solids import Hole
-    >>> hole = Hole(5,2)
-    >>> hole._parameters
-    (5, 2)
-    
-    >>> hole._class_description
-    'with L=5mm and diameter =2mm'
-    
-    >>> hole._class_description_pl
-    'o L=5mm i średnicy =2mm'
-    
-    >>> hole._name
-    {'pl': 'Otwór'}
-    
-    """
+    """This object represents a hole that can be made inside a solid."""
 
     num_of_lines_view = {
-        'horizontal_lines': 1,
-        'vertical_lines': 1,
-        'horizontal_dimensions': 0,
-        'vertical_dimensions': 0,
+        'horizontal_lines': 1, 'vertical_lines': 1,
+        'horizontal_dimensions': 0, 'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
-        'horizontal_lines': 3,
-        'vertical_lines': 1,
-        'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'horizontal_lines': 3, 'vertical_lines': 1,
+        'horizontal_dimensions': 1, 'vertical_dimensions': 1,
         'inclined_lines': 0,
     }
-
     num_of_lines_half_sec = {
-        'horizontal_lines': 2,
-        'vertical_lines': 1,
-        'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
+        'horizontal_lines': 2, 'vertical_lines': 1,
+        'horizontal_dimensions': 1, 'vertical_dimensions': 1,
         'inclined_lines': 0,
     }
-
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
 
     def __init__(self, height, diameter):
-
-        num_of_lines_view = self.__class__.num_of_lines_view
-        num_of_lines_sec = self.__class__.num_of_lines_sec
-        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
-        num_of_lines_front = self.__class__.num_of_lines_front
-
-        super().__init__(View(**num_of_lines_view),
-                         Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front))
+        super().__init__(View(**self.__class__.num_of_lines_view),
+                         Section(**self.__class__.num_of_lines_sec),
+                         HalfSection(**self.__class__.num_of_lines_half_sec),
+                         FrontView(**self.__class__.num_of_lines_front))
         self.height = height
         self.diameter = diameter
 
         self._parameters = height, diameter
-        self._class_description = "with L={}mm and diameter={}mm".format(
-            *self._parameters)
-
+        self._class_description = "with L={}mm and diameter={}mm".format(*self._parameters)
         self._name['pl'] = 'Otwór'
-        self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
-            *self._parameters)
+        self._class_description_pl = "o L={}mm i średnicy ={}mm".format(*self._parameters)
+        
+        # Puste referencje dla sąsiadów (wypełnia je generator)
+        self.prev_elem = None
+        self.next_elem = None
 
     def str_en(self):
-        return 'Hole \n with L={length}mm \n and diameter={d}mm'.format(
-            length=self.height, d=self.diameter)
+        return f'Hole \n with L={self.height}mm \n and diameter={self.diameter}mm'
 
     def str_pl(self):
-        return 'Otwór \n o L={length}mm i średnicy={d}mm'.format(
-            length=self.height,
-            d=self.diameter).replace('right',
-                                     'prawej').replace('left', 'lewej')
+        return f'Otwór \n o L={self.height}mm i średnicy={self.diameter}mm'
 
     def _plot_2d(self, language='en'):
+        #self._plot_2d_view(language=language)
+        self._plot_2d_section(language=language)
+        
+        origin, r, l = self.origin / 5, self.diameter / 2 / 5, self.height / 5
+        ShaftPreview(0, 0, origin / 2, [r, l, "otwór", 0.7, '#6b7aa1'])
 
-        class_name = self.__class__.__name__
+    def _plot_2d_view(self, language='en'):
+        """Góra: Widok - zmieniono linię przerywaną na ciągłą. Brak opisu (przeniesiony na dół)."""
+        origin, r, l = self.origin / 5, self.diameter / 2 / 5, self.height / 5
 
-        span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
+        # Zwykła linia ciągła wg. Twoich wytycznych
+        x = [origin, origin, origin + l, origin + l]
+        y = [0, r, r, 0]
+        res = GeometryScene.ax_2d.plot(x, y, linestyle='-', color='k',linewidth=1, zorder=3)
+        
+        # Cienka oś symetrii z rzadszym wzorem
+        res += GeometryScene.ax_2d.plot([origin-1, origin+l+1], [0, 0], 
+                                        linestyle=(0, (25, 10, 2, 10)), color='k', linewidth=0.5, zorder=3)
+        return res
 
-        origin = self.origin / 5
-        r = self.diameter / 2 / 5
-        l = self.height / 5
-        end = self.end / 5
+    def _plot_2d_section(self, language='en'):
+        """Dół: Przekrój - maskowanie materiału i dynamiczny opis na dole"""
+        origin, r, l = self.origin / 5, self.diameter / 2 / 5, self.height / 5
 
-        t_l = origin + l / 6
-        t_r = (-r - 23)
+        # --- INTELIGENTNE ODSUWANIE OPISU ---
+        # Szukamy absolutnie największej średnicy w całym wałku!
+        max_d = self.diameter
+        
+        # Skanujemy w lewo
+        curr = self.prev_elem
+        while curr is not None:
+            if getattr(curr, 'diameter', 0) > max_d:
+                max_d = curr.diameter
+            curr = getattr(curr, 'prev_elem', None)
+            
+        # Skanujemy w prawo
+        curr = self.next_elem
+        while curr is not None:
+            if getattr(curr, 'diameter', 0) > max_d:
+                max_d = curr.diameter
+            curr = getattr(curr, 'next_elem', None)
+            
+        # Skalujemy maksymalny promień do układu rysunku
+        max_r = max_d / 2 / 5
 
-        # Rysuje biały blok "czyszczący" pod osią, aby schować kreskowanie wałka
+        # 1. Biały blok "czyszczący"
         GeometryScene.ax_2d.fill_between(
             [origin, origin + l], 
             [0, 0], 
-            [-r, -r], # Gdzie -r to promień otworu
+            [-r, -r], 
             facecolor='white', edgecolor='none', zorder=2
         )
         
-        res = GeometryScene.ax_2d.plot(
-            [origin, origin, origin + l, origin + l],
-            [0, -r, -r, 0],
-             '-',
-             color='b') #+ #GeometryScene.ax_2d.plot(
-                #[origin - 0.5, origin + l + 0.5], [0, 0],
-                #'-.',
-                 #color='k',
-               # linewidth=1
-#)
+        # 2. Widoczny kontur otworu w przekroju
+        x_pts = [origin, origin, origin + l, origin + l]
+        y_pts = [0, -r, -r, 0]
+        res = GeometryScene.ax_2d.plot(x_pts, y_pts, linestyle='-', color='k',linewidth=1, zorder=3)
 
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_pl(),
-                                            rotation='vertical',
-                                            multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_en(),
-                                            rotation='vertical',
-                                            multialignment='center')
-
-        ShaftPreview(0,0, origin / 2,
-                     [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
+        # 3. Dynamiczny opis odsunięty poniżej absolutnie najgrubszego cylindra
+        label = self.str_pl() if language == 'pl' else self.str_en()
+        GeometryScene.ax_2d.text(origin + l/2, -max_r - 5, label, 
+                                 rotation='vertical', multialignment='center', 
+                                 va='top', ha='center', color='k')
+        return res
 
 
 class OpenHole(Hole):
-    """This object represents hole that can be made inside solid.
-    
-    The hole object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height and diameter.
-    
-    Parameters
-    ==========
-    
-    height : int
-        The value of height of hole
-        
-    diameter : int
-        The value of diameter of hole
-    
-    Examples
-    ========
-    
-    >>> from solids import Hole
-    >>> hole = Hole(5,2)
-    >>> hole._parameters
-    (5, 2)
-    
-    >>> hole._class_description
-    'with L=5mm and diameter =2mm'
-    
-    >>> hole._class_description_pl
-    'o L=5mm i średnicy =2mm'
-    
-    >>> hole._name
-    {'pl': 'Otwór'}
-    
-    """
+    """This object represents hole that can be made inside solid."""
     num_of_lines_view = {
-        'horizontal_lines': 1,
-        'vertical_lines': 1,
-        'horizontal_dimensions': 0,
-        'vertical_dimensions': 0,
+        'horizontal_lines': 1, 'vertical_lines': 1,
+        'horizontal_dimensions': 0, 'vertical_dimensions': 0,
         'inclined_lines': 0,
     }
     num_of_lines_sec = {
-        'horizontal_lines': 3,
-        'vertical_lines': 0, # lack of legft line included
-        'horizontal_dimensions': 0,
-        'vertical_dimensions': 1,
+        'horizontal_lines': 3, 'vertical_lines': 0,
+        'horizontal_dimensions': 0, 'vertical_dimensions': 1,
         'inclined_lines': 0,
     }
 
     num_of_lines_half_sec = {
-        'horizontal_lines': 2,
-        'vertical_lines': 0, # lack of legft line included
-        'horizontal_dimensions': 0,
-        'vertical_dimensions': 1,
+        'horizontal_lines': 2, 'vertical_lines': 0,
+        'horizontal_dimensions': 0, 'vertical_dimensions': 1,
         'inclined_lines': 0,
     }
 
     def str_en(self):
-        return 'Open hole \n with diameter={d}mm'.format(length=self.height,
-                                                         d=self.diameter)
+        return 'Open hole \n with diameter={d}mm'.format(length=self.height, d=self.diameter)
 
     def str_pl(self):
         return 'Przelotowy otwór \n o średnicy={d}mm'.format(
-            length=self.height,
-            d=self.diameter).replace('right',
-                                     'prawej').replace('left', 'lewej')
+            length=self.height, d=self.diameter).replace('right', 'prawej').replace('left', 'lewej')
 
     def _plot_2d(self, language='en'):
+        self._plot_2d_section(top=False, language=language)
 
-        origin = self.origin / 5
-        r = self.diameter / 2 / 5
-        l = self.height / 5
-        end = self.end / 5
+    def _plot_2d_section(self, top=True, language='en'):
+        origin, r, l = self.origin / 5, self.diameter / 2 / 5, self.height / 5
 
-        t_l = origin + l / 2
-        t_r = (-r - 23)
+        # --- INTELIGENTNE ODSUWANIE OPISU ---
+        max_d = self.diameter
+        
+        curr = getattr(self, 'prev_elem', None)
+        while curr is not None:
+            if getattr(curr, 'diameter', 0) > max_d: max_d = curr.diameter
+            curr = getattr(curr, 'prev_elem', None)
+            
+        curr = getattr(self, 'next_elem', None)
+        while curr is not None:
+            if getattr(curr, 'diameter', 0) > max_d: max_d = curr.diameter
+            curr = getattr(curr, 'next_elem', None)
+            
+        max_r = max_d / 2 / 5
 
-        # Rysuje biały blok "czyszczący" pod osią, aby schować kreskowanie wałka
+        # 1. Biały blok czyszczący
         GeometryScene.ax_2d.fill_between(
-            [origin, origin + l], 
-            [0, 0], 
-            [-r, -r], # Gdzie -r to promień otworu
+            [origin, origin + l], [0, 0], [-r, -r],
             facecolor='white', edgecolor='none', zorder=2
         )
 
-        res = GeometryScene.ax_2d.plot(
-            [origin, origin, origin + l, origin + l],
-            [0, -r, -r, 0],
-             '-',
-             color='b') #+ GeometryScene.ax_2d.plot(
-                #[origin - 0.5, origin + l + 0.5], [0, 0],
-                # '-.',
-                # color='k',
-                #linewidth=1
-#)
-               
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_pl(),
-                                            rotation='vertical',
-                                            multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_en(),
-                                            rotation='vertical',
-                                            multialignment='center')
+        # --- BEZPIECZNE OBLICZENIE STYKU Z SĄSIADEM ---
+        prev_r = 0
+        if getattr(self, 'prev_elem', None) is not None:
+            prev_r = getattr(self.prev_elem, 'diameter', 0) / 10
+            if hasattr(self.prev_elem, 'chamfer_pos') and getattr(self.prev_elem, 'chamfer_pos') in ['right', 'both']:
+                n_cl = getattr(self.prev_elem, 'chamfer_length', 0) / 5
+                n_ca = getattr(self.prev_elem, 'chamfer_angle', 45)
+                n_ch = n_cl * np.tan(np.radians(n_ca))
+                prev_r += n_ch
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
-
-
-class ChamferedHole(Solid):
-    """This object represents chamfered hole that can be made inside solid.
-    
-    The chamfered hole object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height, diameter, chamfer length, angle and position.
-    
-    Parameters
-    ==========
-    
-    height : int
-        The value of height of hole
+        # 2. Widoczny kontur otworu ze schodkami
+        x_pts, y_pts = [], []
+        x_pts.extend([origin, origin])
+        y_pts.extend([-prev_r, -r])
         
-    diameter : int
-        The value of diameter of hole
+        x_pts.append(origin + l)
+        y_pts.append(-r)
+        
+        if getattr(self, 'next_elem', None) is None:
+            x_pts.append(origin + l)
+            y_pts.append(0)
+
+        res = GeometryScene.ax_2d.plot(x_pts, y_pts, linestyle='-', color='k', zorder=3)
+
+        # 3. Dynamiczny opis
+        label = self.str_pl() if language == 'pl' else self.str_en()
+        GeometryScene.ax_2d.text(origin + l/2, -max_r - 5, label, 
+                                 rotation='vertical', multialignment='center', 
+                                 va='top', ha='center', color='k')
+
+        ShaftPreview(0,0, origin / 2, [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
+        return res
     
-    chamfer_length=1 : int
-        The value of chamfer length
-    
-    chamfer_angle=45 : int
-        The value of chamfer angle
-    
-    chamfer_pos='left' : str
-        The position of chamfer
-    
-    Examples
-    ========
-    
-    >>> from solids import ChamferedHole
-    >>> chamf_hole = ChamferedHole(5,2)
-    >>> chamf_hole._parameters
-    (5, 2)
-    
-    >>> chamf_hole.str_en()
-    'Hole with L=5mm, diameter=2mm and 1x45 chamfer on the left side'
-    
-    >>> chamf_hole.str_pl()
-    'Otwór o L=5mm, średnicy=2mm i fazie 1x45 znajdującej się po lewej stronie'
-    
-    >>> chamf_hole._class_description
-    'with L=5mm and diameter=2mm'
-    
-    """
+class ChamferedHole(Hole):
+    """This object represents chamfered hole that can be made inside solid."""
 
     num_of_lines_view = {
         'horizontal_lines': 1,
@@ -1393,7 +1333,6 @@ class ChamferedHole(Solid):
         'inclined_lines': 2,
         'angular_dimensions': 1,
     }
-
     num_of_lines_half_sec = {
         'horizontal_lines': 2,
         'vertical_lines': 2,
@@ -1402,148 +1341,168 @@ class ChamferedHole(Solid):
         'inclined_lines': 1,
         'angular_dimensions': 1,
     }
-
     num_of_lines_front = {'circles': 2, 'phi_dimensions': 0}
 
     def __init__(self,
                  height,
                  diameter,
-                 chamfer_length=1,
+                 chamfer_length=None,
                  chamfer_angle=45,
                  chamfer_pos='left'):
 
-        num_of_lines_view = self.__class__.num_of_lines_view
-        num_of_lines_sec = self.__class__.num_of_lines_sec
-        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
-        num_of_lines_front = self.__class__.num_of_lines_front
+        # Inicjalizacja poprzez Hole (automatycznie ustawi słowniki i parametry bazowe)
+        super().__init__(height, diameter)
 
-        super().__init__(View(**num_of_lines_view),
-                         Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front))
-
-        self.height = height
-        self.diameter = diameter
-        self.chamfer_length = chamfer_length
-        self.chamfer_angle = chamfer_angle
-        self.chamfer_pos = chamfer_pos
-        self._parameters = height, diameter
-        self._class_description = "with L={}mm and diameter={}mm".format(
-            *self._parameters)
+        # Prosta inicjalizacja fazy
+        if chamfer_length is None:
+            self.chamfer_length = max(1, min(4, round(diameter * 0.05)))
+        else:
+            self.chamfer_length = chamfer_length 
+            
+        self.chamfer_angle = chamfer_angle if chamfer_angle is not None else 45
+        self.chamfer_pos = chamfer_pos if chamfer_pos is not None else 'none'
 
     def str_en(self):
-        return 'Hole \n with L={length}mm, diameter={d}mm \n and {l_ch}x{angle} chamfer on the {pos} side'.format(
-            length=self.height,
-            d=self.diameter,
-            angle=self.chamfer_angle,
-            l_ch=self.chamfer_length,
-            pos=self.chamfer_pos)
+        # Pobieramy bazowy opis z Hole
+        base = super().str_en()
+        if self.chamfer_pos == 'none':
+            return base
+        return f"{base}\n{self.chamfer_length}x{self.chamfer_angle} chamfer ({self.chamfer_pos})"
 
     def str_pl(self):
-        return 'Otwór \n o L={length}mm, średnicy={d}mm \n i fazie {l_ch}x{angle} znajdującej się po {pos} stronie'.format(
-            length=self.height,
-            d=self.diameter,
-            angle=self.chamfer_angle,
-            l_ch=self.chamfer_length,
-            pos=self.chamfer_pos).replace('right',
-                                          'prawej').replace('left', 'lewej')
+        # Pobieramy bazowy opis z Hole
+        base = super().str_pl()
+        if self.chamfer_pos == 'none':
+            return base
+        pos_pl = self.chamfer_pos.replace('right', 'prawa').replace('left', 'lewa').replace('both', 'obie strony')
+        return f"{base}\nfaza {self.chamfer_length}x{self.chamfer_angle} ({pos_pl})"
 
-
-#     def _plot_2d(self,language='en'):
-
-#         class_name = self.__class__.__name__
-
-#         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
-
-#         origin = self.origin / 10
-#         r = self.diameter / 2 / 10
-#         l = self.height / 10
-#         end = self.end / 10
-#         c_l = self.chamfer_length / 10
-#         c_a = self.chamfer_angle
-#         c_h = c_l * np.tan(c_a)
-
-#         t_l = origin + l / 2
-#         t_r = (r + 1)
-
-#         res = GeometryScene.ax_2d.plot(
-#             [origin+c_l,origin+c_l,origin+l,origin+l,origin+c_l],[ -r, +r, +r, -r, -r],'--',color='c') + GeometryScene.ax_2d.plot(
-#                 [origin+c_l,origin,origin,origin+c_l],[ -r, -r-c_h, +r+c_h, +r],'--',color='c')+ GeometryScene.ax_2d.plot(
-#                     [origin,origin+l],[ -r-c_h, -r-c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
-#                         [origin,origin+l],[ +r+c_h, +r+c_h],'--',linewidth=1,color='c') + GeometryScene.ax_2d.plot(
-#                             [origin+l,origin+l],[r+c_h,-r-c_h],'--',color='c')
-
-#         text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
-#         print(res)
-
-    def _plot_2d(self, language='en'):
-
-        class_name = self.__class__.__name__
-
-        span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
-
-
-        origin = self.origin / 5
-        r = self.diameter / 2 / 5
-        l = self.height / 5
-        end = self.end / 5
+    def _plot_2d_view(self, language='en'):
+        """Góra: Widok - bezpieczne łączenie, czarny obrys (gr. 1) i oś symetrii"""
+        origin, r, l = self.origin / 5, self.diameter / 2 / 5, self.height / 5
         c_l = self.chamfer_length / 5
-
-        # Obliczenia dla fazy
-        # Zamieniamy stopnie na radiany, bo np.tan tak woli:
         c_h = c_l * np.tan(np.radians(self.chamfer_angle))
+        pos = self.chamfer_pos
 
-        t_l = origin + l / 7
-        t_r = (-r - 25)
+        # --- BEZPIECZNE OBLICZENIE STYKU Z SĄSIADEM ---
+        prev_r = 0
+        if getattr(self, 'prev_elem', None) is not None:
+            prev_r = getattr(self.prev_elem, 'diameter', 0) / 10
+            
+            # Sprawdzamy czy sąsiad ma fazę
+            if hasattr(self.prev_elem, 'chamfer_pos') and getattr(self.prev_elem, 'chamfer_pos') in ['right', 'both']:
+                n_cl = getattr(self.prev_elem, 'chamfer_length', 0) / 5
+                n_ca = getattr(self.prev_elem, 'chamfer_angle', 45)
+                n_ch = n_cl * np.tan(np.radians(n_ca))
+                prev_r += n_ch  # Faza otworu go poszerza!
 
-        if self.chamfer_pos == 'left':
-            x_coords = [origin, origin, origin + c_l, origin + l, origin + l]
-            y_coords = [0, -r - c_h, -r, -r, 0]
-        elif self.chamfer_pos == 'right':
-            x_coords = [origin, origin, origin + l - c_l, origin + l, origin + l]
-            y_coords = [0, -r, -r, -r - c_h, 0]
-        else:
-            # W razie braku fazy lub błędu w parametrze, rysuje prosty otwór
-            x_coords = [origin, origin, origin + l, origin + l]
-            y_coords = [0, -r, -r, 0]
+        x_pts, y_pts = [], []
+        start_y = r + c_h if pos in ['left', 'both'] else r
         
-        # Rysuje biały blok "czyszczący" pod osią, aby schować kreskowanie wałka
+        # Start od promienia sąsiada (w otworze nie dociągamy do osi!)
+        x_pts.extend([origin, origin])
+        y_pts.extend([prev_r, start_y])
+        
+        if pos in ['left', 'both']:
+            x_pts.append(origin + c_l)
+            y_pts.append(r)
+            # Pionowa kreska brzegu fazy widoczna z zewnątrz (gr. 1, czarna)
+            GeometryScene.ax_2d.plot([origin + c_l, origin + c_l], [0, r], color='k',linewidth=1,  zorder=3)
+            
+        # Prawa strona
+        end_x = origin + l - c_l if pos in ['right', 'both'] else origin + l
+        x_pts.append(end_x)
+        y_pts.append(r)
+
+        if pos in ['right', 'both']:
+            x_pts.append(origin + l)
+            y_pts.append(r + c_h)
+            GeometryScene.ax_2d.plot([origin + l - c_l, origin + l - c_l], [0, r], color='k',linewidth=1, zorder=3)
+            
+        if getattr(self, 'next_elem', None) is None:
+            x_pts.append(origin + l)
+            y_pts.append(0)
+
+        # Rysowanie obrysu (czarny, grubość 1) i osi (grubość 0.5)
+        res = GeometryScene.ax_2d.plot(x_pts, y_pts, linestyle='-', color='k', linewidth=1, zorder=3)
+        res += GeometryScene.ax_2d.plot([origin-1, origin+l+1], [0, 0], 
+                                        linestyle=(0, (25, 10, 2, 10)), color='k',linewidth=0.5, zorder=3)
+        return res
+
+    def _plot_2d_section(self, language='en'):
+        """Dół: Przekrój - maskowanie materiału, faza i dynamiczny tekst (czarny obrys gr. 1)"""
+        origin, r, l = self.origin / 5, self.diameter / 2 / 5, self.height / 5
+        c_l = self.chamfer_length / 5
+        c_h = c_l * np.tan(np.radians(self.chamfer_angle))
+        pos = self.chamfer_pos
+
+        # --- INTELIGENTNE ODSUWANIE OPISU ---
+        max_d = self.diameter
+        curr = getattr(self, 'prev_elem', None)
+        while curr is not None:
+            if getattr(curr, 'diameter', 0) > max_d: max_d = curr.diameter
+            curr = getattr(curr, 'prev_elem', None)
+            
+        curr = getattr(self, 'next_elem', None)
+        while curr is not None:
+            if getattr(curr, 'diameter', 0) > max_d: max_d = curr.diameter
+            curr = getattr(curr, 'next_elem', None)
+            
+        max_r = max_d / 2 / 5
+
+        # 1. Biały blok czyszczący szrafowanie pod osią
         GeometryScene.ax_2d.fill_between(
-            [origin, origin + l], 
-            [0, 0], 
-            [-r, -r], # Gdzie -r to promień otworu
+            [origin, origin + l], [0, 0], [-r, -r],
             facecolor='white', edgecolor='none', zorder=2
         )
 
-        # Rysowanie obrysu otworu z fazą + oś symetrii
-        res = GeometryScene.ax_2d.plot(
-            x_coords, y_coords,
-            '-',
-            color='b'
-        ) + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5], [0, 0],
-            '-.',
-            color='k',
-            linewidth=1
-        )
+        # --- BEZPIECZNE OBLICZENIE STYKU Z SĄSIADEM ---
+        prev_r = 0
+        if getattr(self, 'prev_elem', None) is not None:
+            prev_r = getattr(self.prev_elem, 'diameter', 0) / 10
+            if hasattr(self.prev_elem, 'chamfer_pos') and getattr(self.prev_elem, 'chamfer_pos') in ['right', 'both']:
+                n_cl = getattr(self.prev_elem, 'chamfer_length', 0) / 5
+                n_ca = getattr(self.prev_elem, 'chamfer_angle', 45)
+                n_ch = n_cl * np.tan(np.radians(n_ca))
+                prev_r += n_ch
 
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_pl(),
-                                            rotation='vertical',
-                                            multialignment='center')
+        # 2. Widoczny kontur otworu ze schodkami i fazą
+        x_pts, y_pts = [], []
+        start_y = -r - c_h if pos in ['left', 'both'] else -r
+        
+        x_pts.extend([origin, origin])
+        y_pts.extend([-prev_r, start_y])
+        
+        if pos in ['left', 'both']:
+            x_pts.append(origin + c_l)
+            y_pts.append(-r)
+            # Wewnętrzna krawędź skosu w przekroju (gr. 1, czarna)
+            GeometryScene.ax_2d.plot([origin + c_l, origin + c_l], [-r, 0], color='k',linewidth=1,  zorder=3)
+            
+        if pos in ['right', 'both']:
+            x_pts.append(origin + l - c_l)
+            y_pts.append(-r)
+            x_pts.append(origin + l)
+            y_pts.append(-r - c_h)
+            GeometryScene.ax_2d.plot([origin + l - c_l, origin + l - c_l], [-r, 0], color='k', linewidth=1, zorder=3)
         else:
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_en(),
-                                            rotation='vertical',
-                                            multialignment='center')
+            x_pts.append(origin + l)
+            y_pts.append(-r)
+            
+        if getattr(self, 'next_elem', None) is None:
+            x_pts.append(origin + l)
+            y_pts.append(0)
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
+        # Obrys główny przekroju
+        res = GeometryScene.ax_2d.plot(x_pts, y_pts, linestyle='-', color='k', linewidth=1, zorder=3)
+
+        # 3. Dynamiczny opis
+        label = self.str_pl() if language == 'pl' else self.str_en()
+        GeometryScene.ax_2d.text(origin + l/2, -max_r - 5, label, 
+                                 rotation='vertical', multialignment='center', 
+                                 va='top', ha='center', color='k')
+
+        return res
 
 
 class ChamferedOpenHoleWithKeyway(ChamferedHole):
@@ -1698,248 +1657,171 @@ class ChamferedOpenHoleWithKeyway(ChamferedHole):
                      [2 * r / 2, l / 2, "bez fazy", 0.7, '#6b7aa1'])
 
 
-class ChamferedCylinder(Solid):
-    """This object represents chamfered cylinder solid.
-    
-    The chamfered cylinder object has predefined numbers of lines and dimensions 
-    that are needed to make a engineering drawing in view, section and half-section. 
-    It also stores information about height, diameter, chamfer length, angle and position.
-    
-    Parameters
-    ==========
-    
-    height : int
-        The value of height of hole
+class ChamferedCylinder(Cylinder):
+    def __init__(self, height, diameter, chamfer_length=None, chamfer_angle=45, chamfer_pos='left'):
+        super().__init__(height, diameter)
         
-    diameter : int
-        The value of diameter of hole
-    
-    chamfer_length=1 : int
-        The value of chamfer length
-    
-    chamfer_angle=45 : int
-        The value of chamfer angle
-    
-    chamfer_pos='left' : str
-        The position of chamfer
-    
-    Examples
-    ========
-    
-    >>> from solids import ChamferedCylinder
-    >>> chamf_cyl = ChamferedCylinder(5,2)
-    >>> chamf_cyl._parameters
-    (5, 2)
-    
-    >>> chamf_cyl.str_en()
-    'Cylinder with L=5mm, diameter=2mm and 1x45 chamfer on the left side'
-    
-    >>> chamf_cyl.str_pl()
-    'Walec o L=5mm, średnicy=2mm i fazie 1x45 znajdującej się po lewej stronie'
-    
-    >>> chamf_cyl._class_description
-    'with L=5mm and diameter=2mm'
-    
-    """
-    num_of_lines_view = {
-        'horizontal_lines': 3,
-        'vertical_lines': 3,
-        'horizontal_dimensions': 2,
-        'vertical_dimensions': 1,
-        'inclined_lines': 2,
-        'angular_dimensions': 1,
-    }
+        if chamfer_length is None:
+            self.chamfer_length = max(1, min(4, round(diameter * 0.05)))
+        else:
+            self.chamfer_length = chamfer_length 
+            
+        self.chamfer_angle = chamfer_angle if chamfer_angle is not None else 45
+        self._intended_chamfer_pos = chamfer_pos if chamfer_pos is not None else 'none'
+        
+        self.prev_elem = None
+        self.next_elem = None
 
-    num_of_lines_sec = {
-        'horizontal_lines': 3,
-        'vertical_lines': 2,
-        'horizontal_dimensions': 2,
-        'vertical_dimensions': 1,
-        'inclined_lines': 2,
-        'angular_dimensions': 1,
-    }
-
-    num_of_lines_half_sec = {
-        'horizontal_lines': 3,
-        'vertical_lines': 3,
-        'horizontal_dimensions': 2,
-        'vertical_dimensions': 1,
-        'inclined_lines': 2,
-        'angular_dimensions': 1,
-    }
-
-    num_of_lines_front = {'circles': 2, 'phi_dimensions': 0}
-
-    def __init__(self,
-                 height,
-                 diameter,
-                 chamfer_length=1,
-                 chamfer_angle=45,
-                 chamfer_pos='left'):
-
-        num_of_lines_view = self.__class__.num_of_lines_view
-        num_of_lines_sec = self.__class__.num_of_lines_sec
-        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
-        num_of_lines_front = self.__class__.num_of_lines_front
-
-        super().__init__(View(**num_of_lines_view),
-                         Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front))
-
-        self.height = height
-        self.diameter = diameter
-        self.chamfer_length = chamfer_length
-        self.chamfer_angle = chamfer_angle
-        self.chamfer_pos = chamfer_pos
-        self._parameters = height, diameter
-        self._class_description = "with L={}mm and diameter={}mm".format(
-            *self._parameters)
+    @property
+    def chamfer_pos(self):
+        """Dynamiczne wygaszanie faz, jeśli brakuje na nie miejsca"""
+        pos = self._intended_chamfer_pos
+        radial_drop = self.chamfer_length * np.tan(np.radians(self.chamfer_angle))
+        edge_diameter = self.diameter - (2 * radial_drop)
+        
+        if pos in ['left', 'both'] and self.prev_elem is not None:
+            d_prev = getattr(self.prev_elem, 'diameter', 0)
+            if d_prev >= self.diameter or edge_diameter < d_prev:
+                pos = 'right' if pos == 'both' else 'none'
+                
+        if pos in ['right', 'both'] and self.next_elem is not None:
+            d_next = getattr(self.next_elem, 'diameter', 0)
+            if d_next >= self.diameter or edge_diameter < d_next:
+                pos = 'left' if pos == 'both' else 'none'
+                
+        return pos
+    
+    @chamfer_pos.setter
+    def chamfer_pos(self, value):
+        """Pozwala generatorom na ręczne nadpisywanie pozycji fazy"""
+        self._intended_chamfer_pos = value    
 
     def str_en(self):
-        return 'Cylinder \n with L={length}mm, diameter={d}mm \n and {l_ch}x{angle} chamfer on the {pos} side'.format(
-            length=self.height,
-            d=self.diameter,
-            angle=self.chamfer_angle,
-            l_ch=self.chamfer_length,
-            pos=self.chamfer_pos)
+        base = super().str_en()
+        if self.chamfer_pos == 'none':
+            return base
+        return f"{base}\n{self.chamfer_length}x{self.chamfer_angle} chamfer ({self.chamfer_pos})"
 
     def str_pl(self):
-        return 'Walec \n o L={length}mm, średnicy={d}mm \n i fazie {l_ch}x{angle} znajdującej się po {pos} stronie'.format(
-            length=self.height,
-            d=self.diameter,
-            angle=self.chamfer_angle,
-            l_ch=self.chamfer_length,
-            pos=self.chamfer_pos).replace('right',
-                                          'prawej').replace('left', 'lewej')
+        base = super().str_pl()
+        if self.chamfer_pos == 'none':
+            return base
+        pos_pl = self.chamfer_pos.replace('right', 'prawa').replace('left', 'lewa').replace('both', 'obie strony')
+        return f"{base}\nfaza {self.chamfer_length}x{self.chamfer_angle} ({pos_pl})"
 
-#     def _plot_2d(self,language='en'):
+    def _plot_2d_view(self, language='en'):
+        origin, r, l = self.origin/5, self.diameter/2/5, self.height/5
+        c_l = self.chamfer_length/5
+        c_h = c_l * np.tan(np.radians(self.chamfer_angle))
+        pos = self.chamfer_pos
 
-#         class_name = self.__class__.__name__
+        # --- OBLICZENIE STYKU Z SĄSIADEM ---
+        prev_r = 0
+        if getattr(self, 'prev_elem', None) is not None:
+            prev_r = getattr(self.prev_elem, 'diameter', 0) / 10
+            
+            # Sprawdzamy czy sąsiad ma fazę
+            if hasattr(self.prev_elem, 'chamfer_pos') and getattr(self.prev_elem, 'chamfer_pos') in ['right', 'both']:
+                # BEZPIECZNE POBIERANIE WARTOSCI: Jeśli nie ma chamfer_length, podstaw 0
+                n_cl = getattr(self.prev_elem, 'chamfer_length', 0) / 5
+                n_ca = getattr(self.prev_elem, 'chamfer_angle', 45)
+                
+                n_ch = n_cl * np.tan(np.radians(n_ca))
+                prev_r -= n_ch
 
-#         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
-
-#         r = self.diameter / 2 / 10
-#         l = self.height / 10
-#         origin = self.origin / 10
-#         c_l = self.chamfer_length / 10
-#         c_a = self.chamfer_angle
-#         c_h = c_l * np.tan(c_a)
-
-#         t_l = origin + l / 2
-#         t_r = (r + 1)
-
-#         res = GeometryScene.ax_2d.plot(
-#             [origin + c_l, origin + c_l, origin + l, origin + l, origin + c_l], [-r, r, r, -r, -r],
-#             color='g') + GeometryScene.ax_2d.plot(
-#                 [ origin + c_l, origin + 0, origin + 0, origin + c_l], [-r, -r + c_h, r - c_h, r],
-#                 color='g')
-#         text = GeometryScene.ax_2d.text(t_l,t_r,self.str_pl(),rotation='vertical',multialignment='center')
-#         print(res)
-
-#         ShaftPreview(5,5,origin/2 ,[2*r/2, l/2, "bez fazy", 0.2, '#6b7aa1'])
-
-    def _plot_2d(self, language='en'):
-        class_name = self.__class__.__name__
-        span = np.linspace(0, len(class_name), 100)
-
-        origin = self.origin / 5
-        r = self.diameter / 2 / 5
-        l = self.height / 5
-        end = self.end / 5
+        x_pts, y_pts = [], []
+        start_y = r - c_h if pos in ['left', 'both'] else r
         
-        c_l = getattr(self, 'chamfer_length', 1) / 5    
-        c_a = getattr(self, 'chamfer_angle', 45)
-        c_h = c_l * np.tan(np.radians(c_a))
-        chamfer_pos = getattr(self, 'chamfer_pos', 'both') 
+        # --- TUTAJ JEST POPRAWKA (NAPRAWIA ŻÓŁTE KRESKI) ---
+        # Start rysowania: pionowa kreska od samej osi (0), przez sąsiada do nas
+        x_pts.extend([origin, origin, origin])
+        y_pts.extend([0, prev_r, start_y])
+            
+        if pos in ['left', 'both']:
+            x_pts.append(origin + c_l)
+            y_pts.append(r)
+            GeometryScene.ax_2d.plot([origin + c_l, origin + c_l], [0, r], color='k',linewidth=1, zorder=3)
 
-        t_l = origin + l / 4
-        t_r = (r + 0.5)
+        # Góra i prawa strona
+        end_x = origin + l - c_l if pos in ['right', 'both'] else origin + l
+        x_pts.append(end_x)
+        y_pts.append(r)
 
-        # --- LOGIKA WSPÓŁRZĘDNYCH DLA KRESKOWANIA I OBRYSU ---
-        if chamfer_pos == 'left':
-            x_hatch = [origin, origin + c_l, origin + l]
-            y_hatch = [-r + c_h, -r, -r]
-            x_coords = [origin, origin + c_l, origin + l, origin + l, origin + c_l, origin, origin]
-            y_coords = [-r + c_h, -r, -r, r, r, r - c_h, -r + c_h]
-        elif chamfer_pos == 'right':
-            x_hatch = [origin, origin + l - c_l, origin + l]
-            y_hatch = [-r, -r, -r + c_h]
-            x_coords = [origin, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin, origin]
-            y_coords = [-r, -r, -r + c_h, r - c_h, r, r, -r]
-        elif chamfer_pos == 'both':
-            x_hatch = [origin, origin + c_l, origin + l - c_l, origin + l]
-            y_hatch = [-r + c_h, -r, -r, -r + c_h]
-            x_coords = [origin, origin + c_l, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin + c_l, origin, origin]
-            y_coords = [-r + c_h, -r, -r, -r + c_h, r - c_h, r, r, r - c_h, -r + c_h]
-        else: # Gdy nie ma fazy
-            x_hatch = [origin, origin + l]
-            y_hatch = [-r, -r]
-            x_coords = [origin, origin, origin + l, origin + l, origin]
-            y_coords = [-r, r, r, -r, -r]
+        if pos in ['right', 'both']:
+            x_pts.append(origin + l)
+            y_pts.append(r - c_h)
+            GeometryScene.ax_2d.plot([origin + l - c_l, origin + l - c_l], [0, r], color='k',linewidth=1, zorder=3)
+            
+        # Jeśli nie ma sąsiada ALBO sąsiad jest Otworem, zamknij profil pionowo w dół do osi!
+        next_is_solid = self.next_elem is not None and 'Hole' not in type(self.next_elem).__name__
+        
+        if not next_is_solid:
+            x_pts.append(origin + l)
+            y_pts.append(0)
 
-        # --- 1. KRESKOWANIE (fill_between dopasowuje się do fazy) ---
-        GeometryScene.ax_2d.fill_between(
-            x_hatch,
-            [0] * len(x_hatch),
-            y_hatch,
-            facecolor='none', hatch='//', edgecolor='k', alpha=0.5, zorder=1
-        )
+        res = GeometryScene.ax_2d.plot(x_pts, y_pts, color='k', linewidth=1, zorder=3)
+        res += GeometryScene.ax_2d.plot([origin-1, origin+l+1], [0, 0], linestyle=(0, (25, 10, 2, 10)), linewidth=0.5, color='k', zorder=3)
 
-        # --- 2. OBRYS ---
-        res = GeometryScene.ax_2d.plot(
-            x_coords, y_coords,
-            color='g', zorder=3
-        ) + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5], [0, 0],
-            '-.',
-            color='k',
-            linewidth=1, zorder=3
-        )
+        label = self.str_pl() if language == 'pl' else self.str_en()
+        GeometryScene.ax_2d.text(origin + l/2, r + 5, label, rotation='vertical', multialignment='center', va='bottom', ha='center', color='k')
+        return res
 
-        # --- 3. PIONOWE LINIE FAZY ---
-        if chamfer_pos in ['left', 'both']:
-            res += GeometryScene.ax_2d.plot(
-                [origin + c_l, origin + c_l], [-r, r],
-                color='g', zorder=3
-            )
-        if chamfer_pos in ['right', 'both']:
-            res += GeometryScene.ax_2d.plot(
-                [origin + l - c_l, origin + l - c_l], [-r, r],
-                color='g', zorder=3
-            )
+    def _plot_2d_section(self, language='en'):
+        origin, r, l = self.origin/5, self.diameter/2/5, self.height/5
+        c_l = self.chamfer_length/5
+        c_h = c_l * np.tan(np.radians(self.chamfer_angle))
+        pos = self.chamfer_pos
 
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_pl(), rotation='vertical', multialignment='center')
+        # --- OBLICZENIE STYKU Z SĄSIADEM ---
+        prev_r = 0
+        if getattr(self, 'prev_elem', None) is not None:
+            prev_r = getattr(self.prev_elem, 'diameter', 0) / 10
+            
+            # Sprawdzamy czy sąsiad ma fazę
+            if hasattr(self.prev_elem, 'chamfer_pos') and getattr(self.prev_elem, 'chamfer_pos') in ['right', 'both']:
+                # BEZPIECZNE POBIERANIE WARTOSCI: Jeśli nie ma chamfer_length, podstaw 0
+                n_cl = getattr(self.prev_elem, 'chamfer_length', 0) / 5
+                n_ca = getattr(self.prev_elem, 'chamfer_angle', 45)
+                
+                n_ch = n_cl * np.tan(np.radians(n_ca))
+                prev_r -= n_ch
+
+        # Kreskowanie
+        x_hatch = [origin, origin + (c_l if pos in ['left', 'both'] else 0), origin+l - (c_l if pos in ['right', 'both'] else 0), origin+l]
+        y_hatch = [-(r-c_h) if pos in ['left', 'both'] else -r, -r, -r, -(r-c_h) if pos in ['right', 'both'] else -r]
+        GeometryScene.ax_2d.fill_between([origin, origin+l], [0, 0], [-r, -r], facecolor='none', hatch='//', edgecolor='k', linewidth=0, alpha=0.3, zorder=1)
+
+        # Obrys (NAPRAWIA NIEBIESKĄ KRESKĘ - nie schodzi do 0)
+        x_pts, y_pts = [], []
+        start_y = -r + c_h if pos in ['left', 'both'] else -r
+        
+        x_pts.extend([origin, origin])
+        y_pts.extend([-prev_r, start_y]) # Start od promienia sąsiada, nie od osi!
+
+        if pos in ['left', 'both']:
+            x_pts.append(origin + c_l)
+            y_pts.append(-r)
+
+        if pos in ['right', 'both']:
+            x_pts.append(origin + l - c_l)
+            y_pts.append(-r)
+            x_pts.append(origin + l)
+            y_pts.append(-r + c_h)
         else:
-            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_en(), rotation='vertical', multialignment='center')
+            x_pts.append(origin + l)
+            y_pts.append(-r)
 
-        ShaftPreview(0, 0, origin / 2, [2 * r / 2, l / 2, "z fazą", 0.2, '#6b7aa1'])
+        # --- ZMIANA: INTELIGENTNE ZAMYKANIE PRAWEJ KRAWĘDZI ---
+        # Sprawdzamy, czy następny element to twardy materiał (nie "powietrze" czyli Hole)
+        next_is_solid = self.next_elem is not None and 'Hole' not in type(self.next_elem).__name__
+        
+        # Zamknij zarys do osi symetrii (0) jeśli kończymy wał albo zaczyna się otwór
+        if not next_is_solid:
+            x_pts.append(origin + l)
+            y_pts.append(0)
 
-
-#     def _plot_2d(self,language='en'):
-
-#         #         print(f'self.origin property is {self.origin()}')
-#         #         print(f'self.end property is {self.end()}')
-
-#         class_name = self.__class__.__name__
-
-#         span = np.linspace(0, len(class_name), 100)
-#         print(f'plot_2d is called for {class_name}')
-
-#         r = self.diameter / 2 / 10
-#         l = self.height / 10
-#         origin = self.origin / 10
-
-#         res = GeometryScene.ax_2d.plot(
-#             [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-#             [-r, r, r, -r, -r],
-#             color='k')
-#         print(res)
-
-
-class Thread(Solid):
+        return GeometryScene.ax_2d.plot(x_pts, y_pts, color='k',linewidth=1, zorder=3)
+class Thread(ChamferedCylinder):
 
     num_of_lines_view = {
         'horizontal_lines': 5,
@@ -1973,130 +1855,73 @@ class Thread(Solid):
     def __init__(self,
                  height,
                  diameter,
-                 chamfer_length=1,
+                 chamfer_length=None,
                  chamfer_angle=45,
                  thread='M',
-                 chamfer_pos ='left'):
+                 chamfer_pos=None):
 
-        num_of_lines_view = self.__class__.num_of_lines_view
-        num_of_lines_sec = self.__class__.num_of_lines_sec
-        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
-        num_of_lines_front = self.__class__.num_of_lines_front
-
-        super().__init__(View(**num_of_lines_view),
-                         Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front))
-
-        self.height = height
-        self.diameter = diameter
+        # Inicjalizacja poprzez ChamferedCylinder (obsłuży domyślne fazy z automatu!)
+        super().__init__(height, diameter, chamfer_length, chamfer_angle, chamfer_pos)
+        
         self.thread = thread
-        self.chamfer_length = chamfer_length
-        self.chamfer_angle = chamfer_angle
-        self.chamfer_pos = chamfer_pos
-        # self._parameters = thread + str(
-        #     diameter), height, chamfer_length, chamfer_angle,
-        # self._class_description = "{} with L={}mm and chamfer {}x{}".format(
-        #     *(self._parameters))
-
-        # self._name['pl'] = 'Gwint'
-        # self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(
-        #     *self._parameters)
+        self._parameters = thread + str(diameter), height, chamfer_length, chamfer_angle
 
     def str_en(self):
-        return 'Threaded Cylinder \n with L={length}mm, thread M{d} \n and chamfer {l_ch}x{angle}'.format(
-            length=self.height,
-            d=self.diameter,
-            angle=self.chamfer_angle,
-            l_ch=self.chamfer_length,
-        )
+        pos = getattr(self, 'chamfer_pos', self._intended_chamfer_pos)
+        if pos == 'none':
+            return f'Threaded Cylinder \n with L={self.height}mm, thread M{self.diameter}'
+        return f'Threaded Cylinder \n with L={self.height}mm, thread M{self.diameter} \n and chamfer {self.chamfer_length}x{self.chamfer_angle} ({pos})'
 
     def str_pl(self):
-        return 'Walec gwintowany \n o L={length}mm, gwincie M{d}mm \n i fazie {l_ch}x{angle}'.format(
-            length=self.height,
-            d=self.diameter,
-            angle=self.chamfer_angle,
-            l_ch=self.chamfer_length,
-        )
+        pos = getattr(self, 'chamfer_pos', self._intended_chamfer_pos)
+        pos_pl = pos.replace('right', 'prawa').replace('left', 'lewa').replace('both', 'obie strony')
+        if pos == 'none':
+            return f'Walec gwintowany \n o L={self.height}mm, gwincie M{self.diameter}'
+        return f'Walec gwintowany \n o L={self.height}mm, gwincie M{self.diameter} \n i fazie {self.chamfer_length}x{self.chamfer_angle} ({pos_pl})'
 
     def _plot_2d(self, language='en'):
-        class_name = self.__class__.__name__
-        span = np.linspace(0, len(class_name), 100)
-
-        origin = self.origin / 5
-        r = self.diameter / 2 / 5
-        l = self.height / 5
+        self._plot_2d_view(language)
+        self._plot_2d_section(language)
         
-        # Fazka dynamiczna
-        c_l = getattr(self, 'chamfer_length', 1) / 5
-        c_a = getattr(self, 'chamfer_angle', 45)
-        c_h = c_l * np.tan(np.radians(c_a)) 
-        chamfer_pos = getattr(self, 'chamfer_pos', 'left')
+        origin, r, l = self.origin / 5, self.diameter / 2 / 5, self.height / 5
+        ShaftPreview(0, 0, origin / 2, [r, l, "gwint", 0.2, '#56754A'])
+
+    # UWAGA: _plot_2d_view usunięte! Dzięki temu w górnym widoku wygeneruje 
+    # się sam, czysty walec z ChamferedCylinder, bez czerwonej linii gwintu!
+
+    def _plot_2d_section(self, language='en'):
+        """Dół: Przekrój - Szrafuje walec i dorysowuje tylko czerwony rdzeń i końce gwintu"""
         
-        t_l = origin + l / 2
-        t_r = (r + 7) 
-        r_t = 0.9 * r # Rdzeń gwintu
+        # 1. Baza: ChamferedCylinder odwala czarną robotę (obrys, szrafowanie, schodki z sąsiadem)
+        res = super()._plot_2d_section(language)
 
-        # --- LOGIKA WSPÓŁRZĘDNYCH DLA KRESKOWANIA I OBRYSU ---
-        if chamfer_pos == 'left':
-            x_hatch = [origin, origin + c_l, origin + l]
-            y_hatch = [-r + c_h, -r, -r]
-            x_obrys = [origin, origin + c_l, origin + l, origin + l, origin + c_l, origin, origin]
-            y_obrys = [-r + c_h, -r, -r, r, r, r - c_h, -r + c_h]
-        elif chamfer_pos == 'right':
-            x_hatch = [origin, origin + l - c_l, origin + l]
-            y_hatch = [-r, -r, -r + c_h]
-            x_obrys = [origin, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin, origin]
-            y_obrys = [-r, -r, -r + c_h, r - c_h, r, r, -r]
-        elif chamfer_pos == 'both':
-            x_hatch = [origin, origin + c_l, origin + l - c_l, origin + l]
-            y_hatch = [-r + c_h, -r, -r, -r + c_h]
-            x_obrys = [origin, origin + c_l, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin + c_l, origin, origin]
-            y_obrys = [-r + c_h, -r, -r, -r + c_h, r - c_h, r, r, r - c_h, -r + c_h]
-        else: # bez fazy
-            x_hatch = [origin, origin + l]
-            y_hatch = [-r, -r]
-            x_obrys = [origin, origin, origin + l, origin + l, origin, origin]
-            y_obrys = [-r, -r, -r, r, r, -r]
+        # 2. Parametry gwintu
+        origin, r, l = self.origin/5, self.diameter/2/5, self.height/5
+        r_t = 0.95 * r # Dno gwintu na przekroju
+        
+        pos = self.chamfer_pos
+        c_l = self.chamfer_length/5
 
-        # --- 1. KRESKOWANIE ---
-        GeometryScene.ax_2d.fill_between(
-            x_hatch, 
-            [0] * len(x_hatch), 
-            y_hatch, 
-            facecolor='none', hatch='//', edgecolor='k', alpha=0.5, zorder=1
-        )
+        # --- 3. Linia rdzenia gwintu (czerwona cienka) ---
+        # POPRAWKA: Gwint idzie przez całą długość stopnia, przecinając fazę
+        start_core_x = origin 
+        end_core_x = origin + l
+        
+        res += GeometryScene.ax_2d.plot([start_core_x, end_core_x], [-r_t, -r_t], 
+                                        '-', linewidth=0.5, color='r', zorder=3)
 
-        # --- 2. OBRYS PEŁNY (GÓRA I DÓŁ, z fazą) ---
-        res = GeometryScene.ax_2d.plot(
-            x_obrys, y_obrys,
-            color='k', zorder=3
-        ) + GeometryScene.ax_2d.plot(
-            [origin, origin + l], [-r_t, -r_t], # Dolna linia gwintu
-            '-', linewidth=0.5, color='r', zorder=3
-        ) + GeometryScene.ax_2d.plot(
-            [origin - 0.5, origin + l + 0.5], [0, 0], # Oś symetrii
-            '-.', color='k', linewidth=1, zorder=3
-        )
+        # --- 4. PIONOWE LINIE KOŃCA GWINTU (Zgodnie z normą PN/ISO) ---
+        # Jeśli NIE ma fazy na danym końcu (gwint dobija do progu), rysujemy grubą czarną kreskę
+        # od zarysu zewnętrznego (-r) do rdzenia (-r_t)
+        if pos not in ['left', 'both']:
+            # Koniec gwintu z lewej strony
+            res += GeometryScene.ax_2d.plot([origin, origin], [-r, -0.9*r_t], color='k', linewidth=1., zorder=3)
+            
+        if pos not in ['right', 'both']:
+            # Koniec gwintu z prawej strony
+            res += GeometryScene.ax_2d.plot([origin + l, origin + l], [-r, -0.9*r_t], color='k', linewidth=1., zorder=3)
 
-        # --- 3. PIONOWE LINIE FAZY ---
-        if chamfer_pos in ['left', 'both']:
-            res += GeometryScene.ax_2d.plot(
-                [origin + c_l, origin + c_l], [-r, r],
-                color='k', linewidth=1, zorder=3
-            )
-        if chamfer_pos in ['right', 'both']:
-            res += GeometryScene.ax_2d.plot(
-                [origin + l - c_l, origin + l - c_l], [-r, r],
-                color='k', linewidth=1, zorder=3
-            )
-
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_pl(), rotation='vertical', multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_en(), rotation='vertical', multialignment='center')
-
-        ShaftPreview(0, 0, origin / 2, [2 * r / 2, l / 2, "z fazą", 0.2, '#56754A'])
+        return res
 
 
 class ThreadOfScrew(Thread):
@@ -2147,47 +1972,9 @@ class ThreadOfScrew(Thread):
         )
 
 
-class ThreadedOpenHole(Solid):
-    """This object represents threaded hole that can be made inside solid.
-    
-    The threaded hole object has predefined numbers of lines and dimensions that are needed to make a engineering drawing in view, section and half-section. It also stores information about height, diameter, chamfer length, angle and position.
-    
-    Parameters
-    ==========
-    
-    height : int
-        The value of height of hole
-        
-    diameter : int
-        The value of diameter of hole
-    
-    chamfer_length=1 : int
-        The value of chamfer length
-    
-    chamfer_angle=45 : int
-        The value of chamfer angle
-    
-    chamfer_pos='left' : str
-        The position of chamfer
-    
-    Examples
-    ========
-    
-    >>> from solids import ThreadedOpenHole
-    >>> thr_hole = ThreadedOpenHole(5,2)
-    >>> thr_hole._parameters
-    (5, 2)
-    
-    >>> chamf_hole.str_en()
-    'Hole with L=5mm, diameter=2mm and 1x45 chamfer on the left side'
-    
-    >>> chamf_hole.str_pl()
-    'Otwór o L=5mm, średnicy=2mm i fazie 1x45 znajdującej się po lewej stronie'
-    
-    >>> chamf_hole._class_description
-    'with L=5mm and diameter=2mm'
-    
-    """
+class ThreadedOpenHole(ChamferedHole):
+    """This object represents an open threaded hole with chamfers on both sides."""
+
     num_of_lines_view = {
         'horizontal_lines': 1,
         'vertical_lines': 1,
@@ -2203,7 +1990,6 @@ class ThreadedOpenHole(Solid):
         'inclined_lines': 4,
         'angular_dimensions': 2,
     }
-
     num_of_lines_half_sec = {
         'horizontal_lines': 3,
         'vertical_lines': 2,
@@ -2212,34 +1998,20 @@ class ThreadedOpenHole(Solid):
         'inclined_lines': 2,
         'angular_dimensions': 2,
     }
-
     num_of_lines_front = {'circles': 3, 'phi_dimensions': 0}
 
     def __init__(self,
                  height,
                  diameter,
-                 chamfer_length=1,
+                 chamfer_length=None,
                  chamfer_angle=45,
                  thread='M'):
 
-        num_of_lines_view = self.__class__.num_of_lines_view
-        num_of_lines_sec = self.__class__.num_of_lines_sec
-        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
-        num_of_lines_front = self.__class__.num_of_lines_front
-
-        super().__init__(View(**num_of_lines_view),
-                         Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front))
-
-        self.diameter = diameter
-        self.height = height
-        self.chamfer_length = chamfer_length
-        self.chamfer_angle = chamfer_angle
+        # Wywołujemy inicjalizację z ChamferedHole, wymuszając fazę z obu stron ('both')
+        super().__init__(height, diameter, chamfer_length, chamfer_angle, chamfer_pos='both')
+        
         self.thread = thread
-        self._parameters = thread, diameter,
-        self._class_description = "Threaded open hole {}{}".format(
-            *self._parameters)
+        self._parameters = thread, diameter
 
     def str_en(self):
         return 'Open threaded hole \n (to the end of solid) \n {thread}{d} with {l_ch}x{angle} \n chamfers on both sides'.format(
@@ -2255,62 +2027,142 @@ class ThreadedOpenHole(Solid):
             angle=self.chamfer_angle,
             l_ch=self.chamfer_length)
 
-    def _plot_2d(self, language='en'):
-        class_name = self.__class__.__name__
-        span = np.linspace(0, len(class_name), 100)
-
-        origin = self.origin / 5
-        r = self.diameter / 2 / 5
-        l = self.height / 5
+    def _plot_2d_view(self, language='en'):
+        """Góra: Widok - naprawione połączenie (schodek), wewnętrzne krawędzie faz, docięty gwint"""
+        origin, r, l = self.origin / 5, self.diameter / 2 / 5, self.height / 5
+        c_l = self.chamfer_length / 5
+        c_h = c_l * np.tan(np.radians(self.chamfer_angle))
         
-        # Fazki z obu stron otworu
-        c_l = getattr(self, 'chamfer_length', 1) / 5
-        c_a = getattr(self, 'chamfer_angle', 45)
-        c_h = c_l * np.tan(np.radians(c_a)) 
-        
-        t = 1.1 * r # Linia gwintu wewnętrznego
+        t = 1.1 * r # Linia gwintu wewnętrznego (rdzeń) - szersza niż otwór!
 
-        t_l = origin + l / 7
-        t_r = (-t - 20)
+        # --- BEZPIECZNE OBLICZENIE STYKU Z SĄSIADEM ---
+        prev_r = 0
+        if getattr(self, 'prev_elem', None) is not None:
+            prev_r = getattr(self.prev_elem, 'diameter', 0) / 10
+            if hasattr(self.prev_elem, 'chamfer_pos') and getattr(self.prev_elem, 'chamfer_pos') in ['right', 'both']:
+                n_cl = getattr(self.prev_elem, 'chamfer_length', 0) / 5
+                n_ca = getattr(self.prev_elem, 'chamfer_angle', 45)
+                n_ch = n_cl * np.tan(np.radians(n_ca))
+                prev_r += n_ch
 
-        # --- 1. BIAŁA MASKA (tylko na dole, żeby zasłonić wałek pod spodem) ---
-        x_mask = [origin, origin + c_l, origin + l - c_l, origin + l]
-        y_mask = [-r - c_h, -r, -r, -r - c_h]
+        x_pts, y_pts = [], []
         
+        # POPRAWKA: Rysujemy połączenie z sąsiadem, a nie z pustym powietrzem!
+        x_pts.extend([origin, origin])
+        y_pts.extend([prev_r, r + c_h])
+        
+        # Lewy skos
+        x_pts.append(origin + c_l)
+        y_pts.append(r)
+        
+        # PIONOWA LINIA WEWNĘTRZNA FAZY
+        GeometryScene.ax_2d.plot([origin + c_l, origin + c_l], [0, r], color='k', linewidth=1, zorder=3)
+        
+        # Prawy skos
+        x_pts.append(origin + l - c_l)
+        y_pts.append(r)
+        x_pts.append(origin + l)
+        y_pts.append(r + c_h)
+        
+        # PIONOWA LINIA WEWNĘTRZNA FAZY (Z PRAWEJ)
+        GeometryScene.ax_2d.plot([origin + l - c_l, origin + l - c_l], [0, r], color='k', linewidth=1, zorder=3)
+        
+        # Główny obrys czarny, grubość 1 (przelotowy na końcu, bez zjazdu do 0)
+        res = GeometryScene.ax_2d.plot(x_pts, y_pts, linestyle='-', color='k', linewidth=1, zorder=3)
+        
+        # --- WYLICZENIE STYKU GWINTU Z FAZĄ ---
+        if c_h >= (t - r):
+            dx = c_l * (t - r) / c_h
+            start_t_x = origin + c_l - dx
+            end_t_x = origin + l - c_l + dx
+        else:
+            start_t_x = origin
+            end_t_x = origin + l
+            
+        res += GeometryScene.ax_2d.plot([start_t_x, end_t_x], [t, t], '-', color='r', linewidth=0.5, zorder=3)
+        
+        # Oś symetrii
+        res += GeometryScene.ax_2d.plot([origin-1, origin+l+1], [0, 0], linestyle=(0, (25, 10, 2, 10)), color='k', linewidth=0.5, zorder=3)
+        return res
+
+    def _plot_2d_section(self, language='en'):
+        """Dół: Przekrój - maskowanie pod fazą, naprawiony schodek, czarny obrys (gr. 1)"""
+        origin, r, l = self.origin / 5, self.diameter / 2 / 5, self.height / 5
+        c_l = self.chamfer_length / 5
+        c_h = c_l * np.tan(np.radians(self.chamfer_angle))
+        t = 1.1 * r
+
+        # Odsunięcie opisu
+        max_d = self.diameter
+        curr = getattr(self, 'prev_elem', None)
+        while curr is not None:
+            if getattr(curr, 'diameter', 0) > max_d: max_d = curr.diameter
+            curr = getattr(curr, 'prev_elem', None)
+            
+        curr = getattr(self, 'next_elem', None)
+        while curr is not None:
+            if getattr(curr, 'diameter', 0) > max_d: max_d = curr.diameter
+            curr = getattr(curr, 'next_elem', None)
+            
+        max_r = max_d / 2 / 5
+
+        # 1. Dokładna biała maska
         GeometryScene.ax_2d.fill_between(
-            x_mask, 
+            [origin, origin + c_l, origin + l - c_l, origin + l], 
             [0, 0, 0, 0], 
-            y_mask, 
+            [-(r + c_h), -r, -r, -(r + c_h)], 
             facecolor='white', edgecolor='none', zorder=2
         )
 
-        # --- 2. OBRYS PEŁNY OTWORU (GÓRA I DÓŁ) ---
-        x_top = [origin, origin + c_l, origin + l - c_l, origin + l]
-        y_top = [r + c_h, r, r, r + c_h]
+        # --- BEZPIECZNE OBLICZENIE STYKU Z SĄSIADEM ---
+        prev_r = 0
+        if getattr(self, 'prev_elem', None) is not None:
+            prev_r = getattr(self.prev_elem, 'diameter', 0) / 10
+            if hasattr(self.prev_elem, 'chamfer_pos') and getattr(self.prev_elem, 'chamfer_pos') in ['right', 'both']:
+                n_cl = getattr(self.prev_elem, 'chamfer_length', 0) / 5
+                n_ca = getattr(self.prev_elem, 'chamfer_angle', 45)
+                n_ch = n_cl * np.tan(np.radians(n_ca))
+                prev_r += n_ch
+
+        # 2. Widoczny kontur otworu ze schodkami i fazą
+        x_pts, y_pts = [], []
         
-        x_bot = [origin, origin + c_l, origin + l - c_l, origin + l]
-        y_bot = [-r - c_h, -r, -r, -r - c_h]
+        # POPRAWKA: Schodek pionowy od promienia sąsiada w dół do początku skosu!
+        x_pts.extend([origin, origin])
+        y_pts.extend([-prev_r, -(r + c_h)])
+        
+        # Lewy skos
+        x_pts.append(origin + c_l)
+        y_pts.append(-r)
+        GeometryScene.ax_2d.plot([origin + c_l, origin + c_l], [-r, 0], color='k', linewidth=1, zorder=3)
+        
+        # Prawy skos
+        x_pts.append(origin + l - c_l)
+        y_pts.append(-r)
+        x_pts.append(origin + l)
+        y_pts.append(-(r + c_h))
+        GeometryScene.ax_2d.plot([origin + l - c_l, origin + l - c_l], [-r, 0], color='k', linewidth=1, zorder=3)
 
-        res = GeometryScene.ax_2d.plot(
-            x_bot, y_bot, '-', color='y', zorder=3
-        ) + GeometryScene.ax_2d.plot(
-            [origin + c_l, origin + c_l], [-r, 0], # Pionowa krawędź lewej fazy (ucięta do osi)
-            '-', linewidth=0.5, color='y', zorder=3
-        ) + GeometryScene.ax_2d.plot(
-            [origin + l - c_l, origin + l - c_l], [-r, 0], # Pionowa krawędź prawej fazy (ucięta do osi)
-            '-', linewidth=0.5, color='y', zorder=3
-        ) + GeometryScene.ax_2d.plot(
-            [origin, origin + l], [-t, -t], # Dolna cienka linia gwintu
-            '-', linewidth=0.5, color='y', zorder=3
-        )
+        # Obrys główny czarny (brak pionowej kreski zamykającej profil po prawej!)
+        res = GeometryScene.ax_2d.plot(x_pts, y_pts, linestyle='-', color='k', linewidth=1, zorder=3)
 
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_pl(), rotation='vertical', multialignment='center')
+        # Czerwona linia dna gwintu w przekroju
+        if c_h >= (t - r):
+            dx = c_l * (t - r) / c_h
+            start_t_x = origin + c_l - dx
+            end_t_x = origin + l - c_l + dx
         else:
-            text = GeometryScene.ax_2d.text(t_l, t_r, self.str_en(), rotation='vertical', multialignment='center')
+            start_t_x = origin
+            end_t_x = origin + l
+            
+        res += GeometryScene.ax_2d.plot([start_t_x, end_t_x], [-t, -t], '-', color='r', linewidth=0.5, zorder=3)
 
-        ShaftPreview(0,0, origin / 2, [2 * r / 2, l / 2, "z fazami", 0.7, '#6b7aa1'])
-
+        # 3. Dynamiczny opis
+        label = self.str_pl() if language == 'pl' else self.str_en()
+        GeometryScene.ax_2d.text(origin + l/2, -max_r - 5, label, 
+                                 rotation='vertical', multialignment='center', 
+                                 va='top', ha='center', color='k')
+        return res
 
 class Gear(Solid):
     """This object represents a gear.
@@ -5260,182 +5112,107 @@ class BlockHiddenHole(OpenHole):
         BlockPreview(0,0, origin/2,
         self._front_view_outline, l / 2, "bez fazy", 0.2, '#6b7aa1')
 class ShaftWithKeyseatsSketch(Solid):
-    """This object represents cylinder solid.
-    
-    The cylinder object has predefined numbers of lines and dimensions that are needed make a engineering drawing. Also it stores information about height and diameter.
-    
-    Parameters
-    ==========
-    
-    height : int
-        The value of height of cylinder
-        
-    diameter : int
-        The value of diameter of cylinder
-    
-    Examples
-    ========
-    
-    >>> from solids import Cylinder
-    >>> cyl = Cylinder(5,2)
-    >>> cyl._parameters
-    (5, 2)
-    
-    >>> cyl._class_description
-    'with L=5mm and diameter =2mm'
-    
-    >>> cyl._class_description_pl
-    'o L=5mm i średnicy =2mm'
-    
-    >>> cyl._name
-    {'pl': 'Walec'}
-    
-    """
-
     line_type = '-'
     color = 'k'
 
-    num_of_lines_view = {
-        'horizontal_lines': 3,
-        'vertical_lines': 2,
-        'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
-        'inclined_lines': 0,
-    }
-    num_of_lines_sec = {
-        'horizontal_lines': 3,
-        'vertical_lines': 2,
-        'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
-        'inclined_lines': 0,
-    }
-
-    num_of_lines_half_sec = {
-        'horizontal_lines': 3,
-        'vertical_lines': 2,
-        'horizontal_dimensions': 1,
-        'vertical_dimensions': 1,
-        'inclined_lines': 0,
-    }
-
+    # Zaktualizowane limity linii dla lepszej czytelności rysunku
+    num_of_lines_view = {'horizontal_lines': 5, 'vertical_lines': 4, 'inclined_lines': 2}
+    num_of_lines_sec = {'horizontal_lines': 5, 'vertical_lines': 2, 'inclined_lines': 2}
+    num_of_lines_half_sec = {'horizontal_lines': 5, 'vertical_lines': 4, 'inclined_lines': 2}
     num_of_lines_front = {'circles': 1, 'phi_dimensions': 0}
 
-    def __init__(self, height, diameter):
-
-        num_of_lines_view = self.__class__.num_of_lines_view
-        num_of_lines_sec = self.__class__.num_of_lines_sec
-        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
-        num_of_lines_front = self.__class__.num_of_lines_front
-
-        super().__init__(View(**num_of_lines_view),
-                         Section(**num_of_lines_sec),
-                         HalfSection(**num_of_lines_half_sec),
-                         FrontView(**num_of_lines_front))
+    def __init__(self, height, diameter, chamfer_length=1, chamfer_angle=45, chamfer_pos='left'):
+        super().__init__(View(**self.num_of_lines_view),
+                         Section(**self.num_of_lines_sec),
+                         HalfSection(**self.num_of_lines_half_sec),
+                         FrontView(**self.num_of_lines_front))
 
         self.height = height
         self.diameter = diameter
-
-        self._parameters = height, diameter
-        self._class_description = "with L={}mm and diameter ={}mm".format(
-            *self._parameters)
-
-        self._name['pl'] = 'Walec'
-        self._class_description_pl = "o L={}mm i średnicy ={}mm".format(
-            *self._parameters)
+        self.chamfer_length = chamfer_length
+        self.chamfer_angle = chamfer_angle
+        self.chamfer_pos = chamfer_pos
 
     def str_en(self):
-        return 'Cylinder \n with L={length}mm \n and diameter={d}mm'.format(
-            length=self.height, d=self.diameter)
+        return f'Cylinder with Keyseat\nL={self.height}mm, d={self.diameter}mm\nChamfer: {self.chamfer_length}x{self.chamfer_angle}'
 
     def str_pl(self):
-        return 'Walec \n o L={length}mm i średnicy={d}mm'.format(
-            length=self.height,
-            d=self.diameter).replace('right',
-                                     'prawej').replace('left', 'lewej')
+        return f'Walec z rowkiem wpustowym\nL={self.height}mm, d={self.diameter}mm\nFaza: {self.chamfer_length}x{self.chamfer_angle}'
 
     def _plot_2d(self, language='en'):
-
-        #         print(f'self.origin property is {self.origin()}')
-        #         print(f'self.end property is {self.end()}')
-
-        class_name = self.__class__.__name__
-
-        span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
-
-        r = self.diameter / 2 / 10
-        l = self.height / 10
-        origin = self.origin / 10
-        end = self.end / 10
-
-        t_l = origin - 3
-        t_r = (r + 5.5)
-
-        line_type = self.line_type
-        color = self.color
+        # Skala 1/5 zgodnie z nowym standardem
+        origin = self.origin / 5
+        r = self.diameter / 2 / 5
+        l = self.height / 5
         
-        angle = np.linspace(1/2*np.pi,3/2*np.pi,100)
+        c_l = self.chamfer_length / 5
+        c_h = c_l * np.tan(np.radians(self.chamfer_angle))
         
-        x_c_l = r*2/9 * np.cos(angle)
-        y_c_l = r*2/9 * np.sin(angle)
-        x_c_r = r*2/9 * -np.cos(angle)
-        y_c_r = r*2/9 * -np.sin(angle)
+        t_l = origin + l / 2
+        t_r = (r + 7) # Pozycja tekstu nad wałkiem
+
+        # --- LOGIKA WSPÓŁRZĘDNYCH DLA FAZ ---
+        if self.chamfer_pos == 'left':
+            x_obrys = [origin, origin + c_l, origin + l, origin + l, origin + c_l, origin, origin]
+            y_obrys = [-r + c_h, -r, -r, r, r, r - c_h, -r + c_h]
+            x_hatch = [origin, origin + c_l, origin + l]
+            y_hatch = [-r + c_h, -r, -r]
+        elif self.chamfer_pos == 'right':
+            x_obrys = [origin, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin, origin]
+            y_obrys = [-r, -r, -r + c_h, r - c_h, r, r, -r]
+            x_hatch = [origin, origin + l - c_l, origin + l]
+            y_hatch = [-r, -r, -r + c_h]
+        elif self.chamfer_pos == 'both':
+            x_obrys = [origin, origin + c_l, origin + l - c_l, origin + l, origin + l, origin + l - c_l, origin + c_l, origin, origin]
+            y_obrys = [-r + c_h, -r, -r, -r + c_h, r - c_h, r, r, r - c_h, -r + c_h]
+            x_hatch = [origin, origin + c_l, origin + l - c_l, origin + l]
+            y_hatch = [-r + c_h, -r, -r, -r + c_h]
+        else: # none
+            x_obrys = [origin, origin + l, origin + l, origin, origin]
+            y_obrys = [-r, -r, r, r, -r]
+            x_hatch = [origin, origin + l]
+            y_hatch = [-r, -r]
+
+        # 1. KRESKOWANIE (Dolna połowa dla półprzekroju)
+        GeometryScene.ax_2d.fill_between(x_hatch, [0]*len(x_hatch), y_hatch, 
+                                        facecolor='none', hatch='//', edgecolor='k', alpha=0.5)
+
+        # 2. OBRYS GŁÓWNY
+        res = GeometryScene.ax_2d.plot(x_obrys, y_obrys, color='k', linewidth=1.5, zorder=3)
+
+        # 3. ROWEK WPUSTOWY (Keyseat)
+        # Rysujemy go centralnie na górnej części wałka
+        kw_l = l * 0.6  # długość rowka (60% długości wałka)
+        kw_r = r * 0.4  # "głębokość" wizualna rowka
+        kw_x_start = origin + (l - kw_l) / 2
         
-        x_coords_l=x_c_l
-        y_coords_l=y_c_l
-        x_coords_r=x_c_r
-        y_coords_r=y_c_r
+        # Geometria zaokrągleń wpustu (Twoja oryginalna logika, ale w nowej skali)
+        angle = np.linspace(0.5*np.pi, 1.5*np.pi, 50)
+        cx_l = (r*0.2) * np.cos(angle) + kw_x_start
+        cy_l = (r*0.2) * np.sin(angle) + r*0.6
+        cx_r = (r*0.2) * -np.cos(angle) + (kw_x_start + kw_l)
+        cy_r = (r*0.2) * np.sin(angle) + r*0.6
         
-        circle_l = np.array([[x,y]  for x,y in zip(x_coords_l,y_coords_l)])
-        circle_r = np.array([[x,y]  for x,y in zip(x_coords_r,y_coords_r)])
+        res += GeometryScene.ax_2d.plot(cx_l, cy_l, 'k-', linewidth=1)
+        res += GeometryScene.ax_2d.plot(cx_r, cy_r, 'k-', linewidth=1)
+        res += GeometryScene.ax_2d.plot([kw_x_start, kw_x_start + kw_l], [r*0.8, r*0.8], 'k-', linewidth=1)
+        res += GeometryScene.ax_2d.plot([kw_x_start, kw_x_start + kw_l], [r*0.4, r*0.4], 'k-', linewidth=1)
 
-        res = GeometryScene.ax_2d.plot(
-            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
-            [-r, r, r, -r, -r],
-            line_type,
-            color=color) + GeometryScene.ax_2d.plot(
-                [origin - 0.5, origin + l + 0.5], [0, 0],
-                '-.',
-                color='k',
-                linewidth=1) + GeometryScene.ax_2d.plot(
-                    [origin + l/3, origin + l*2/3], 
-                    [r*2/9, r*2/9],
-                    '-',
-                    color='k',
-                        linewidth=1) + GeometryScene.ax_2d.plot(
-                        [origin + l*2/3, origin + l/3], 
-                        [-r*2/9, -r*2/9],
-                        '-',
-                        color='k',
-                        linewidth=1) + GeometryScene.ax_2d.plot(
-                            circle_l[:,0] + origin + l/3, 
-                            circle_l[:,1],
-                            '-',
-                            color='k',
-                            linewidth=1) + GeometryScene.ax_2d.plot(
-                                circle_r[:,0] + origin + l*2/3, 
-                                circle_r[:,1],
-                                '-',
-                                color='k',
-                                linewidth=1)
+        # 4. PIONOWE LINIE FAZY (jeśli występują)
+        if self.chamfer_pos in ['left', 'both']:
+            res += GeometryScene.ax_2d.plot([origin + c_l, origin + c_l], [-r, r], 'k-', linewidth=1)
+        if self.chamfer_pos in ['right', 'both']:
+            res += GeometryScene.ax_2d.plot([origin + l - c_l, origin + l - c_l], [-r, r], 'k-', linewidth=1)
 
-        if language == 'pl':
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_pl(),
-                                            rotation='vertical',
-                                            multialignment='center')
-        else:
-            text = GeometryScene.ax_2d.text(t_l,
-                                            t_r,
-                                            self.str_en(),
-                                            rotation='vertical',
-                                            multialignment='center')
+        # 5. OŚ SYMETRII
+        res += GeometryScene.ax_2d.plot([origin - 1, origin + l + 1], [0, 0], '-.', color='k', linewidth=1)
 
-        ShaftPreview(0,0, origin / 2,
-                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#6b7aa1'])
+        # 6. TEKST
+        label = self.str_pl() if language == 'pl' else self.str_en()
+        GeometryScene.ax_2d.text(t_l, t_r, label, rotation='vertical', multialignment='center', va='bottom')
 
-        print(res)
+        # Podgląd (ShaftPreview)
+        ShaftPreview(0, 0, origin / 2, [r, l, "wpust", 0.2, '#6b7aa1'])
 
 class CylinderWithKeyseat(Cylinder):
     """This object represents cylinder solid.
