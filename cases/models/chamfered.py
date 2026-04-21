@@ -1,1 +1,0 @@
-# class for chamfered classes bla bla bla
