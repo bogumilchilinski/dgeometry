@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from ..dgeometry import GeometryScene
+from dgeometry import GeometryScene
 import numpy as np
 from numbers import Number
 
