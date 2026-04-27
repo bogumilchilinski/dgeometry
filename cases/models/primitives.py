@@ -98,133 +98,404 @@ class Primitive:
 
 class Solid(Primitive):
     """
-    Represents a composite geometric object that can contain Primitives and other Solids.
-    Acts as a composite node in the geometric tree.
+    Abstract base class for all CadQuery-based solid elements.
     
-    A Solid is a container for geometric elements, enabling hierarchical composition.
-    It can contain:
-    - Primitive objects (basic geometric elements)
-    - Other Solid objects (nested compositions)
-    
-    Examples
-    --------
-    >>> assembly = Solid(name="Assembly")
-    >>> cube = Primitive(name="Cube", shape_type="box", dimensions=(10, 10, 10))
-    >>> sphere = Primitive(name="Sphere", shape_type="sphere", radius=5)
-    >>> assembly.add_child(cube)
-    >>> assembly.add_child(sphere)
-    
-    >>> # Nested composition
-    >>> sub_assembly = Solid(name="SubAssembly")
-    >>> sub_assembly.add_child(Primitive(name="Cylinder", shape_type="cylinder"))
-    >>> assembly.add_child(sub_assembly)
+    Each solid knows its height, diameter, and position (origin).
+    Solids can be chained together via _ref_elem to create composed parts.
     """
     
-    def __init__(self, name: str, properties: Optional[Dict[str, Any]] = None):
+    def __init__(self, height: float, diameter: float):
+        self.height = height
+        self.diameter = diameter
+        self._origin: float = 0
+        self._ref_elem: Optional['Solid'] = None
+        self._name = {'en': 'Solid', 'pl': 'Bryła'}
+    
+    @property
+    def origin(self) -> float:
+        """Get the origin position, considering reference element if set."""
+        if self._ref_elem is not None:
+            return self._ref_elem.end
+        return self._origin
+    
+    @property
+    def end(self) -> float:
+        """Get the end position (origin + height)."""
+        return self.origin + self.height
+    
+    @property
+    def radius(self) -> float:
+        """Get the radius (diameter / 2)."""
+        return self.diameter / 2
+    
+    @abstractmethod
+    def to_cq(self, workplane: Optional[cq.Workplane] = None) -> cq.Workplane:
         """
-        Initialize a Solid (composite) object.
+        Generate CadQuery geometry for this solid.
         
-        Parameters
-        ----------
-        name : str
-            Name/identifier of the solid
-        properties : dict, optional
-            Additional properties
-        """
-        self._name = name
-        self._properties = properties or {}
-        self._children: List[Node] = []
-        self._parent: Optional['Solid'] = None
-    
-    def add_child(self, child: Node) -> None:
-        """
-        Add a child node (Primitive or Solid).
+        Args:
+            workplane: Optional existing workplane to build upon.
+                      If None, creates a new workplane.
         
-        Parameters
-        ----------
-        child : Node
-            Child node to add (Primitive or Solid)
-        
-        Raises
-        ------
-        TypeError
-            If child is not a valid Node type
+        Returns:
+            CadQuery Workplane with the solid geometry.
         """
-        if not isinstance(child, Node):
-            raise TypeError(f"Child must be a Node, got {type(child)}")
-        
-        if child not in self._children:
-            self._children.append(child)
-            if isinstance(child, (Primitive, Solid)):
-                child.set_parent(self)
+        pass
     
-    def remove_child(self, child: Node) -> None:
-        """
-        Remove a child node.
-        
-        Parameters
-        ----------
-        child : Node
-            Child node to remove
-        """
-        if child in self._children:
-            self._children.remove(child)
-            if isinstance(child, (Primitive, Solid)):
-                child.set_parent(None)
+    def str_en(self) -> str:
+        """English description of the solid."""
+        return f"{self._name['en']} L={self.height}mm, D={self.diameter}mm"
     
-    def get_children(self) -> List[Node]:
-        """Return list of direct children."""
-        return self._children.copy()
-    
-    def get_all_descendants(self) -> List[Node]:
-        """Return all descendants (recursive)."""
-        descendants = list(self._children)
-        for child in self._children:
-            if isinstance(child, Solid):
-                descendants.extend(child.get_all_descendants())
-        return descendants
-    
-    def is_leaf(self) -> bool:
-        """Solid is a leaf only if it has no children."""
-        return len(self._children) == 0
-    
-    def get_type(self) -> NodeType:
-        """Return SOLID type."""
-        return NodeType.SOLID
-    
-    def get_bounds(self) -> Dict[str, Any]:
-        """
-        Return aggregated bounds from all children.
-        """
-        children_bounds = [child.get_bounds() for child in self._children] if hasattr(self._children[0] if self._children else None, 'get_bounds') else []
-        return {
-            'name': self._name,
-            'num_children': len(self._children),
-            'children_bounds': children_bounds,
-            **self._properties
-        }
-    
-    def get_volume(self) -> float:
-        """
-        Calculate total volume of all contained elements.
-        """
-        total_volume = 0.0
-        for child in self._children:
-            if hasattr(child, 'get_volume'):
-                total_volume += child.get_volume()
-        return total_volume
-    
-    def get_name(self) -> str:
-        """Return name of solid."""
-        return self._name
-    
-    def set_parent(self, parent: Optional['Solid']) -> None:
-        """Set parent Solid."""
-        self._parent = parent
-    
-    def get_parent(self) -> Optional['Solid']:
-        """Get parent Solid."""
-        return self._parent
+    def str_pl(self) -> str:
+        """Polish description of the solid."""
+        return f"{self._name['pl']} L={self.height}mm, D={self.diameter}mm"
     
     def __repr__(self) -> str:
-        return f"Solid(name='{self._name}', children={len(self._children)})"
+        return f"{self.__class__.__name__}(height={self.height}, diameter={self.diameter})"
+
+
+class Cylinder(Primitive):
+    """
+    A simple cylinder solid.
+    
+    Creates a cylinder along the X axis (for shaft-like parts).
+    """
+    
+    def __init__(self, height: float, diameter: float):
+        super().__init__(height, diameter)
+        self._name = {'en': 'Cylinder', 'pl': 'Walec'}
+    
+    def to_cq(self, workplane: Optional[cq.Workplane] = None) -> cq.Workplane:
+        """Create a cylinder centered on the axis."""
+        if workplane is None:
+            workplane = cq.Workplane("YZ")
+        
+        # Create cylinder along X axis, starting at origin
+        result = (
+            workplane
+            .center(0, 0)
+            .circle(self.radius)
+            .extrude(self.height)
+            .translate((self.origin, 0, 0))
+        )
+        return result
+
+
+class CQChamferedCylinder(CQSolid):
+    """
+    A cylinder with chamfered edges.
+    
+    Parameters:
+        height: Length of the cylinder
+        diameter: Diameter of the cylinder  
+        chamfer_length: Length of the chamfer
+        chamfer_angle: Angle of the chamfer (degrees)
+        chamfer_pos: 'left', 'right', or 'both'
+    """
+    
+    def __init__(self, height: float, diameter: float, 
+                 chamfer_length: float = 1, chamfer_angle: float = 45,
+                 chamfer_pos: str = 'left'):
+        super().__init__(height, diameter)
+        self.chamfer_length = chamfer_length
+        self.chamfer_angle = chamfer_angle
+        self.chamfer_pos = chamfer_pos
+        self._name = {'en': 'Chamfered Cylinder', 'pl': 'Walec z fazą'}
+    
+    def to_cq(self, workplane: Optional[cq.Workplane] = None) -> cq.Workplane:
+        """Create a chamfered cylinder."""
+        if workplane is None:
+            workplane = cq.Workplane("YZ")
+        
+        # Create base cylinder
+        result = (
+            workplane
+            .center(0, 0)
+            .circle(self.radius)
+            .extrude(self.height)
+            .translate((self.origin, 0, 0))
+        )
+        
+        # Apply chamfers based on position
+        try:
+            if self.chamfer_pos in ('left', 'both'):
+                result = result.faces("<X").chamfer(self.chamfer_length)
+            if self.chamfer_pos in ('right', 'both'):
+                result = result.faces(">X").chamfer(self.chamfer_length)
+        except Exception:
+            # Chamfer may fail if geometry doesn't allow it
+            pass
+            
+        return result
+    
+    def str_en(self) -> str:
+        return f"Chamfered Cylinder L={self.height}mm, D={self.diameter}mm, chamfer {self.chamfer_length}x{self.chamfer_angle}° ({self.chamfer_pos})"
+    
+    def str_pl(self) -> str:
+        pos_pl = {'left': 'lewa', 'right': 'prawa', 'both': 'obie'}
+        return f"Walec z fazą L={self.height}mm, D={self.diameter}mm, faza {self.chamfer_length}x{self.chamfer_angle}° ({pos_pl.get(self.chamfer_pos, self.chamfer_pos)})"
+
+
+class Thread(Primitive):
+    """
+    A threaded cylinder section.
+    
+    Visually represented as a cylinder (threads are not geometrically modeled).
+    """
+    
+    def __init__(self, height: float, diameter: float,
+                 chamfer_length: float = 1, chamfer_angle: float = 45,
+                 thread: str = 'M'):
+        super().__init__(height, diameter)
+        self.chamfer_length = chamfer_length
+        self.chamfer_angle = chamfer_angle
+        self.thread = thread
+        self._name = {'en': 'Thread', 'pl': 'Gwint'}
+    
+    def to_cq(self, workplane: Optional[cq.Workplane] = None) -> cq.Workplane:
+        """Create thread representation (simplified as cylinder)."""
+        if workplane is None:
+            workplane = cq.Workplane("YZ")
+        
+        result = (
+            workplane
+            .center(0, 0)
+            .circle(self.radius)
+            .extrude(self.height)
+            .translate((self.origin, 0, 0))
+        )
+        
+        # Add chamfer on left side
+        try:
+            result = result.faces("<X").chamfer(self.chamfer_length)
+        except Exception:
+            pass
+            
+        return result
+    
+    def str_en(self) -> str:
+        return f"Thread {self.thread}{self.diameter} L={self.height}mm"
+    
+    def str_pl(self) -> str:
+        return f"Gwint {self.thread}{self.diameter} L={self.height}mm"
+
+
+class Hole(Primitive):
+    """
+    A hole (negative cylinder) to be subtracted from other solids.
+    """
+    
+    def __init__(self, height: float, diameter: float):
+        super().__init__(height, diameter)
+        self._name = {'en': 'Hole', 'pl': 'Otwór'}
+        self._is_hole = True
+    
+    def to_cq(self, workplane: Optional[cq.Workplane] = None) -> cq.Workplane:
+        """Create a hole (cylinder to be subtracted)."""
+        if workplane is None:
+            workplane = cq.Workplane("YZ")
+        
+        result = (
+            workplane
+            .center(0, 0)
+            .circle(self.radius)
+            .extrude(self.height)
+            .translate((self.origin, 0, 0))
+        )
+        return result
+
+
+class CQComposedPart:
+    """
+    A composed part made of multiple solid elements.
+    
+    Handles combining positive solids and subtracting holes to create
+    the final 3D model.
+    """
+    
+    def __init__(self, *elements: CQSolid):
+        self.elements: List[CQSolid] = list(elements) if elements else []
+    
+    def add(self, element: CQSolid) -> 'CQComposedPart':
+        """Add an element to the composed part."""
+        new_elements = list(self.elements)
+        new_elements.append(element)
+        return CQComposedPart(*new_elements)
+    
+    def __add__(self, other: CQSolid) -> 'CQComposedPart':
+        return self.add(other)
+    
+    def to_cq(self) -> cq.Workplane:
+        """
+        Generate the complete CadQuery model.
+        
+        Combines all positive solids and subtracts all holes.
+        """
+        if not self.elements:
+            return cq.Workplane("YZ")
+        
+        # Separate positive solids from holes
+        positive_solids = []
+        holes = []
+        
+        for elem in self.elements:
+            if hasattr(elem, '_is_hole') and elem._is_hole:
+                holes.append(elem)
+            else:
+                positive_solids.append(elem)
+        
+        # Build the positive geometry
+        if not positive_solids:
+            return cq.Workplane("YZ")
+        
+        # Start with the first solid
+        result = positive_solids[0].to_cq()
+        
+        # Union with remaining positive solids
+        for solid in positive_solids[1:]:
+            solid_cq = solid.to_cq()
+            result = result.union(solid_cq)
+        
+        # Subtract all holes
+        for hole in holes:
+            hole_cq = hole.to_cq()
+            result = result.cut(hole_cq)
+        
+        return result
+    
+    def export_step(self, filename: str) -> None:
+        """Export the model to a STEP file."""
+        model = self.to_cq()
+        model.val().exportStep(filename)
+    
+    def export_stl(self, filename: str, tolerance: float = 0.1) -> None:
+        """Export the model to an STL file."""
+        model = self.to_cq()
+        model.val().exportStl(filename, tolerance)
+    
+    @property
+    def total_length(self) -> float:
+        """Calculate the total length of the composed part."""
+        if not self.elements:
+            return 0
+        
+        # Find max end position among non-hole elements
+        positive_ends = [
+            elem.end for elem in self.elements 
+            if not (hasattr(elem, '_is_hole') and elem._is_hole)
+        ]
+        return max(positive_ends) if positive_ends else 0
+
+
+# =============================================================================
+# Profile generation utilities
+# =============================================================================
+
+def create_cq_random_profile(
+    max_steps_no: int,
+    min_steps_no: int = 1,
+    initial_diameter: List[int] = None,
+    increase_values: List[int] = None,
+    step_lengths: List[int] = None,
+    step_type: type = CQCylinder,
+    step_modificator=None,
+    origin: float = 0
+) -> List[CQSolid]:
+    """
+    Create a random stepped profile for shaft-like parts.
+    
+    Args:
+        max_steps_no: Maximum number of steps
+        min_steps_no: Minimum number of steps
+        initial_diameter: List of possible initial diameters
+        increase_values: List of diameter increase values between steps
+        step_lengths: List of possible step lengths
+        step_type: Type of solid to use for each step
+        step_modificator: Optional function to modify each step
+        origin: Starting position
+    
+    Returns:
+        List of CQSolid elements forming the profile
+    """
+    if initial_diameter is None:
+        initial_diameter = [50, 55, 60, 65]
+    if increase_values is None:
+        increase_values = [2, 3, 4, 5]
+    if step_lengths is None:
+        step_lengths = [50, 55, 60]
+    if step_modificator is None:
+        step_modificator = lambda step: step
+    
+    steps_no = random.randint(min_steps_no, max_steps_no)
+    
+    first_d = random.choice(initial_diameter)
+    
+    profile_changes = [
+        random.choice(increase_values) for _ in range(steps_no)
+    ]
+    
+    profile = [first_d] + [
+        first_d + sum(profile_changes[0:step_no + 1])
+        for step_no in range(len(profile_changes))
+    ]
+    
+    base_geometry = [
+        step_type(random.choice(step_lengths), diameter)
+        for diameter in profile
+    ]
+    
+    # Apply modificator and flatten
+    steps_list = []
+    for step in base_geometry:
+        modified = step_modificator(step)
+        if isinstance(modified, list):
+            steps_list.extend(modified)
+        else:
+            steps_list.append(modified)
+    
+    # Set up origin chain
+    if steps_list:
+        steps_list[0]._origin = origin
+        steps_list[0]._ref_elem = None
+        
+        for no in range(1, len(steps_list)):
+            steps_list[no]._ref_elem = steps_list[no - 1]
+    
+    return steps_list
+
+
+# =============================================================================
+# Step modificators for profile generation
+# =============================================================================
+
+def cq_step_mod_inc_chamfer(step: CQSolid) -> CQSolid:
+    """Modificator that may add chamfer to increasing step."""
+    return random.choice([
+        copy.copy(step),
+        CQChamferedCylinder(
+            step.height, step.diameter, 
+            chamfer_angle=45, chamfer_length=1, chamfer_pos='left'
+        ),
+    ])
+
+
+def cq_step_mod_dec_chamfer(step: CQSolid) -> CQSolid:
+    """Modificator that may add chamfer to decreasing step."""
+    return random.choice([
+        copy.copy(step),
+        CQChamferedCylinder(
+            step.height, step.diameter,
+            chamfer_angle=45, chamfer_length=1, chamfer_pos='right'
+        ),
+    ])
+
+
+def cq_step_mod_dec_hole_chamfer(step: CQSolid) -> CQSolid:
+    """Modificator that may add chamfer to hole."""
+    return random.choice([
+        copy.copy(step),
+        CQChamferedHole(
+            step.height, step.diameter,
+            chamfer_angle=45, chamfer_length=1.2
+        ),
+    ])
