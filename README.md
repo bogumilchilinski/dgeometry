@@ -95,7 +95,6 @@ Python Version: **Python 3.8+**. Required Libraries:
 - **pymupdf** 
 - **cadquery**
 
-
 ## 2. Manual Installation
 
 1. Install Visual Studio Code (Microsoft Store or code.visualstudio.com/docs/setup/mac for mac)
@@ -117,60 +116,13 @@ pip install -r requirements.txt
 pip3 install -r requirements.txt
 ```
 if the issue still persist verify if step 2 is fulfilled.
-
-- For users more familiar with coding it is HIGHLY RECOMMENDED to use uv. Install it first --> https://docs.astral.sh/uv/#python-versions, then after doing so run the following command in terminal:
-```bash
-uv venv
-uv pip install -r requirements.txt
-```
-
-It allows user to manage Python versions, dependencies, and virtual environments.
-uv is a fast Python package and environment manager written in Rust by Astral. It replaces several traditional Python tools such as pip, venv, pip-tools, pipx, and pyenv with a single unified workflow.
-
-Why uv?
-
-- Fast – written in Rust with a very fast dependency resolver
-- All-in-one tool – manages dependencies, environments, and Python versions
-- Reproducible environments – uses lockfiles to ensure consistent installs
-- Automatic Python installation – downloads the required Python version if it is not available locally
-
-Python Versions:
-uv can work with two types of Python installations:
-- System Python
-  Python already installed on the system (via OS packages, Homebrew, pyenv, etc.).
-- Managed Python
-  Python versions automatically downloaded and managed by uv.
-
-If a required Python version is not installed, uv will automatically download and install it.
-
-You can run commands inside the project environment with:
-```bash
-uv run <command>
-```
-
-Example:
-```bash
-uv run python main.py
-```
-
-For more information you can refer to the documentation of uv package --> https://docs.astral.sh/uv/
-
 6. Install plugins: in VS Code (git extension package)
-
 7. Creating a virtual environment in VSCode
 Working folder on the main drive + subfolders (output, images)
 
 Set the kernel and Jupyter Notebook environment
 
 Set Git Autofetch: True in VSCode settings
-
-Assuming uv was installed; utilize it to create virtual environment.
-Typical workflow:
-```bash
-uv venv
-uv sync
-uv run python example.py
-```
 
 # Licensing Information
 
