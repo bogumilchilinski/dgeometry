@@ -5,11 +5,33 @@ Supports compositing of Solid and Primitive geometric objects.
 
 #from abc import ABC, abstractmethod
 #from typing import List, Union, Optional, Dict, Any
+import sys
+import os
+from typing import Optional
+# Ensure we import the pip-installed cadquery, not the local folder
+_repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_local_cq = os.path.join(_repo_root, 'cadquery')
+_original_path = sys.path.copy()
+sys.path = [p for p in sys.path if os.path.abspath(p) != _repo_root]
+
+import cadquery as cq
+
+sys.path = _original_path  # Restore original path
+
+from typing import List, Optional, Union, Tuple, Dict, Any
+import random
+from abc import ABC, abstractmethod
+from enum import Enum
+import random
 
 
+class NodeType(Enum):
+    """Enumeration for node types in the geometric tree."""
+    PRIMITIVE = "primitive"
+    SOLID = "solid"
 
 
-class Primitive:
+class Primitive(ABC):
     """
     Represents a primitive geometric object (basic geometric element).
     Acts as a leaf node in the geometric tree.
@@ -260,16 +282,16 @@ class CQComposedPart:
     the final 3D model.
     """
     
-    def __init__(self, *elements: CQSolid):
-        self.elements: List[CQSolid] = list(elements) if elements else []
+    def __init__(self, *elements: Solid):
+        self.elements: List[Solid] = list(elements) if elements else []
     
-    def add(self, element: CQSolid) -> 'CQComposedPart':
+    def add(self, element: Solid) -> 'CQComposedPart':
         """Add an element to the composed part."""
         new_elements = list(self.elements)
         new_elements.append(element)
         return CQComposedPart(*new_elements)
     
-    def __add__(self, other: CQSolid) -> 'CQComposedPart':
+    def __add__(self, other: Solid) -> 'CQComposedPart':
         return self.add(other)
     
     def to_cq(self) -> cq.Workplane:
@@ -344,10 +366,10 @@ def create_cq_random_profile(
     initial_diameter: List[int] = None,
     increase_values: List[int] = None,
     step_lengths: List[int] = None,
-    step_type: type = CQCylinder,
+    step_type: type = Cylinder,
     step_modificator=None,
     origin: float = 0
-) -> List[CQSolid]:
+) -> List[Solid]:
     """
     Create a random stepped profile for shaft-like parts.
     
@@ -362,7 +384,7 @@ def create_cq_random_profile(
         origin: Starting position
     
     Returns:
-        List of CQSolid elements forming the profile
+        List of Solid elements forming the profile
     """
     if initial_diameter is None:
         initial_diameter = [50, 55, 60, 65]
@@ -410,39 +432,3 @@ def create_cq_random_profile(
     
     return steps_list
 
-
-# =============================================================================
-# Step modificators for profile generation
-# =============================================================================
-
-def cq_step_mod_inc_chamfer(step: CQSolid) -> CQSolid:
-    """Modificator that may add chamfer to increasing step."""
-    return random.choice([
-        copy.copy(step),
-        CQChamferedCylinder(
-            step.height, step.diameter, 
-            chamfer_angle=45, chamfer_length=1, chamfer_pos='left'
-        ),
-    ])
-
-
-def cq_step_mod_dec_chamfer(step: CQSolid) -> CQSolid:
-    """Modificator that may add chamfer to decreasing step."""
-    return random.choice([
-        copy.copy(step),
-        CQChamferedCylinder(
-            step.height, step.diameter,
-            chamfer_angle=45, chamfer_length=1, chamfer_pos='right'
-        ),
-    ])
-
-
-def cq_step_mod_dec_hole_chamfer(step: CQSolid) -> CQSolid:
-    """Modificator that may add chamfer to hole."""
-    return random.choice([
-        copy.copy(step),
-        CQChamferedHole(
-            step.height, step.diameter,
-            chamfer_angle=45, chamfer_length=1.2
-        ),
-    ])
