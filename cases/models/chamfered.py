@@ -99,7 +99,7 @@ def create_cq_random_profile(
     initial_diameter: List[int] = None,
     increase_values: List[int] = None,
     step_lengths: List[int] = None,
-    step_type: type = CQCylinder,
+    step_type: type = ChamferedCylinder,
     step_modificator=None,
     origin: float = 0
 ) -> List[Solid]:
