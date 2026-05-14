@@ -1099,6 +1099,12 @@ class Solid(Primitive):
         else:
             self.preview()
 
+    def _plot_2d_cq(self, opts=None):
+        if exporters is None:
+            raise ImportError("cadquery is not installed")
+        svg_content = exporters.getSVG(self.to_cq().val(), opts or {})
+        IP.display.display(IP.display.SVG(svg_content))
+
 class View:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -1214,13 +1220,12 @@ class Cylinder(Solid):
 
     def _plot_2d(self, language='en'):
 
-        #         print(f'self.origin property is {self.origin()}')
-        #         print(f'self.end property is {self.end()}')
+        if GeometryScene.ax_2d is None:
+            GeometryScene()
 
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
 
         r = self.diameter / 2 / 10
         l = self.height / 10
