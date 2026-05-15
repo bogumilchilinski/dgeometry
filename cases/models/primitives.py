@@ -1099,6 +1099,12 @@ class Solid(Primitive):
         else:
             self.preview()
 
+    def _plot_2d_cq(self, opts=None):
+        if exporters is None:
+            raise ImportError("cadquery is not installed")
+        svg_content = exporters.getSVG(self.to_cq().val(), opts or {})
+        IP.display.display(IP.display.SVG(svg_content))
+
 class View:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -1214,13 +1220,12 @@ class Cylinder(Solid):
 
     def _plot_2d(self, language='en'):
 
-        #         print(f'self.origin property is {self.origin()}')
-        #         print(f'self.end property is {self.end()}')
+        if GeometryScene.ax_2d is None:
+            GeometryScene()
 
         class_name = self.__class__.__name__
 
         span = np.linspace(0, len(class_name), 100)
-        #         print(f'plot_2d is called for {class_name}')
 
         r = self.diameter / 2 / 10
         l = self.height / 10
@@ -1874,6 +1879,9 @@ class ComposedPart:
             self.elements = list(args)
         else:
             self.elements = []
+        self._transforms = [None] * len(self.elements)
+        self._operations = ['union'] * (len(self.elements) - 1)
+        self._positions = [None] * len(self.elements)
 
     @classmethod
     def _scheme(cls):
@@ -1893,24 +1901,78 @@ class ComposedPart:
 
         print(*list(enumerate(self.elements)))
 
-        #self.elements[0]._origin = 0
-        #self.elements[-1]._origin = -30
-
         for no, elem in enumerate(self.elements):
-
+            original_origin = elem._origin
+            pos = self._positions[no] if no < len(self._positions) else None
+            if pos is not None:
+                elem._origin = pos[0]
             elem._plot_2d(language=language)
+            elem._origin = original_origin
 
-    def add(self, other):
+    def add(self, other, transform=None, operation='union', position=None, rotation=None):
+
+        if position is not None or rotation is not None:
+            def transform(shape, _pos=position, _rot=rotation):
+                if _rot:
+                    rx, ry, rz = _rot
+                    if rx: shape = shape.rotate((0, 0, 0), (1, 0, 0), rx)
+                    if ry: shape = shape.rotate((0, 0, 0), (0, 1, 0), ry)
+                    if rz: shape = shape.rotate((0, 0, 0), (0, 0, 1), rz)
+                if _pos:
+                    shape = shape.translate(_pos)
+                return shape
 
         new_element_list = list(self.elements)
+        new_transforms = list(self._transforms)
+        new_operations = list(self._operations)
+        new_positions = list(self._positions)
 
         if isinstance(other, Solid):
             new_element_list.append(other)
+            new_transforms.append(transform)
+            new_operations.append(operation)
+            new_positions.append(position)
 
-        return ComposedPart(*new_element_list)
+        result = ComposedPart(*new_element_list)
+        result._transforms = new_transforms
+        result._operations = new_operations
+        result._positions = new_positions
+        return result
 
     def __add__(self, other):
         return self.add(other)
+
+    def to_cq(self, transforms=None, operations=None):
+        if cq is None:
+            raise ImportError("cadquery is not installed")
+        if not self.elements:
+            return cq.Workplane("YZ")
+        transforms = transforms if transforms is not None else self._transforms
+        operations = operations if operations is not None else self._operations
+        result = None
+        for i, (elem, transform) in enumerate(zip(self.elements, transforms)):
+            shape = elem.to_cq()
+            if transform is not None:
+                shape = transform(shape)
+            if result is None:
+                result = shape
+            else:
+                op = operations[i - 1]
+                if op == 'cut':
+                    result = result.cut(shape)
+                elif op == 'intersect':
+                    result = result.intersect(shape)
+                else:
+                    result = result.union(shape)
+        return result
+
+    def show_model(self, port=3939, transforms=None, operations=None):
+        if ocp_show is not None:
+            if ocp_set_port is not None:
+                ocp_set_port(port)
+            ocp_show(self.to_cq(transforms=transforms, operations=operations))
+        else:
+            self.preview()
 
     @property
     def view(self):
