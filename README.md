@@ -91,6 +91,18 @@ The module can be used in:
 
 ---
 
+## 2. 2D Calling Conventions & Workflow
+
+When building custom 2D geometries in `dgeometry`, follow this standard procedural workflow:
+
+1. **Define the Base Points (`Point`):** Always start by anchoring your geometry in the 2D coordinate system. Use these points as your reference nodes.
+2. **Build Primitives (`Line`, `Circle`, `Arc`):** Connect your points to create boundaries and centerlines.
+3. **Apply Operations:** Use built-in methods (like `.intersect()`, `.offset()`, or `.mirror()`) to manipulate the geometry without hardcoding new coordinates.
+4. **Group into Profiles/Sketches:** Gather your connected primitives into a coherent profile representing the mechanical part.
+5. **Render/Preview:** Call the `.preview()` or equivalent rendering method to verify the sketch visually before exporting or converting to 3D.
+
+---
+
 # Installation & Setup (Optional, for Local Development)
 
 ## 1. Requirements
@@ -110,35 +122,44 @@ Python Version: **Python 3.8+**. Required Libraries:
 - **pymupdf** 
 - **cadquery**
 
-## 2. Manual Installation
+# Installation & Setup (Local Development)
 
-1. Install Visual Studio Code (Microsoft Store or code.visualstudio.com/docs/setup/mac for mac)
-2. Install Python (Microsoft Store or python.org)
-3. Install Git
-For Windows users: https://git-scm.com/install/windows
-For Mac users: https://git-scm.com/install/mac
-4. Install the dgeometry library (https://github.com/bogumilchilinski/dgeometry) by using following command in terminal:
-```bash
-git clone https://github.com/bogumilchilinski/dgeometry
-```
-5. Install all required libraries (2 ways):
-- If you are just starting coding or your abilities are limited you can install required libraries by using the following code:
-```bash
-pip install -r requirements.txt
-```
- if for some reason the result of above command returns "command not found: pip", then try this code:
-```bash
-pip3 install -r requirements.txt
-```
-if the issue still persist verify if step 2 is fulfilled.
-6. Install plugins: in VS Code (git extension package)
-7. Creating a virtual environment in VSCode
-Working folder on the main drive + subfolders (output, images)
+## 1. Requirements
 
-Set the kernel and Jupyter Notebook environment
+Python Version: **Python 3.8+**. All required libraries (including `numpy`, `sympy`, `cadquery`, `matplotlib`, `pylatex`, etc.) are listed in the repository's `requirements.txt` file.
 
-Set Git Autofetch: True in VSCode settings
+## 2. Manual Installation & VS Code Setup
 
+**CRITICAL NOTE FOR 3D/CADQUERY USERS:** If you plan to use any CadQuery features, **you MUST manually install the `OCP CAD Viewer` extension in Visual Studio Code**. Without this specific extension, your models will not visualize, and the 3D preview windows will simply fail to render.
+
+**Step-by-Step Guide:**
+
+1. Install **Visual Studio Code** (from the Microsoft Store or `code.visualstudio.com`).
+2. Install **Python** (from the Microsoft Store or `python.org`).
+3. Install **Git**:
+   - Windows: `git-scm.com/install/windows`
+   - Mac: `git-scm.com/install/mac`
+4. Clone the `dgeometry` repository by opening your terminal and running:
+   ```bash
+   git clone [https://github.com/bogumilchilinski/dgeometry]              (https://github.com/bogumilchilinski/dgeometry)
+5. Navigate to the cloned folder and install all required libraries using:
+`bash
+pip install -r requirements.txt`
+
+(Note: If your terminal returns `"command not found: pip",` try using `pip3 install -r requirements.txt.` If the issue persists, verify that Python is correctly added to your system PATH).
+
+6. Install VS Code Extensions:
+   -Python Extension Pack
+   -Git Extension Package
+   -OCP CAD Viewer (Mandatory for CadQuery visualization!)
+7. Environment Setup in VS Code:
+   
+Create a working folder on your main drive with subfolders (e.g., `output/`, `images/`).
+
+Select the correct Python Interpreter/Kernel for your Jupyter Notebooks in the top right corner.
+
+Go to VS Code Settings and set `Git: Autofetch` to `True`.
+   
 # Licensing Information
 
 dgeometry is distributed under an open-source license. Refer to the LICENSE file for details.
