@@ -28,6 +28,20 @@ The module is particularly useful in computational geometry, geometric modeling,
 - **2D Drafting & Visualization:** Enables generation of detailed 2D diagrams and technical profiles.
 - **Integration with CadQuery:** Ready for advanced boundary representation (B-rep) modeling and programmatic CAD generation.
 
+### 2.1. 2D Calling Conventions & Best Practices (Code-Driven Design)
+
+To ensure your sketches are robust, reusable, and easy to modify, follow these essential coding conventions when using `dgeometry`:
+
+* **Parametrization Over Hardcoding:** Avoid entering raw numbers directly into geometric entities. Define all dimensions as variables at the beginning of your script. If a specific dimension (e.g., a tool diameter) needs to be updated from 45 mm to 80 mm, you should only have to change one variable, automatically updating the entire downstream geometry.
+* **Standardized Coordinate Origins:** Always anchor your base geometry to the origin `Point(0, 0)`. 
+  * For *turned or rotational parts* (e.g., machine shafts, pulleys, or sleeves), standard practice is to place the axis of rotation exactly on the X-axis (where `Y = 0`), modeling only the upper half of the cross-section.
+* **Strict Instantiation Order:** Follow this structural hierarchy to build complex shapes cleanly:
+  1. **Nodes:** Define all `Point` objects first.
+  2. **Edges:** Connect nodes using basic primitives (`Line`, `Circle`, `Arc`).
+  3. **Profiles:** Gather your connected edges into a coherent `Profile` or `Sketch` object.
+  4. **Transformations/Operations:** Apply operations like fillets, chamfers, intersections, or offsets directly to the profile object, rather than manually calculating new coordinates.
+* **Descriptive Naming:** Name variables based on their mechanical function rather than arbitrary letters. Use clear engineering identifiers (e.g., `bearing_journal_line` instead of `line2`, or `d_inner` / `d_outer` for diameters).
+
 ## 3. Getting Started on CoCalc
 To begin working with dgeometry without local installation, you need an account on [CoCalc](https://cocalc.com/).
 1. Create an account on CoCalc.
