@@ -1,72 +1,87 @@
 # dgeometry
+
 ## Table of Contents
 - [Introduction](#introduction)
-  - [1. What is dgeometry?](#1-what-is-dynpi)
+  - [1. What is dgeometry?](#1-what-is-dgeometry)
   - [2. Key Features](#2-key-features)
   - [3. Getting Started on CoCalc](#3-getting-started-on-cocalc)
 - [How to Start / Basic Usage](#how-to-start--basic-usage)
-  - [1. Example Script](#1-example-scripts)
-  - [2. Usage](#2-usage)
-- [Installation \& Setup (Optional, for Local Development)](#installation--setup-optional-for-local-development)
+  - [1. Example Scripts (2D Focus)](#1-example-scripts-2d-focus)
+  - [2. 2D Calling Conventions & Workflow](#2-2d-calling-conventions--workflow)
+- [Installation & Setup (Local Development)](#installation--setup-local-development)
   - [1. Requirements](#1-requirements)
-  - [2. Manual Installation](#2-manual-installation)
+  - [2. Manual Installation & VS Code Setup](#2-manual-installation--vs-code-setup)
 - [Licensing Information](#licensing-information)
+
+---
 
 # Introduction
 
 ## 1. What is dgeometry?
-
 dgeometry is a Python module designed for generating, manipulating, and visualizing engineering drawings. The library focuses on representing geometric constructions in a clear and extensible way, enabling users to model geometric entities using points, lines, and planes and perform operations on them.
-The module is particularly useful in computational geometry, geometric modeling, and educational contexts, where geometric reasoning and visualization are important.
-In many mathematical and engineering contexts, geometric constructions are traditionally performed using drawing tools or graphical software. While these approaches are intuitive, they are often difficult to reproduce, automate, or integrate with computational workflows.
-dgeometry addresses this limitation by representing geometric objects as Python classes and expressing constructions through code. Each geometric object contains both data describing its geometric properties and methods that define relationships and operations with other objects. This makes it possible to create complex constructions in a transparent, reusable, and extensible way.
+
+The module is particularly useful in computational geometry, geometric modeling, and educational contexts (e.g., parametric design of machine parts), where geometric reasoning and visualization are important. By representing geometric objects as Python classes and expressing constructions through code, it makes it possible to create complex, repeatable constructions in a transparent and fully automated way.
 
 ## 2. Key Features
-
-- **Representation of Basic Geometric Objects:** Provides classes and structures to represent fundamental geometric elements such as points, lines, and planes.
-- **Geometric Transformations and Operations:** Supports creating and manipulating geometric relationships including intersections, projections, and dependencies between objects.
-- **Visualization:** Enables generation of diagrams and visual representations of geometric structures to help analyze and present results.
-- **Modular and Extensible Design:** Designed as a flexible Python module that can be easily extended with new geometric primitives, algorithms, or visualization features.
+- **Representation of Basic Geometric Objects:** Provides classes and structures to represent fundamental geometric elements such as points, lines, and profiles.
+- **Geometric Transformations and Operations:** Supports creating and manipulating geometric relationships including intersections, projections, and parametric dependencies between objects.
+- **2D Drafting & Visualization:** Enables generation of detailed 2D diagrams and technical profiles.
+- **Integration with CadQuery:** Ready for advanced boundary representation (B-rep) modeling and programmatic CAD generation.
 
 ## 3. Getting Started on CoCalc
-
-To begin working with dgeometry, you need an account on [CoCalc](https://cocalc.com/).
-
+To begin working with dgeometry without local installation, you need an account on [CoCalc](https://cocalc.com/).
 1. Create an account on CoCalc.
 2. Accept the project invitation using this [link](https://cocalc.com/app?project-invite=hXnPFLqokQsoK6TG).
-3. It is highly recommended to get familiar with DynPi module first. To do so open the [README](https://cocalc.com/projects/b51ce971-5b39-4911-ad97-ef59f15f0039/files/READme.ipynb) file and follow the instructions in the introductory guide.
+3. Open the repository files and explore the provided notebooks.
 
 ---
 
 # How to Start / Basic Usage
 
-## 1. Example Scripts
+## 1. Example Scripts (2D Focus)
+You can find a massive collection of diverse examples and use cases in the **`cases/models/test.ipynb`** notebook. 
 
-To view exemplary capabilities of dynpy, run the following example script:
+Here are three distinct examples demonstrating different 2D capabilities of the library:
 
+**Example A: Simple Parametric Profile (Sleeve)**
 ```python
 from dgeometry.cases.drawings import SleeveSketch
-SleeveSketch.from_random_data().preview()
+
+# Generates a basic sleeve profile using randomized/default parametric data
+sleeve = SleeveSketch.from_random_data()
+sleeve.preview()
 ```
-
-## 2. Usage
-
-After installing the dependencies (refer to Installation & Setup (Optional, for Local Development) section), you can import the module in your Python scripts or notebooks and start creating geometric objects and constructions.
-Example:
+**Example B: Drive Shaft Geometry Construction**
 ```python
-from dgeometry import *
+from dgeometry import Point, Line, Profile
 
-# Example geometric objects
-A = Point(0, 0)
-B = Point(4, 3)
+# Defining base nodes for a stepped shaft
+p1 = Point(0, 0)
+p2 = Point(50, 0)
+p3 = Point(50, 20)
+p4 = Point(0, 20)
 
-# Create a line passing through two points
-line_AB = Line(A, B)
+# Creating boundary lines
+shaft_axis = Line(p1, p2)
+step_edge = Line(p2, p3)
 
-print(line_AB)
+print("Shaft axis length:", shaft_axis.length)
 ```
 
-You can extend this by defining additional points, lines, planes, and performing geometric constructions or visualizations depending on your use case.
+**Example C: Intersections and Constraints**
+```python
+from dgeometry import Point, Circle, Line
+
+# Creating a reference circle (e.g., for a bolt pattern on a flange)
+center = Point(0, 0)
+pitch_circle = Circle(center, radius=80)
+
+# Finding intersections with a specific axis
+horizontal_axis = Line(Point(-100, 0), Point(100, 0))
+intersections = pitch_circle.intersect(horizontal_axis)
+
+print("Bolt hole locations:", intersections)
+```
 
 The module can be used in:
 
