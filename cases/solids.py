@@ -129,7 +129,7 @@ class HexPreview:
         # Draw a circle on the x axis 'wall'
         p = RegularPolygon(begin_cords,
                            6,
-                           1.2 * radius,
+                           radius=1.2 * radius,
                            alpha=0.6,
                            color='#6b7aa1')
         self.ax.add_patch(p)
@@ -378,7 +378,30 @@ class ComposedPart:
         for no, elem in enumerate(self.elements):
 
             elem._plot_2d(language=language)
+           
+    def preview_sbs(self, example=False, language='en'):
 
+        print(*list(enumerate(self.elements)))
+
+        #self.elements[0]._origin = 0
+        #self.elements[-1]._origin = -30
+
+        for no, elem in enumerate(self.elements):
+
+        # Create a new figure for each element
+            plt.figure(figsize=(8,6))
+
+        # Plot the element
+            elem._plot_2d(language=language)
+
+        # Display the figure in a notebook / CoCalc
+            plt.show()
+
+        
+        # Close this figure so the next step starts fresh
+            plt.close()
+
+            
     def add(self, other):
 
         new_element_list = list(self.elements)

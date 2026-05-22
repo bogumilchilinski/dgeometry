@@ -2180,7 +2180,7 @@ class IsoscelesRightTrianglePrismHLineSwappedProjections(IsoscelesRightTriangleP
                    #triangle1_edge, 
                   ]
 
-    
+
     
 class EdgeIsoscelesRightTrianglePrism(IsoscelesRightTrianglePrism):
   
@@ -2194,6 +2194,29 @@ class EdgeIsoscelesRightTrianglePrism(IsoscelesRightTrianglePrism):
         parameters_dict[Symbol('A')] = (point_P + point_O) * 0.5 + Point(0, 0, 5)
 
         return parameters_dict
+    
+    
+    
+class EdgeIsoscelesRightTrianglePrismSwappedProjections(IsoscelesRightTrianglePrism):
+  
+
+    shift = [
+        Point(x, y, z) for x in [ -9.5, -9, -8.5, -8,-7]
+        for y in [-1,-0.5,0,0.5] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+    ]
+
+
+    def get_random_parameters(self):
+
+        parameters_dict = super().get_random_parameters()
+
+        point_P = parameters_dict[Symbol('P')]
+        point_O = parameters_dict[Symbol('O')]
+
+        parameters_dict[Symbol('A')] = (point_P + point_O) * 0.5 + Point(0, 0, 5)
+
+        return parameters_dict
+    
     
 
 class TruncatedTriangularPrism(GeometricalCase):
@@ -2992,11 +3015,13 @@ class TiltedTetragonalPrism(TetragonalPrism):
 
 #         return parameters_dict
     
-class TriangularPrismSwappedProjections(TriangularPrism):
-    shift = [
-        Point(x, y, z) for x in [-11, -10.5, -10, -9.5, -9, -8.5, -8]
-        for y in [0] for z in [-13, -12, -11, -10.5, -10, -9.5, -9]
+class TriangularPrismSwappedProjections(ParallelogramPrism):
+    point_packs = [ triangle1_swapped,
+                    triangle2_swapped,
+
     ]
+    
+    
 
 class ParallelogramPrismSwappedProjections(ParallelogramPrism):
     point_packs = [ triangle1_swapped,

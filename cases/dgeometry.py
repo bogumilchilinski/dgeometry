@@ -1385,8 +1385,82 @@ class GeometricalCase(DrawingSet):
         self.preview()
 
         return self._path
+    
+    def _scheme_sbs(self):
+
+        self.preview_sbs()
+
+        return self._path
+
+    def _real_example_sbs(self):
+
+        self.preview_sbs()
+
+        return self._path
 
     def preview(self, example=False,force=False):
+
+
+        #print('preview')
+        #print(self._assumptions3d)
+        #print(len(self._assumptions3d))        
+        #print('preview')        
+        
+        if self._assumptions3d is None or len(self._assumptions3d)==0:
+            self._assumptions3d = self._solution3d_step[0]
+
+        #print(self._assumptions3d)
+        
+        set_to_plot = self._assumptions
+        set_to_plot_3d = self._assumptions3d
+        
+        if len(set_to_plot) == 0:
+            set_to_plot = self._solution_step[0]
+        
+        self._set_to_plot = set_to_plot
+        
+        if self._path and force == False:
+            path = self._path
+            
+        else:
+            
+            print("++++++++",list(set_to_plot),"++++++++++")
+            print("++++++++",type(set_to_plot),"++++++++++")
+            
+            GeometrySceneDG()
+
+            set_to_plot_3d.plot()
+            set_to_plot.plot_hp()
+            set_to_plot.plot_vp()
+
+            #self._assumptions3d.plot()
+            #self._assumptions.plot_hp()
+            #self._assumptions.plot_vp()
+            
+            path = __file__.replace('dgeometry.py',
+                                    'images/') + self.__class__.__name__ + str(
+                                        next(self.__class__._case_no)) + '.png'
+            plt.title('Assumptions')
+
+            plt.savefig(path)
+            self._path=path
+
+            plt.close()
+
+        
+
+#        print('check' * 100)
+        print(self._path)
+#        print('check' * 100)
+        plt.close()
+
+        with open(f"{path}", "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+        image_file.close()
+
+        return IP.display.Image(base64.b64decode(encoded_string))
+    
+    def preview_sbs(self, example=False,force=False):
 
 
         #print('preview')

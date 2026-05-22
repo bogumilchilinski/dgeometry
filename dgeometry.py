@@ -1385,6 +1385,18 @@ class GeometricalCase(DrawingSet):
         self.preview()
 
         return self._path
+    
+    def _scheme_sbc(self):
+
+        self.preview_sbc()
+
+        return self._path
+
+    def _real_example_sbc(self):
+
+        self.preview_sbc()
+
+        return self._path
 
     def preview(self, example=False,force=False):
 
@@ -1447,6 +1459,67 @@ class GeometricalCase(DrawingSet):
         image_file.close()
 
         return IP.display.Image(base64.b64decode(encoded_string))
+    
+    def preview_sbs(self, example=False,force=False):
+
+        #print('preview')
+        #print(self._assumptions3d)
+        #print(len(self._assumptions3d))        
+        #print('preview')        
+        
+        if self._assumptions3d is None or len(self._assumptions3d)==0:
+            if self._solution3d_step is None or len(self._solution3d_step)==0:
+                print("WARNING: _solution3d_step is empty")
+                return
+            self._assumptions3d = self._solution3d_step[0]
+
+        #print(self._assumptions3d)
+        
+        set_to_plot = self._assumptions
+        set_to_plot_3d = self._assumptions3d
+        
+        if len(set_to_plot) == 0:
+            if self._solution_step is None or len(self._solution_step)==0:
+                print("WARNING: _solution_step is empty")
+                return
+            set_to_plot = self._solution_step[0]
+        
+        self._set_to_plot = set_to_plot
+        
+        if self._path and force == False:
+            path = self._path
+            
+        else:
+            
+            print("++++++++",list(set_to_plot),"++++++++++")
+            print("++++++++",type(set_to_plot),"++++++++++")
+            
+            GeometrySceneDG()
+
+            set_to_plot_3d.plot()
+            set_to_plot.plot_hp()
+            set_to_plot.plot_vp()
+
+            path = __file__.replace('dgeometry.py',
+                                    'images/') + self.__class__.__name__ + str(
+                                        next(self.__class__._case_no)) + '.png'
+            plt.title('Assumptions')
+
+            plt.savefig(path)
+            self._path=path
+
+            plt.close()
+
+        print(self._path)
+
+        plt.close()
+
+        with open(f"{path}", "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+        image_file.close()
+
+        return IP.display.Image(base64.b64decode(encoded_string))
+    
 
     @classmethod
     def from_random_data(cls):

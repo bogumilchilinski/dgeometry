@@ -272,19 +272,24 @@ step_mod_dec_screw = lambda step: random.choice([
                               chamfer_angle=45,
                               chamfer_length=None,
                               chamfer_pos='right')],
-        
+
+    [sol.Cylinder(4, round(step.diameter*0.85)),
+            sol.Thread(step.height, step.diameter)],
+    
     [sol.ChamferedCylinder(10,
                               round(step.diameter*1.3),
                               chamfer_angle=45,
                               chamfer_length=None,
                               chamfer_pos='right'),
+             sol.Cylinder(4, round(step.diameter*0.85)),
             sol.Thread(step.height, step.diameter),sol.ChamferedCylinder(round(step.height*0.3),
                               round(step.diameter*0.85),
                               chamfer_angle=45,
                               chamfer_length=None,
                               chamfer_pos='right')],
-    sol.Thread(step.height, step.diameter),
-    [sol.Thread(step.height, step.diameter),sol.ChamferedCylinder(round(step.height*0.3),
+    #sol.Thread(step.height, step.diameter),
+    [sol.Cylinder(4, round(step.diameter*0.85)),
+        sol.Thread(step.height, step.diameter),sol.ChamferedCylinder(round(step.height*0.3),
                               round(step.diameter*0.85),
                               chamfer_angle=45,
                               chamfer_length=None,
@@ -566,6 +571,29 @@ class ShaftSketch(GeometricalCase):
             self.preview(language='pl')
 
         return self._path
+    
+    def _scheme_sbs(self):
+
+        if self._path is None:
+            self.preview_sbs()
+
+
+        return self._path
+
+    def _real_example_sbs(self):
+
+        if self._path is None:
+            self.preview_sbs()
+
+        return self._path
+
+
+    def _scheme_pl_sbs(self):
+
+        if self._path is None:
+            self.preview_sbs(language='pl')
+
+        return self._path
 
 
 
@@ -607,7 +635,79 @@ class ShaftSketch(GeometricalCase):
 
         return IP.display.Image(base64.b64decode(encoded_string))
     
-    
+#     """"""def preview_sbs(self, example=False,language='en'): # do naprawy PB
+#         GeometryScene(30,60,figsize=(14,7))
+
+#         self._solid_structure.preview_sbs(language=language)
+
+        
+        
+#         path = __file__.replace('cases/drawings.py', 'images/') + self.__class__.__name__ + str(next(self.__class__._case_no)) + '.png'
+
+        
+        
+#         plt.savefig(path)
+
+
+#         # Clear the current axes.
+#         plt.cla() 
+#         # Clear the current figure.
+#         plt.clf() 
+#         # Closes all the figure windows.
+#         plt.close('all')
+
+#         gc.collect()
+
+
+#         self._path = path
+
+    def preview_sbs(self, example=False, language='en'):
+        
+    # Step 1: Initialize the Geometry Scene
+        scene = GeometryScene(30, 60, figsize=(14, 7))
+        
+        path = __file__.replace('cases/drawings.py', 'images/') + self.__class__.__name__ + str(next(self.__class__._case_no)) + '.png'
+
+        
+        
+        plt.savefig(path)
+        
+
+    # Step 2: Preview the solid structure side-by-side
+        self._solid_structure.preview_sbs(language=language)
+        display(plt.gcf())  # Show updated figure
+        plt.pause(0.5)
+
+
+
+    # Step 4: Show the final figure
+        display(plt.gcf())
+        plt.pause(0.5)
+
+    # Step 5: Clear and close figures
+        plt.cla()         # Clear current axes
+        plt.clf()         # Clear current figure
+        plt.close('all')  # Close all figures
+
+    # Step 6: Garbage collection
+        gc.collect()
+        
+        
+        self._path = path
+
+
+     
+
+
+
+        with open(f"{path}", "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+        image_file.close()
+
+        return IP.display.Image(base64.b64decode(encoded_string))
+       
+        
+        
     def __init__(self, *assumptions, **kwargs):
         super().__init__()
         self._solution_step = []
@@ -1573,25 +1673,27 @@ class HexNutSketch(ShaftSketch
             
             shafts.append(shaft)
 
-        for i in range(50):
             
-            indiameter = random.randint( 70,80)
-            height=round(1.2*0.5*indiameter)
+# 3 hex heads
+#         for i in range(50):
             
-            shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
-            shaft[0]._origin = 0
-            shaft += [sol.Cylinder(round(shaft[-1].height*0.3),round(shaft[-1].indiameter*0.9))]
-            shaft[-1]._origin= shaft[-2].end
-            shaft  += [sol.ChamferedHexagonalPrism(shaft[-2].height, shaft[-2].indiameter, shaft[-2].chamfer_length)]
-            shaft[-1]._origin = shaft[-2].end
-            shaft += [sol.Cylinder(round(shaft[-1].height*0.4),round(shaft[-1].indiameter*0.9))]
-            shaft[-1]._origin= shaft[-2].end
-            shaft  += [sol.ChamferedHexagonalPrism(shaft[-2].height, shaft[-2].indiameter, shaft[-2].chamfer_length)]
-            shaft[-1]._origin = shaft[-2].end
-            shaft += [sol.ThreadedOpenHole(shaft[-5].height + shaft[-4].height + shaft[-3].height+shaft[-2].height+shaft[-1].height,shaft[-3].diameter-8)]
-            shaft[-1]._origin = 0
+#             indiameter = random.randint( 70,80)
+#             height=round(1.2*0.5*indiameter)
             
-            shafts.append(shaft)
+#             shaft = [sol.ChamferedHexagonalPrism(height,indiameter, random.randint(3,4))]
+#             shaft[0]._origin = 0
+#             shaft += [sol.Cylinder(round(shaft[-1].height*0.3),round(shaft[-1].indiameter*0.9))]
+#             shaft[-1]._origin= shaft[-2].end
+#             shaft  += [sol.ChamferedHexagonalPrism(shaft[-2].height, shaft[-2].indiameter, shaft[-2].chamfer_length)]
+#             shaft[-1]._origin = shaft[-2].end
+#             shaft += [sol.Cylinder(round(shaft[-1].height*0.4),round(shaft[-1].indiameter*0.9))]
+#             shaft[-1]._origin= shaft[-2].end
+#             shaft  += [sol.ChamferedHexagonalPrism(shaft[-2].height, shaft[-2].indiameter, shaft[-2].chamfer_length)]
+#             shaft[-1]._origin = shaft[-2].end
+#             shaft += [sol.ThreadedOpenHole(shaft[-5].height + shaft[-4].height + shaft[-3].height+shaft[-2].height+shaft[-1].height,shaft[-3].diameter-8)]
+#             shaft[-1]._origin = 0
+            
+#             shafts.append(shaft)
             
         return shafts
     
@@ -1710,6 +1812,8 @@ class BasicGearSketch(ShaftSketch
   
             
         return shafts
+    
+    
 class DoubleRingGear(ShaftSketch
                              #GeometricalCase
                              ):
@@ -2096,9 +2200,9 @@ class BodyBlockView(ShaftSketch
             
             body_type = random.choice([
                                        sol.BodyBlock,
-                                       sol.BodyBlockShapeT,
-                                       sol.HeavyBodyBlockShapeT,
-                                       sol.MediumBodyBlockShapeT,
+#                                        sol.BodyBlockShapeT,
+#                                        sol.HeavyBodyBlockShapeT,
+#                                        sol.MediumBodyBlockShapeT,
                                        #sol.BodyBlockShapeC,
                                        #sol.BodyBlockCutType,
                                       ])
@@ -2150,7 +2254,7 @@ class BearingBlockView(ShaftSketch
             
             axis_pos= round(0.01*random.randint(50,70) * body_height)
             
-            body_type = random.choice([sol.BodyBlock,
+            body_type = random.choice([#sol.BodyBlock,
                                        sol.BodyBlockShapeT,
                                        sol.HeavyBodyBlockShapeT,
                                        sol.MediumBodyBlockShapeT,
@@ -2185,7 +2289,7 @@ class BearingBlockView(ShaftSketch
             
             axis_pos= round(0.01*random.randint(50,70) * body_height)
             
-            body_type = random.choice([sol.BodyBlock,
+            body_type = random.choice([#sol.BodyBlock,
                                        sol.BodyBlockShapeT,
                                        sol.HeavyBodyBlockShapeT,
                                        sol.MediumBodyBlockShapeT,
@@ -2222,7 +2326,7 @@ class BearingBlockView(ShaftSketch
             
             axis_pos= round(0.01*random.randint(50,70) * body_height)
             
-            body_type = random.choice([sol.BodyBlock,
+            body_type = random.choice([#sol.BodyBlock,
                                        sol.BodyBlockShapeT,
                                        sol.HeavyBodyBlockShapeT,
                                        sol.MediumBodyBlockShapeT,
