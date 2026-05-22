@@ -1,0 +1,12 @@
+cadquery==2.5.2
+cadquery-ocp==7.7.2
+ocp_vscode==2.6.2
+numpy==2.0.2
+sympy==1.14.0
+matplotlib==3.9.4
+ipython==8.18.1
+ipykernel==6.31.0
+PyLaTeX==1.4.2
+ezdxf==1.4.2
+casadi==3.7.2
+nlopt==2.9.1

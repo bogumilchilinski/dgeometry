@@ -23,11 +23,21 @@ import os
 import matplotlib.pyplot as plt
 import IPython as IP
 
-# Import cq from cq_solids which handles the path correctly
-from . import cq_solids as cqs
-from .cq_solids import cq
-
-from ..dgeometry import GeometryScene, GeometricalCase, plots_no
+# Import CadQuery helper module and related symbols from the local models primitives module
+try:
+    from . import chamfered as cqs
+    from .chamfered import cq
+    from ..dgeometry import GeometryScene, GeometricalCase, plots_no
+except ImportError:
+    import sys
+    import os
+    # Add current dir so 'primitives' is found
+    sys.path.insert(0, os.path.dirname(__file__))
+    # Add two levels up so 'dgeometry' package is found
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+    import chamfered as cqs
+    from chamfered import cq
+    from dgeometry import GeometryScene, GeometricalCase, plots_no
 
 
 class CQShaftSketchBase(GeometricalCase):
@@ -219,7 +229,7 @@ class CQShaftSketchBase(GeometricalCase):
             total_length = self._solid_structure.total_length / 10
             ax.plot([-0.5, total_length + 0.5], [0, 0], '-.', color='k', linewidth=1)
     
-    def _draw_element_2d(self, ax, elem: cqs.CQSolid, language: str = 'en'):
+    def _draw_element_2d(self, ax, elem: cqs.Solid, language: str = 'en'):
         """Draw a single element in 2D."""
         r = elem.diameter / 2 / 10  # Scale for display
         l = elem.height / 10
