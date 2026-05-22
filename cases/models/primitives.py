@@ -1099,6 +1099,12 @@ class Solid(Primitive):
         else:
             self.preview()
 
+    def __add__(self, other):
+        return ComposedPart(self) + other
+
+    def __sub__(self, other):
+        return ComposedPart(self) - other
+
     def _plot_2d_cq(self, opts=None):
         if exporters is None:
             raise ImportError("cadquery is not installed")
@@ -1870,18 +1876,70 @@ class GeometricalCase(DrawingSet):
     
 
 
+class Node:
+    """Represents a positioned solid within a ComposedPart."""
+
+    def __init__(self, solid, position=None, rotation=None, operation='union'):
+        self.solid = solid
+        self._position = position
+        self._rotation = rotation
+        self.operation = operation
+
+    @property
+    def position(self):
+        return self._position
+
+    @position.setter
+    def position(self, value):
+        self._position = value
+
+    @property
+    def rotation(self):
+        return self._rotation
+
+    @rotation.setter
+    def rotation(self, value):
+        self._rotation = value
+
+    def apply(self, shape):
+        if self._rotation:
+            rx, ry, rz = self._rotation
+            if rx: shape = shape.rotate((0, 0, 0), (1, 0, 0), rx)
+            if ry: shape = shape.rotate((0, 0, 0), (0, 1, 0), ry)
+            if rz: shape = shape.rotate((0, 0, 0), (0, 0, 1), rz)
+        if self._position:
+            shape = shape.translate(self._position)
+        return shape
+
+    def __repr__(self):
+        return (f"Node({self.solid.__class__.__name__}, "
+                f"position={self._position}, rotation={self._rotation}, "
+                f"operation='{self.operation}')")
+
+
 class ComposedPart:
     scheme_name = 'engine.png'
     real_name = 'engine_real.PNG'
 
     def __init__(self, *args):
-        if args:
-            self.elements = list(args)
-        else:
-            self.elements = []
-        self._transforms = [None] * len(self.elements)
-        self._operations = ['union'] * (len(self.elements) - 1)
-        self._positions = [None] * len(self.elements)
+        self._nodes = []
+        for arg in args:
+            if isinstance(arg, Node):
+                self._nodes.append(arg)
+            elif isinstance(arg, Solid):
+                self._nodes.append(Node(arg))
+
+    # ── backward-compat properties ────────────────────────────────────────────
+
+    @property
+    def elements(self):
+        return [n.solid for n in self._nodes]
+
+    @property
+    def nodes(self):
+        return {i: node for i, node in enumerate(self._nodes)}
+
+    # ── class methods ─────────────────────────────────────────────────────────
 
     @classmethod
     def _scheme(cls):
@@ -1897,67 +1955,79 @@ class ComposedPart:
 
         return path
 
+    # ── preview ───────────────────────────────────────────────────────────────
+
     def preview(self, example=False, language='en'):
 
         print(*list(enumerate(self.elements)))
 
-        for no, elem in enumerate(self.elements):
-            original_origin = elem._origin
-            pos = self._positions[no] if no < len(self._positions) else None
-            if pos is not None:
-                elem._origin = pos[0]
-            elem._plot_2d(language=language)
-            elem._origin = original_origin
+        for node in self._nodes:
+            original_origin = node.solid._origin
+            if node.position is not None:
+                node.solid._origin = node.position[0]
+            node.solid._plot_2d(language=language)
+            node.solid._origin = original_origin
 
-    def add(self, other, transform=None, operation='union', position=None, rotation=None):
+    # ── add / operators ───────────────────────────────────────────────────────
 
-        if position is not None or rotation is not None:
-            def transform(shape, _pos=position, _rot=rotation):
-                if _rot:
-                    rx, ry, rz = _rot
-                    if rx: shape = shape.rotate((0, 0, 0), (1, 0, 0), rx)
-                    if ry: shape = shape.rotate((0, 0, 0), (0, 1, 0), ry)
-                    if rz: shape = shape.rotate((0, 0, 0), (0, 0, 1), rz)
-                if _pos:
-                    shape = shape.translate(_pos)
-                return shape
+    def add(self, other, operation='union', position=None, rotation=None):
 
-        new_element_list = list(self.elements)
-        new_transforms = list(self._transforms)
-        new_operations = list(self._operations)
-        new_positions = list(self._positions)
+        if isinstance(other, Node):
+            node = Node(other.solid, position=other.position,
+                        rotation=other.rotation, operation=operation)
+        else:
+            # Node strategy: default position is end face of last element
+            if position is None and rotation is None and self._nodes:
+                last = self._nodes[-1]
+                last_x = last.position[0] if last.position is not None else last.solid._origin
+                position = (last_x + last.solid.height, 0, 0)
+            node = Node(other, position=position, rotation=rotation, operation=operation)
 
-        if isinstance(other, Solid):
-            new_element_list.append(other)
-            new_transforms.append(transform)
-            new_operations.append(operation)
-            new_positions.append(position)
-
-        result = ComposedPart(*new_element_list)
-        result._transforms = new_transforms
-        result._operations = new_operations
-        result._positions = new_positions
-        return result
+        return ComposedPart(*self._nodes, node)
 
     def __add__(self, other):
-        return self.add(other)
+        if isinstance(other, tuple):
+            solid, *rest = other
+            position = rest[0] if len(rest) > 0 else None
+            rotation = rest[1] if len(rest) > 1 else None
+            return self.add(solid, operation='union', position=position, rotation=rotation)
+        return self.add(other, operation='union')
+
+    def __sub__(self, other):
+        if isinstance(other, tuple):
+            solid, *rest = other
+            position = rest[0] if len(rest) > 0 else None
+            rotation = rest[1] if len(rest) > 1 else None
+            return self.add(solid, operation='cut', position=position, rotation=rotation)
+        if isinstance(other, Node):
+            return self.add(other, operation='cut')
+        # Default: cutter extends inward from the end face of the last solid
+        position = None
+        if self._nodes:
+            last = self._nodes[-1]
+            last_x = last.position[0] if last.position is not None else last.solid._origin
+            position = (last_x + last.solid.height - other.height, 0, 0)
+        return self.add(other, operation='cut', position=position)
+
+    # ── CadQuery ──────────────────────────────────────────────────────────────
 
     def to_cq(self, transforms=None, operations=None):
         if cq is None:
             raise ImportError("cadquery is not installed")
-        if not self.elements:
+        if not self._nodes:
             return cq.Workplane("YZ")
-        transforms = transforms if transforms is not None else self._transforms
-        operations = operations if operations is not None else self._operations
         result = None
-        for i, (elem, transform) in enumerate(zip(self.elements, transforms)):
-            shape = elem.to_cq()
-            if transform is not None:
-                shape = transform(shape)
+        for i, node in enumerate(self._nodes):
+            shape = node.solid.to_cq()
+            if transforms is not None and i < len(transforms) and transforms[i] is not None:
+                shape = transforms[i](shape)
+            else:
+                shape = node.apply(shape)
             if result is None:
                 result = shape
             else:
-                op = operations[i - 1]
+                op = (operations[i - 1] if operations is not None and i - 1 < len(operations)
+                      else node.operation)
                 if op == 'cut':
                     result = result.cut(shape)
                 elif op == 'intersect':
