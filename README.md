@@ -165,7 +165,7 @@ pip install -r requirements.txt`
 6. Install VS Code Extensions:
    -Python Extension Pack
    -Git Extension Package
-   -OCP CAD Viewer (Mandatory for CadQuery visualization!)
+   -OCP CAD Viewer (Mandator/y for CadQuery visualization!)
 7. Environment Setup in VS Code:
    
 Create a working folder on your main drive with subfolders (e.g., `output/`, `images/`).
