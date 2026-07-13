@@ -36,6 +36,10 @@ from pylatex.utils import italic, NoEscape
 import itertools as it
 import sys
 import os
+import ssl
+import json
+import ftplib
+import threading
 
 class GeometrySceneDG:
 
@@ -2322,3 +2326,247 @@ class TetraPrism(Prism):
 
     names = ['E', 'F', 'G', 'H']
 
+
+try:
+    import paho.mqtt.client as _mqtt_client
+except ImportError:
+    _mqtt_client = None
+
+
+class _ImplicitFTP_TLS(ftplib.FTP_TLS):
+    """
+    Handles implicit FTPS (TLS-from-start on port 990) used by BambuLab printers.
+
+    Two fixes over plain FTP_TLS:
+    1. sock setter — wraps the control socket in SSL immediately on connect.
+    2. storbinary — BambuLab never sends SSL close_notify after transfer,
+       so conn.unwrap() hangs forever; we catch and ignore that timeout.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._sock = None
+
+    @property
+    def sock(self):
+        return self._sock
+
+    @sock.setter
+    def sock(self, value):
+        if value is not None and not isinstance(value, ssl.SSLSocket):
+            value = self.context.wrap_socket(value)
+        self._sock = value
+
+    def storbinary(self, cmd, fp, blocksize=8192, callback=None, rest=None):
+        self.voidcmd('TYPE I')
+        with self.transfercmd(cmd, rest) as conn:
+            while True:
+                buf = fp.read(blocksize)
+                if not buf:
+                    break
+                conn.sendall(buf)
+                if callback:
+                    callback(buf)
+            # Intentionally skip conn.unwrap(): BambuLab never sends SSL close_notify,
+            # so unwrap() blocks forever. conn.close() (called by the with-block) is enough.
+        return self.voidresp()
+
+
+class BambuPrintPipeline:
+    """
+    Slices (if needed) and sends a 3MF/STL file to a BambuLab A1 printer over WiFi.
+
+    Slicing is done automatically via OrcaSlicer CLI when the file has no embedded gcode.
+    BambuStudio CLI crashes on macOS Apple Silicon; OrcaSlicer is the reliable alternative.
+
+    Credentials: Settings → Network → LAN Mode on the printer touchscreen.
+
+    Usage:
+        pipeline = BambuPrintPipeline(
+            ip='192.168.0.73',
+            access_code='f3b251fb',
+            serial='03919C450202357',
+        )
+        pipeline('cylinder.stl')            # auto-slices then prints
+        pipeline('cylinder_sliced.3mf')     # already sliced, prints directly
+
+    Slicer profiles default to Generic PLA / 0.20mm Standard on A1 0.4 nozzle.
+    Override via: layer_height='0.15mm', filament='Bambu PLA Basic @BBL A1'
+    """
+
+    _FTPS_PORT = 990
+    _MQTT_PORT = 8883
+    _USER = 'bblp'
+
+    _ORCA_BIN = '/Applications/OrcaSlicer.app/Contents/MacOS/OrcaSlicer'
+    _ORCA_PROFILES = '/Applications/OrcaSlicer.app/Contents/Resources/profiles/BBL'
+
+    def __init__(self, ip: str, access_code: str, serial: str):
+        self.ip = ip
+        self.access_code = access_code
+        self.serial = serial
+
+    def __call__(self, filepath: str, bed_leveling: bool = True,
+                 flow_cali: bool = True, vibration_cali: bool = True,
+                 use_ams: bool = False, timelapse: bool = False,
+                 layer_height: str = '0.20mm', filament: str = 'Generic PLA'):
+        import zipfile
+        try:
+            with zipfile.ZipFile(filepath) as z:
+                has_gcode = any('gcode' in n.lower() for n in z.namelist())
+        except Exception:
+            has_gcode = False
+
+        if not has_gcode:
+            print(f"[BambuPrint] No gcode found — slicing with OrcaSlicer ...")
+            filepath = self._slice(filepath, layer_height=layer_height, filament=filament)
+
+        filename = os.path.basename(filepath)
+        print(f"[BambuPrint] Uploading {filename} → {self.ip} ...")
+        self._upload(filepath, filename, bed_leveling=bed_leveling, flow_cali=flow_cali,
+                     vibration_cali=vibration_cali, use_ams=use_ams, timelapse=timelapse)
+        print("[BambuPrint] Sending print command ...")
+        self._start_print(
+            filename,
+            bed_leveling=bed_leveling,
+            flow_cali=flow_cali,
+            vibration_cali=vibration_cali,
+            use_ams=use_ams,
+            timelapse=timelapse,
+        )
+        print("[BambuPrint] Done — printer is starting.")
+
+    def _slice(self, filepath: str, layer_height: str = '0.20mm',
+               filament: str = 'Generic PLA') -> str:
+        import subprocess, glob
+        if not os.path.exists(self._ORCA_BIN):
+            raise FileNotFoundError(
+                "OrcaSlicer not found. Install via: brew install --cask orcaslicer"
+            )
+
+        machine = os.path.join(self._ORCA_PROFILES, 'machine', 'Bambu Lab A1 0.4 nozzle.json')
+        process_pattern = os.path.join(self._ORCA_PROFILES, 'process', f'{layer_height}*@BBL A1.json')
+        process_matches = [p for p in glob.glob(process_pattern) if 'mini' not in p]
+        if not process_matches:
+            raise FileNotFoundError(f"No process profile found for '{layer_height}' on A1")
+        process = process_matches[0]
+
+        filament_pattern = os.path.join(self._ORCA_PROFILES, 'filament', f'{filament} @BBL A1.json')
+        filament_matches = [p for p in glob.glob(filament_pattern) if 'mini' not in p and 'nozzle' not in p]
+        if not filament_matches:
+            raise FileNotFoundError(f"No filament profile found for '{filament}' on A1")
+        filament_path = filament_matches[0]
+
+        filepath = os.path.abspath(filepath)
+        base = os.path.splitext(filepath)[0]
+        out_path = f"{base}_sliced.3mf"
+
+        result = subprocess.run(
+            [self._ORCA_BIN, '--slice', '0',
+             '--load-settings', f'{machine};{process}',
+             '--load-filaments', filament_path,
+             '--export-3mf', out_path,
+             filepath],
+            capture_output=True, text=True, timeout=300,
+        )
+        if result.returncode != 0 or not os.path.exists(out_path):
+            raise RuntimeError(f"Slicing failed (exit {result.returncode}):\n{result.stderr[-500:]}")
+
+        print(f"[BambuPrint] Sliced → {os.path.basename(out_path)}")
+        self._patch_3mf(out_path)
+        return out_path
+
+    def _patch_3mf(self, path: str):
+        """Patch printer_model_id to 'N2S' in slice_info.config so the A1 accepts the file."""
+        import zipfile, tempfile, shutil
+        target = 'Metadata/slice_info.config'
+        tmp = path + '.tmp'
+        with zipfile.ZipFile(path, 'r') as zin, zipfile.ZipFile(tmp, 'w', zipfile.ZIP_DEFLATED) as zout:
+            for item in zin.infolist():
+                data = zin.read(item.filename)
+                if item.filename == target:
+                    data = data.replace(
+                        b'key="printer_model_id" value=""',
+                        b'key="printer_model_id" value="N2S"',
+                    )
+                zout.writestr(item, data)
+        shutil.move(tmp, path)
+        print("[BambuPrint] Patched printer_model_id → N2S")
+
+    def _upload(self, filepath: str, filename: str, **opts):
+        import hashlib, io as _io
+        with open(filepath, 'rb') as f:
+            data = f.read()
+        bbl_name = f'1_{os.path.splitext(filename)[0]}.bbl'
+        bbl = json.dumps({
+            "file path": f"/sdcard/cache/{filename}",
+            "subtask_name": os.path.splitext(filename)[0],
+            "subtask id": "0",
+            "file_size": str(len(data)),
+            "md5": hashlib.md5(data).hexdigest().upper(),
+            "timelapse": opts.get("timelapse", False),
+            "bed_leveling": opts.get("bed_leveling", True),
+            "flow_cali": opts.get("flow_cali", True),
+            "vibration_cali": opts.get("vibration_cali", True),
+            "layer_inspect": False,
+            "use ams": opts.get("use_ams", False),
+            "xy_mech_mode_sweep": False,
+            "auto_recovery": True,
+        }, indent='\t').encode()
+
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+
+        with _ImplicitFTP_TLS(context=ctx) as ftp:
+            ftp.connect(self.ip, self._FTPS_PORT)
+            ftp.login(self._USER, self.access_code)
+            ftp.prot_p()
+            try:
+                ftp.mkd('/cache')
+            except ftplib.error_perm:
+                pass  # already exists
+            ftp.storbinary(f'STOR /cache/{filename}', _io.BytesIO(data))
+            ftp.storbinary(f'STOR /cache/{bbl_name}', _io.BytesIO(bbl))
+            print(f"[BambuPrint] Uploaded {filename} + {bbl_name}")
+
+    def _start_print(self, filename: str, **opts):
+        if _mqtt_client is None:
+            raise ImportError("paho-mqtt is required: pip install paho-mqtt")
+
+        payload = json.dumps({
+            "print": {
+                "sequence_id": "13",
+                "command": "project_file",
+                "param": "Metadata/plate_1.gcode",
+                "subtask_name": filename,
+                "url": f"file:///sdcard/cache/{filename}",
+                "bed_type": "auto",
+                "timelapse": opts.get("timelapse", False),
+                "bed_leveling": opts.get("bed_leveling", True),
+                "flow_cali": opts.get("flow_cali", True),
+                "vibration_cali": opts.get("vibration_cali", True),
+                "layer_inspect": False,
+                "use_ams": opts.get("use_ams", False),
+            }
+        })
+
+        published = threading.Event()
+
+        def on_connect(client, userdata, flags, reason_code, properties):
+            client.publish(f"device/{self.serial}/request", payload)
+
+        def on_publish(client, userdata, mid, reason_code, properties):
+            published.set()
+
+        client = _mqtt_client.Client(_mqtt_client.CallbackAPIVersion.VERSION2)
+        client.username_pw_set(self._USER, self.access_code)
+        client.tls_set(cert_reqs=ssl.CERT_NONE)
+        client.tls_insecure_set(True)
+        client.on_connect = on_connect
+        client.on_publish = on_publish
+        client.connect(self.ip, self._MQTT_PORT, keepalive=10)
+        client.loop_start()
+        published.wait(timeout=10)
+        client.loop_stop()
+        client.disconnect()
