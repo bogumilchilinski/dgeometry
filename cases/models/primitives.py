@@ -148,7 +148,7 @@ class Primitive:
     __text = None
     __marker = None
     __style = None
-    __fmt = None
+    __fmt = None 
     _linewidth = 1.5
     _share_color = True
 
@@ -1290,6 +1290,170 @@ class Cylinder(Solid):
         )
 
 
+class Thread(Solid):
+
+    num_of_lines_view = {
+        'horizontal_lines': 5,
+        'vertical_lines': 3,
+        'inclined_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 2,
+        'inclined_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_half_sec = {
+        'horizontal_lines': 5,
+        'vertical_lines': 3,
+        'inclined_lines': 2,
+        'horizontal_dimensions': 2,
+        'vertical_dimensions': 1,
+        'angular_dimensions': 1,
+    }
+
+    num_of_lines_front = {'circles': 1, 'arcs': 1}
+
+    def __init__(self,
+                 height,
+                 diameter,
+                 chamfer_length=1,
+                 chamfer_angle=45,
+                 thread='M'):
+
+        num_of_lines_view = self.__class__.num_of_lines_view
+        num_of_lines_sec = self.__class__.num_of_lines_sec
+        num_of_lines_half_sec = self.__class__.num_of_lines_half_sec
+        num_of_lines_front = self.__class__.num_of_lines_front
+
+        super().__init__(View(**num_of_lines_view),
+                         Section(**num_of_lines_sec),
+                         HalfSection(**num_of_lines_half_sec),
+                         FrontView(**num_of_lines_front))
+
+        self.height = height
+        self.diameter = diameter
+        self.thread = thread
+        self.chamfer_length = chamfer_length
+        self.chamfer_angle = chamfer_angle
+        # self._parameters = thread + str(
+        #     diameter), height, chamfer_length, chamfer_angle,
+        # self._class_description = "{} with L={}mm and chamfer {}x{}".format(
+        #     *(self._parameters))
+
+        # self._name['pl'] = 'Gwint'
+        # self._class_description_pl = "{} o L={}mm i fazie {}x{}".format(
+        #     *self._parameters)
+
+    def str_en(self):
+        return 'Threaded Cylinder \n with L={length}mm, thread M{d} \n and chamfer {l_ch}x{angle}'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+        )
+
+    def str_pl(self):
+        return 'Walec gwintowany \n o L={length}mm, gwincie M{d}mm \n i fazie {l_ch}x{angle}'.format(
+            length=self.height,
+            d=self.diameter,
+            angle=self.chamfer_angle,
+            l_ch=self.chamfer_length,
+        )
+
+    def _plot_2d(self, language='en'):
+
+        class_name = self.__class__.__name__
+
+        span = np.linspace(0, len(class_name), 100)
+        print(f'plot_2d is called for {class_name}')
+
+        r = self.diameter / 2 / 10
+        l = self.height / 10
+        r_t = 0.9 * r
+        origin = self.origin / 10
+        end = self.end / 10
+
+        t_l = origin + l * 5 / 4
+        t_r = (-r - 14.5)
+
+        res = GeometryScene.ax_2d.plot(
+            [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+            [-r, r, r, -r, -r],
+            color='k') + GeometryScene.ax_2d.plot(
+                [origin + 0, origin + 0, origin + l, origin + l, origin + 0],
+                [-r_t, r_t, r_t, -r_t, -r_t],
+                linewidth=1,
+                color='r') + GeometryScene.ax_2d.plot(
+                    [origin - 0.5, origin + l + 0.5], [0, 0],
+                    '-.',
+                    color='k',
+                    linewidth=1)
+
+        if language == 'pl':
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_pl(),
+                                            rotation='vertical',
+                                            multialignment='center')
+        else:
+            text = GeometryScene.ax_2d.text(t_l,
+                                            t_r,
+                                            self.str_en(),
+                                            rotation='vertical',
+                                            multialignment='center')
+
+        ShaftPreview(0,0, origin / 2,
+                     [2 * r / 2, l / 2, "bez fazy", 0.2, '#56754A'])
+
+    def to_cq(self, workplane=None):
+        if cq is None:
+            raise ImportError("cadquery is not installed")
+
+        radius = self.radius
+        height = self.height
+        _pitch_table = {2: 0.4, 3: 0.5, 4: 0.7, 5: 0.8, 6: 1.0,
+                        8: 1.25, 10: 1.5, 12: 1.75, 16: 2.0, 20: 2.5, 24: 3.0}
+        pitch = _pitch_table.get(int(round(self.diameter)),
+                                 max(0.5, round(self.diameter * 0.15, 1)))
+        thread_depth = 0.6134 * pitch
+        r_inner = radius - thread_depth
+
+        # Base cylinder along Z
+        base = cq.Workplane("XY").circle(radius).extrude(height)
+
+        # Chamfer entry and exit faces
+        cl = min(self.chamfer_length, r_inner * 0.3, pitch * 0.45)
+        if cl > 0:
+            try:
+                base = base.faces(">Z").chamfer(cl)
+                base = base.faces("<Z").chamfer(cl)
+            except Exception:
+                pass
+
+        # Thread profile: isosceles triangle in XZ plane (X=radial, Z=axial)
+        profile = (
+            cq.Workplane("XZ")
+            .polyline([(r_inner, 0), (radius, pitch / 2), (r_inner, pitch)])
+            .close()
+        )
+        helix = cq.Wire.makeHelix(pitch=pitch, height=height,
+                                   radius=(radius + r_inner) / 2)
+        thread_solid = profile.sweep(helix, isFrenet=True)
+
+        result = base.cut(thread_solid)
+
+        # Rotate to X-axis convention (same as Cylinder.to_cq) then place at origin
+        return (result
+                .rotate((0, 0, 0), (0, 1, 0), 90)
+                .translate((self.origin, 0, 0)))
 
 
 class ParallelPlane(Plane):
@@ -2274,10 +2438,472 @@ class ComposedPart:
         return sum([solid.view.horizontal_lines() for solid in self.elements])
 
 
+class ModelDoc:
+    """
+    Generates detailed documentation for a ComposedPart or Solid.
+    All geometric properties are computed via CadQuery — no analytical formulas.
 
+    Usage:
+        doc = ModelDoc(part)
+        doc()        # display in notebook (HTML) or terminal (text)
+        str(doc)     # plain-text version
+    """
 
+    def __init__(self, part):
+        self._part = part
 
+    def __call__(self):
+        try:
+            import IPython.display as _ipd
+            _ipd.display(_ipd.HTML(self._html()))
+        except Exception:
+            print(self._text())
 
+    def __str__(self):
+        return self._text()
+
+    def __repr__(self):
+        return self._text()
+
+    def _repr_html_(self):
+        return self._html()
+
+    # ── CadQuery property extraction ──────────────────────────────────────────
+
+    def _cq_props(self, solid):
+        props = {}
+        try:
+            shape = solid.to_cq().val()
+            props["volume"]         = round(shape.Volume(), 2)
+            props["area"]           = round(shape.Area(), 2)
+            bb = shape.BoundingBox()
+            props["bbox_x"]         = (round(bb.xmin, 2), round(bb.xmax, 2))
+            props["bbox_y"]         = (round(bb.ymin, 2), round(bb.ymax, 2))
+            props["bbox_z"]         = (round(bb.zmin, 2), round(bb.zmax, 2))
+            props["bbox_dims"]      = (round(bb.xlen, 2), round(bb.ylen, 2), round(bb.zlen, 2))
+            c = shape.Center()
+            props["center_of_mass"] = (round(c.x, 2), round(c.y, 2), round(c.z, 2))
+        except Exception:
+            pass
+        return props
+
+    def _cq_total_props(self):
+        props = {}
+        try:
+            shape = self._part.to_cq().val()
+            props["volume"]         = round(shape.Volume(), 2)
+            props["area"]           = round(shape.Area(), 2)
+            bb = shape.BoundingBox()
+            props["bbox_dims"]      = (round(bb.xlen, 2), round(bb.ylen, 2), round(bb.zlen, 2))
+            c = shape.Center()
+            props["center_of_mass"] = (round(c.x, 2), round(c.y, 2), round(c.z, 2))
+        except Exception:
+            pass
+        return props
+
+    def _solid_extras(self, solid):
+        extras = {}
+        if isinstance(solid, Thread):
+            _pt = {2: 0.4, 3: 0.5, 4: 0.7, 5: 0.8, 6: 1.0,
+                   8: 1.25, 10: 1.5, 12: 1.75, 16: 2.0, 20: 2.5, 24: 3.0}
+            pitch = _pt.get(int(round(solid.diameter)),
+                            max(0.5, round(solid.diameter * 0.15, 1)))
+            extras["Thread type"]         = solid.thread
+            extras["Pitch [mm]"]          = pitch
+            extras["Thread depth [mm]"]   = round(0.6134 * pitch, 4)
+            extras["Root radius [mm]"]    = round(solid.radius - 0.6134 * pitch, 4)
+            extras["Chamfer length [mm]"] = solid.chamfer_length
+            extras["Chamfer angle [°]"]   = solid.chamfer_angle
+        return extras
+
+    # ── row building ──────────────────────────────────────────────────────────
+
+    def _build_row(self, idx, s, position, rotation, operation):
+        x0 = position[0] if position else getattr(s, "_origin", 0)
+        return {
+            "idx":       idx,
+            "type":      s.__class__.__name__,
+            "height":    getattr(s, "height",   "—"),
+            "diameter":  getattr(s, "diameter", "—"),
+            "radius":    getattr(s, "radius",   "—"),
+            "position":  position,
+            "rotation":  rotation,
+            "operation": operation,
+            "x_start":   x0,
+            "x_end":     x0 + getattr(s, "height", 0),
+            "cq":        self._cq_props(s),
+            "extras":    self._solid_extras(s),
+        }
+
+    def _get_rows(self):
+        rows = []
+        if isinstance(self._part, ComposedPart):
+            for i, node in self._part.nodes.items():
+                rows.append(self._build_row(
+                    i + 1, node.solid, node.position, node.rotation, node.operation
+                ))
+        elif isinstance(self._part, Solid):
+            s = self._part
+            x0 = getattr(s, "_origin", 0)
+            rows.append(self._build_row(1, s, (x0, 0, 0), None, "union"))
+        return rows
+
+    # ── text output ───────────────────────────────────────────────────────────
+
+    def _text(self):
+        rows       = self._get_rows()
+        total      = self._cq_total_props()
+        n_union    = sum(1 for r in rows if r["operation"] == "union")
+        n_cut      = sum(1 for r in rows if r["operation"] == "cut")
+        union_rows = [r for r in rows if r["operation"] != "cut"]
+        x_min = min((r["x_start"] for r in union_rows), default=0)
+        x_max = max((r["x_end"]   for r in union_rows), default=0)
+
+        def fv(d, key, unit=""):
+            v = d.get(key)
+            return f"{v}{unit}" if v is not None else "— (to_cq not implemented)"
+
+        lines = [
+            "Model Documentation",
+            "=" * 80,
+            f"  Components     : {len(rows)}  (union: {n_union}, cut: {n_cut})",
+            f"  Total span     : X = {x_min} → {x_max} mm",
+            f"  Net volume     : {fv(total, 'volume', ' mm³')}",
+            f"  Surface area   : {fv(total, 'area',   ' mm²')}",
+            f"  Bounding box   : {fv(total, 'bbox_dims')} mm  (W × H × D)",
+            f"  Center of mass : {fv(total, 'center_of_mass')} mm",
+            "=" * 80,
+        ]
+        for r in rows:
+            cq  = r["cq"]
+            pos = str(r["position"]) if r["position"] else "—"
+            rot = str(r["rotation"]) if r["rotation"] else "—"
+            lines += [
+                "",
+                f"  Component {r['idx']} — {r['type']}  [{r['operation'].upper()}]",
+                f"  {'─'*56}",
+                f"  Height          : {r['height']} mm",
+                f"  Diameter        : {r['diameter']} mm",
+                f"  Radius          : {r['radius']} mm",
+                f"  X range         : {r['x_start']} → {r['x_end']} mm",
+                f"  Position (x,y,z): {pos}",
+                f"  Rotation (x,y,z): {rot}",
+                f"  Volume          : {fv(cq, 'volume', ' mm³')}",
+                f"  Surface area    : {fv(cq, 'area',   ' mm²')}",
+                f"  Bounding box    : {fv(cq, 'bbox_dims')} mm",
+                f"  Center of mass  : {fv(cq, 'center_of_mass')} mm",
+            ]
+            for k, v in r["extras"].items():
+                lines.append(f"  {k:<22}: {v}")
+        lines.append("")
+        return "\n".join(lines)
+
+    # ── HTML output ───────────────────────────────────────────────────────────
+
+    def _html(self):
+        rows       = self._get_rows()
+        total      = self._cq_total_props()
+        n_union    = sum(1 for r in rows if r["operation"] == "union")
+        n_cut      = sum(1 for r in rows if r["operation"] == "cut")
+        union_rows = [r for r in rows if r["operation"] != "cut"]
+        x_min = min((r["x_start"] for r in union_rows), default=0)
+        x_max = max((r["x_end"]   for r in union_rows), default=0)
+
+        S     = "color:#000000;font-family:monospace;font-size:13px"
+        op_bg = {"union": "#d4edda", "cut": "#f8d7da", "intersect": "#fff3cd"}
+
+        def th(t):
+            return (f'<th style="{S};background:#c8c8c8;padding:6px 10px;' +
+                    f'border:1px solid #888;font-weight:bold">{t}</th>')
+
+        def td(t, bg="#ffffff"):
+            return (f'<td style="{S};background:{bg};' +
+                    f'padding:5px 10px;border:1px solid #aaa">{t}</td>')
+
+        def fv(d, key, unit=""):
+            v = d.get(key)
+            return f"{v}{unit}" if v is not None else "<i>—</i>"
+
+        # summary box
+        summary = (
+            f'<div style="{S};background:#f5f5f5;border:1px solid #aaa;' +
+            f'padding:10px 14px;margin-bottom:10px;border-radius:4px">' +
+            f'<b style="font-size:15px;color:#000000">Model Documentation</b><br><br>' +
+            f'<b>Components:</b> {len(rows)} &nbsp;|&nbsp; ' +
+            f'<b>Union:</b> {n_union} &nbsp;|&nbsp; <b>Cut:</b> {n_cut}<br>' +
+            f'<b>Total span:</b> X = {x_min} → {x_max} mm<br>' +
+            f'<b>Net volume:</b> {fv(total, "volume", " mm³")}<br>' +
+            f'<b>Surface area:</b> {fv(total, "area", " mm²")}<br>' +
+            f'<b>Bounding box (W×H×D):</b> {fv(total, "bbox_dims", " mm")}<br>' +
+            f'<b>Center of mass:</b> {fv(total, "center_of_mass", " mm")}' +
+            "</div>"
+        )
+
+        # main table
+        cols = ["#", "Class", "Operation", "H [mm]", "Ø [mm]", "R [mm]",
+                "X range [mm]", "Position (x,y,z)", "Rotation (x,y,z)",
+                "Volume [mm³]", "Surface area [mm²]",
+                "Bounding box [mm]", "Center of mass [mm]"]
+        header = "<tr>" + "".join(th(c) for c in cols) + "</tr>"
+
+        trs = []
+        for r in rows:
+            bg  = op_bg.get(r["operation"], "#ffffff")
+            cq  = r["cq"]
+            pos = str(r["position"]) if r["position"] else "—"
+            rot = str(r["rotation"]) if r["rotation"] else "—"
+            trs.append(
+                "<tr>"
+                + td(f'<b>{r["idx"]}</b>', bg)
+                + td(f'<b>{r["type"]}</b>', bg)
+                + td(f'<b>{r["operation"]}</b>', bg)
+                + td(r["height"],   bg)
+                + td(r["diameter"], bg)
+                + td(r["radius"],   bg)
+                + td(f'{r["x_start"]} → {r["x_end"]}', bg)
+                + td(pos, bg)
+                + td(rot, bg)
+                + td(fv(cq, "volume"), bg)
+                + td(fv(cq, "area"),   bg)
+                + td(fv(cq, "bbox_dims"), bg)
+                + td(fv(cq, "center_of_mass"), bg)
+                + "</tr>"
+            )
+
+        main_table = (
+            '<table style="border-collapse:collapse;width:100%">' +
+            header + "".join(trs) + "</table>"
+        )
+
+        # per-component extra cards (Thread etc.)
+        cards = []
+        for r in rows:
+            if not r["extras"]:
+                continue
+            bg = op_bg.get(r["operation"], "#ffffff")
+            detail_rows = "".join(
+                f'<tr>{td(k, "#fafafa")}{td(v, "#fafafa")}</tr>'
+                for k, v in r["extras"].items()
+            )
+            cards.append(
+                f'<div style="{S};border:1px solid #aaa;border-radius:4px;' +
+                f'margin-top:8px;padding:8px 12px;background:{bg}">' +
+                f'<b>Component {r["idx"]} — {r["type"]} extra properties</b>' +
+                '<table style="border-collapse:collapse;margin-top:4px">' +
+                detail_rows + "</table></div>"
+            )
+
+        return (
+            f'<div style="{S}">' +
+            summary + main_table + "".join(cards) +
+            "</div>"
+        )
+
+    def to_pdf(self, path: str = "model_doc.pdf") -> str:
+        try:
+            from reportlab.lib.pagesizes import A4, landscape
+            from reportlab.lib import colors
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import mm
+            from reportlab.platypus import (
+                SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer,
+            )
+        except ImportError:
+            raise ImportError(
+                "reportlab is required for to_pdf(). "
+                "Install it with: pip install reportlab"
+            )
+
+        rows = self._get_rows()
+        total = self._cq_total_props()
+
+        doc = SimpleDocTemplate(
+            path,
+            pagesize=landscape(A4),
+            leftMargin=12 * mm,
+            rightMargin=12 * mm,
+            topMargin=12 * mm,
+            bottomMargin=12 * mm,
+        )
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            "title", parent=styles["Heading1"], fontSize=14, spaceAfter=4
+        )
+        body_style = styles["Normal"]
+        story = []
+
+        story.append(Paragraph("Model Documentation", title_style))
+        story.append(Spacer(1, 4 * mm))
+
+        # --- summary table ---
+        n_components = len(rows)
+        summary_data = [
+            ["Property", "Value"],
+            ["Components", str(n_components)],
+            ["Net Volume [mm³]", f"{total['volume']:.2f}" if total else "—"],
+            ["Surface Area [mm²]", f"{total['area']:.2f}" if total else "—"],
+            [
+                "Bounding Box [mm]",
+                (
+                    f"{total['bbox_dims'][0]:.2f} × "
+                    f"{total['bbox_dims'][1]:.2f} × "
+                    f"{total['bbox_dims'][2]:.2f}"
+                )
+                if total
+                else "—",
+            ],
+            [
+                "Center of Mass [mm]",
+                (
+                    f"({total['center_of_mass'][0]:.2f}, "
+                    f"{total['center_of_mass'][1]:.2f}, "
+                    f"{total['center_of_mass'][2]:.2f})"
+                )
+                if total
+                else "—",
+            ],
+        ]
+        summary_table = Table(summary_data, colWidths=[80 * mm, 110 * mm])
+        summary_table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2c3e50")),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE", (0, 0), (-1, -1), 9),
+                    ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#f0f4f8")),
+                    ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+                     [colors.HexColor("#f0f4f8"), colors.white]),
+                    ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cccccc")),
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                    ("TOPPADDING", (0, 0), (-1, -1), 4),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ]
+            )
+        )
+        story.append(summary_table)
+        story.append(Spacer(1, 6 * mm))
+
+        # --- main component table ---
+        op_color = {
+            "union": colors.HexColor("#d4edda"),
+            "cut": colors.HexColor("#f8d7da"),
+            "intersect": colors.HexColor("#fff3cd"),
+        }
+        header = [
+            "#", "Type", "Operation",
+            "Volume\n[mm³]", "Area\n[mm²]",
+            "BBox X\n[mm]", "BBox Y\n[mm]", "BBox Z\n[mm]",
+            "CoM X\n[mm]", "CoM Y\n[mm]", "CoM Z\n[mm]",
+            "Position", "Rotation",
+        ]
+        col_widths = [
+            8 * mm, 22 * mm, 18 * mm,
+            20 * mm, 20 * mm,
+            16 * mm, 16 * mm, 16 * mm,
+            16 * mm, 16 * mm, 16 * mm,
+            28 * mm, 28 * mm,
+        ]
+
+        def _fmt_pos(r):
+            p = r.get("position")
+            if p is None:
+                return "—"
+            return f"({p[0]:.1f}, {p[1]:.1f}, {p[2]:.1f})"
+
+        def _fmt_rot(r):
+            rv = r.get("rotation")
+            if rv is None:
+                return "—"
+            return f"({rv[0]:.1f}, {rv[1]:.1f}, {rv[2]:.1f})"
+
+        table_data = [header]
+        row_styles = []
+        for data_row in rows:
+            cq = data_row.get("cq") or {}
+            bd = cq.get("bbox_dims", [None, None, None])
+            cm = cq.get("center_of_mass", [None, None, None])
+            table_data.append(
+                [
+                    str(data_row.get("idx", "")),
+                    data_row.get("type", ""),
+                    data_row.get("operation", ""),
+                    f"{cq['volume']:.2f}" if cq.get("volume") is not None else "—",
+                    f"{cq['area']:.2f}" if cq.get("area") is not None else "—",
+                    f"{bd[0]:.2f}" if bd[0] is not None else "—",
+                    f"{bd[1]:.2f}" if bd[1] is not None else "—",
+                    f"{bd[2]:.2f}" if bd[2] is not None else "—",
+                    f"{cm[0]:.2f}" if cm[0] is not None else "—",
+                    f"{cm[1]:.2f}" if cm[1] is not None else "—",
+                    f"{cm[2]:.2f}" if cm[2] is not None else "—",
+                    _fmt_pos(data_row),
+                    _fmt_rot(data_row),
+                ]
+            )
+
+        main_table = Table(table_data, colWidths=col_widths, repeatRows=1)
+        base_style = [
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#2c3e50")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 8),
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cccccc")),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 4),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+            ("TOPPADDING", (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+            ("WORDWRAP", (0, 0), (-1, -1), True),
+        ]
+        for i, data_row in enumerate(rows, start=1):
+            op = data_row.get("operation", "union")
+            bg = op_color.get(op, colors.white)
+            base_style.append(("BACKGROUND", (0, i), (-1, i), bg))
+        main_table.setStyle(TableStyle(base_style))
+        story.append(main_table)
+
+        # --- extra property cards (Thread-specific etc.) ---
+        extra_rows = [r for r in rows if r.get("extras")]
+        if extra_rows:
+            story.append(Spacer(1, 6 * mm))
+            story.append(Paragraph("Extra Properties", title_style))
+            for data_row in extra_rows:
+                story.append(Spacer(1, 3 * mm))
+                story.append(
+                    Paragraph(
+                        f"<b>Component {data_row['idx']} — "
+                        f"{data_row['type']} extra properties</b>",
+                        body_style,
+                    )
+                )
+                ex_data = [["Property", "Value"]] + [
+                    [k, str(v)] for k, v in data_row["extras"].items()
+                ]
+                ex_table = Table(ex_data, colWidths=[80 * mm, 80 * mm])
+                ex_table.setStyle(
+                    TableStyle(
+                        [
+                            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#5d6d7e")),
+                            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                            ("FONTSIZE", (0, 0), (-1, -1), 8),
+                            ("ROWBACKGROUNDS", (0, 1), (-1, -1),
+                             [colors.HexColor("#fafafa"), colors.white]),
+                            ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cccccc")),
+                            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                            ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                            ("TOPPADDING", (0, 0), (-1, -1), 3),
+                            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                        ]
+                    )
+                )
+                story.append(ex_table)
+
+        doc.build(story)
+        return path
 
 
 class Prism(GeometricalCase):
@@ -2409,7 +3035,8 @@ class BambuPrintPipeline:
     def __call__(self, filepath: str, bed_leveling: bool = True,
                  flow_cali: bool = True, vibration_cali: bool = True,
                  use_ams: bool = False, timelapse: bool = False,
-                 layer_height: str = '0.20mm', filament: str = 'Generic PLA'):
+                 layer_height: str = '0.20mm', filament: str = 'Generic PLA',
+                 brim_width: float = 0):
         import zipfile
         try:
             with zipfile.ZipFile(filepath) as z:
@@ -2419,7 +3046,8 @@ class BambuPrintPipeline:
 
         if not has_gcode:
             print(f"[BambuPrint] No gcode found — slicing with OrcaSlicer ...")
-            filepath = self._slice(filepath, layer_height=layer_height, filament=filament)
+            filepath = self._slice(filepath, layer_height=layer_height, filament=filament,
+                                   brim_width=brim_width)
 
         filename = os.path.basename(filepath)
         print(f"[BambuPrint] Uploading {filename} → {self.ip} ...")
@@ -2437,8 +3065,8 @@ class BambuPrintPipeline:
         print("[BambuPrint] Done — printer is starting.")
 
     def _slice(self, filepath: str, layer_height: str = '0.20mm',
-               filament: str = 'Generic PLA') -> str:
-        import subprocess, glob
+               filament: str = 'Generic PLA', brim_width: float = 0) -> str:
+        import subprocess, glob, tempfile
         if not os.path.exists(self._ORCA_BIN):
             raise FileNotFoundError(
                 "OrcaSlicer not found. Install via: brew install --cask orcaslicer"
@@ -2451,6 +3079,19 @@ class BambuPrintPipeline:
             raise FileNotFoundError(f"No process profile found for '{layer_height}' on A1")
         process = process_matches[0]
 
+        tmp_process_path = None
+        if brim_width > 0:
+            with open(process, 'r') as f:
+                proc_cfg = json.load(f)
+            existing = proc_cfg.get('brim_width', '')
+            proc_cfg['brim_type'] = 'outer_only'
+            proc_cfg['brim_width'] = type(existing)(brim_width) if existing != '' else brim_width
+            tmp = tempfile.NamedTemporaryFile(suffix='.json', delete=False, mode='w')
+            json.dump(proc_cfg, tmp)
+            tmp.close()
+            tmp_process_path = tmp.name
+            process = tmp_process_path
+
         filament_pattern = os.path.join(self._ORCA_PROFILES, 'filament', f'{filament} @BBL A1.json')
         filament_matches = [p for p in glob.glob(filament_pattern) if 'mini' not in p and 'nozzle' not in p]
         if not filament_matches:
@@ -2461,14 +3102,18 @@ class BambuPrintPipeline:
         base = os.path.splitext(filepath)[0]
         out_path = f"{base}_sliced.3mf"
 
-        result = subprocess.run(
-            [self._ORCA_BIN, '--slice', '0',
-             '--load-settings', f'{machine};{process}',
-             '--load-filaments', filament_path,
-             '--export-3mf', out_path,
-             filepath],
-            capture_output=True, text=True, timeout=300,
-        )
+        try:
+            result = subprocess.run(
+                [self._ORCA_BIN, '--slice', '0',
+                 '--load-settings', f'{machine};{process}',
+                 '--load-filaments', filament_path,
+                 '--export-3mf', out_path,
+                 filepath],
+                capture_output=True, text=True, timeout=300,
+            )
+        finally:
+            if tmp_process_path:
+                os.unlink(tmp_process_path)
         if result.returncode != 0 or not os.path.exists(out_path):
             raise RuntimeError(f"Slicing failed (exit {result.returncode}):\n{result.stderr[-500:]}")
 
